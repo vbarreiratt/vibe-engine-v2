@@ -43,10 +43,11 @@ export async function generateEmbedding(text: string) {
         // If 'gemini-embedding-001' is strictly required and exists (e.g. absolute resource name), we might need to adjust.
         // Using 'text-embedding-004' for now as the best closest standard.
         const model = client.getGenerativeModel({
-            model: 'text-embedding-004'
+            model: 'publishers/google/models/text-embedding-004' // Using standard full path or just ID
         })
 
-        const result = await model.embedContent(text)
+        // Cast to any to avoid TS error if types are outdated
+        const result = await (model as any).embedContent(text)
         const embedding = result.embedding?.values
 
         if (!embedding) {
