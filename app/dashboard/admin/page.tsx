@@ -44,7 +44,7 @@ export default async function AdminPage() {
             {/* <CreateUserForm /> renders a button initially, keeps layout clean */}
 
 
-            <div className="bg-zinc-900/50 border border-white/5 rounded-xl overflow-hidden">
+            <div className="bg-zinc-900/50 border border-white/5 rounded-xl overflow-visible">
                 <table className="w-full text-left text-sm">
                     <thead className="bg-white/5 text-zinc-400 font-medium">
                         <tr>

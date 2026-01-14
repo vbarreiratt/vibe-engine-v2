@@ -24,14 +24,16 @@ export function UserActionsDropdown({ userId, email }: { userId: string, email: 
         return () => document.removeEventListener("mousedown", handleClickOutside)
     }, [])
 
+    const [error, setError] = useState<string | null>(null)
+
     const handleDelete = async () => {
         setIsLoading(true)
+        setError(null)
         const result = await deleteUser(userId)
         setIsLoading(false)
 
         if (result.error) {
-            alert('Erro: ' + result.error)
-            setConfirmDelete(false)
+            setError(result.error)
         } else {
             setIsOpen(false)
             setConfirmDelete(false)
@@ -40,15 +42,16 @@ export function UserActionsDropdown({ userId, email }: { userId: string, email: 
 
     const handleResetPassword = async () => {
         setIsLoading(true)
+        setError(null)
         const result = await resetUserPassword(userId, email)
         setIsLoading(false)
 
         if (result.error) {
-            alert('Erro: ' + result.error)
+            setError(result.error)
         } else if (result.link) {
             setResetLink(result.link)
         } else {
-            alert(result.message || 'Link gerado.')
+            // No link returned, just close
             setIsOpen(false)
         }
     }
