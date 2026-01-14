@@ -36,19 +36,22 @@ async function getVertexClient() {
 export async function generateEmbedding(text: string) {
     try {
         const client = await getVertexClient()
-        // The user requested 'gemini-embedding-001'.
-        // In Vertex AI SDK, text embedding models are usually 'text-embedding-004'.
-        // However, 'text-embedding-004' is the current stable Gecko model.
-        // We will try to use the model name 'text-embedding-004' as it is the most reliable text embedder.
-        // If 'gemini-embedding-001' is strictly required and exists (e.g. absolute resource name), we might need to adjust.
-        // Using 'text-embedding-004' for now as the best closest standard.
-        const model = client.getGenerativeModel({
-            model: 'publishers/google/models/text-embedding-004' // Using standard full path or just ID
-        })
 
-        // Cast to any to avoid TS error if types are outdated
-        const result = await (model as any).embedContent(text)
-        const embedding = result.embedding?.values
+        // Use the text embedding model from Vertex AI 
+        const model = client.getGenerativeModel({
+            model: 'text-embedding-004',
+        });
+
+        // Generate embeddings - using correct format for embedding models
+        const request = {
+            content: {
+                role: 'user' as const,
+                parts: [{ text }]
+            }
+        };
+
+        const result = await (model as any).embedContent(request);
+        const embedding = result.embedding?.values;
 
         if (!embedding) {
             throw new Error("No embedding returned")
@@ -57,7 +60,6 @@ export async function generateEmbedding(text: string) {
         return embedding
     } catch (error) {
         console.error("Embedding Error (Vertex):", error)
-        // Fallback or rethrow
         throw error
     }
 }
