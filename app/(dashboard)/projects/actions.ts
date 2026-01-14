@@ -28,7 +28,7 @@ export async function createProject(formData: FormData) {
 
     if (projectError) {
         console.error('Create Project Error', projectError)
-        return { error: projectError.message }
+        throw new Error(projectError.message)
     }
 
     // Assign Members (Curators)

@@ -63,7 +63,8 @@ O sistema é colaborativo, auditável e hierárquico, permitindo que **Admins** 
 - [x] Configuração do Supabase (Auth + Tables + RLS).
 - [x] Middleware de Proteção de Rotas (Admin vs Curador).
 - [x] Gestão de Curadores (Tela Admin).
-- [ ] Criação de Projetos e Atribuição (Tela Admin).
+- [x] Criação de Projetos e Atribuição (Tela Admin).
+
 
 
 ### Fase 2: Ingestão e Mídia
@@ -112,4 +113,6 @@ O sistema é colaborativo, auditável e hierárquico, permitindo que **Admins** 
   - Criação do esquema de banco de dados (Migrations iniciais + RLS).
   - Implementação do Login e Logout.
   - Implementação da Dashboard Admin para gestão de usuários (Promover/Rebaixar Admin).
+  - Implementação da Criação de Projetos com alocação de membros.
+
 
