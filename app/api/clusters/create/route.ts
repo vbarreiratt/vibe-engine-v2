@@ -13,14 +13,30 @@ export async function POST(request: Request) {
         }
 
         const body = await request.json();
-        const { project_id, scan_id, signals_run_id, name, visibility = 'private' } = body;
+        const { project_id, signals_run_id, name, visibility = 'private' } = body;
 
-        if (!project_id || !scan_id || !signals_run_id || !name) {
+        if (!project_id || !signals_run_id || !name) {
             return NextResponse.json(
                 { error: 'Missing required fields' },
                 { status: 400 }
             );
         }
+
+        // Get scan_id from signals_run
+        const { data: signalsRun, error: signalsError } = await supabase
+            .from('signals_runs')
+            .select('scan_id')
+            .eq('id', signals_run_id)
+            .single();
+
+        if (signalsError || !signalsRun) {
+            return NextResponse.json(
+                { error: 'Invalid signals_run_id' },
+                { status: 400 }
+            );
+        }
+
+        const actualScanId = signalsRun.scan_id;
 
         // Verify membership
         const { data: member } = await supabase
@@ -30,9 +46,7 @@ export async function POST(request: Request) {
             .eq('user_id', user.id)
             .single();
 
-        if (!member && user.role !== 'service_role') { // simplistic check, assumes profiles role check logic is in RLS or handled elsewhere. RLS usually handles write permissions.
-            // Actually, let's rely on RLS for strict enforcement, but a quick check here saves DB cycles if obvious.
-            // Admin check is separate.
+        if (!member && user.role !== 'service_role') {
             const { data: profile } = await supabase.from('profiles').select('role').eq('user_id', user.id).single();
             if (profile?.role !== 'admin') {
                 return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
@@ -44,7 +58,7 @@ export async function POST(request: Request) {
             .from('clusters_runs')
             .insert({
                 project_id,
-                scan_id,
+                scan_id: actualScanId,
                 signals_run_id,
                 name,
                 visibility,

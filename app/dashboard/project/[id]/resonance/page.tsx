@@ -104,7 +104,6 @@ export default function ResonancePage() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     project_id: id,
-                    scan_id: '00000000-0000-0000-0000-000000000000',
                     signals_run_id: signalsRunId,
                     name: `Ressonância ${new Date().toLocaleString()}`,
                     visibility: 'private'
