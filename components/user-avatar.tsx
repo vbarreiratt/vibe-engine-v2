@@ -43,9 +43,9 @@ export function UserAvatar({ config, className }: { config?: AvatarConfig | null
                     alt=""
                     className="absolute pointer-events-none z-10"
                     style={{
-                        width: '70%',
+                        width: '95%',
                         height: 'auto',
-                        top: '20%',
+                        top: '15%',
                         left: '50%',
                         transform: 'translateX(-50%)'
                     }}
@@ -57,9 +57,9 @@ export function UserAvatar({ config, className }: { config?: AvatarConfig | null
                     alt=""
                     className="absolute pointer-events-none z-20"
                     style={{
-                        width: '30%',
+                        width: '58%',
                         height: 'auto',
-                        top: '45%',
+                        top: '38%',
                         left: '50%',
                         transform: 'translateX(-50%)'
                     }}
@@ -71,9 +71,9 @@ export function UserAvatar({ config, className }: { config?: AvatarConfig | null
                     alt=""
                     className="absolute pointer-events-none z-30"
                     style={{
-                        width: '40%',
+                        width: '90%',
                         height: 'auto',
-                        top: '65%',
+                        top: '55%',
                         left: '50%',
                         transform: 'translateX(-50%)'
                     }}
