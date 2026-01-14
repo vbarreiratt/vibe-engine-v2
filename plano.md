@@ -143,6 +143,7 @@ O sistema é colaborativo, auditável e hierárquico, permitindo que **Admins** 
   - **Scan UI Redesign**: Reformulação da interface de varredura para seleção múltipla em grade, com feedback visual (outline verde) e submissão em lote (Batch Action).
   - **Scan Selection Filter**: Implementação de toggle para visualizar apenas as imagens selecionadas diretamente no grid de varredura.
   - **Scan Stage Mode**: Implementação de "Modo Palco" (visualização full-screen imagem a imagem) com controles de teclado (V/N/Setas) para varredura rápida.
+  - **Gallery Management**: Implementação de exclusão de imagens na galeria, com permissões granulares (Dono apaga próprias, Admin apaga qualquer uma). Limpeza automática no S3 e BD.
 
 
 

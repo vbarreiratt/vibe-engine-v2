@@ -215,3 +215,41 @@ export async function removeProjectMember(projectId: string, userId: string) {
 
     revalidatePath(`/dashboard/project/${projectId}`)
 }
+
+import { DeleteObjectCommand } from '@aws-sdk/client-s3'
+
+export async function deleteImage(projectId: string, imageId: string) {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) throw new Error('Unauthorized')
+
+    // 1. Fetch Image Info
+    const { data: image, error: fetchError } = await supabase.from('images').select('storage_path, created_by').eq('id', imageId).single()
+    if (fetchError || !image) return { error: 'Image not found' }
+
+    // 2. Check Permissions
+    const { data: profile } = await supabase.from('profiles').select('role').eq('user_id', user.id).single()
+    const isAdmin = profile?.role === 'admin'
+    const isOwner = image.created_by === user.id
+
+    if (!isAdmin && !isOwner) return { error: 'Forbidden' }
+
+    // 3. Delete from S3
+    if (image.storage_path) {
+        try {
+            await s3.send(new DeleteObjectCommand({
+                Bucket: process.env.DO_SPACES_BUCKET,
+                Key: image.storage_path
+            }))
+        } catch (e) {
+            console.error('S3 Delete Error', e)
+        }
+    }
+
+    // 4. Delete from DB
+    const { error: dbError } = await supabase.from('images').delete().eq('id', imageId)
+    if (dbError) return { error: dbError.message }
+
+    revalidatePath(`/dashboard/project/${projectId}`)
+    return { success: true }
+}

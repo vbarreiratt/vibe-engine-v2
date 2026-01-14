@@ -147,7 +147,12 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
 
                     {/* Gallery Grid */}
                     <div className="mt-8">
-                        <ProjectGallery images={images || []} currentUserId={user.id} />
+                        <ProjectGallery
+                            images={images || []}
+                            currentUserId={user.id}
+                            projectId={projectId}
+                            isAdmin={isAdmin}
+                        />
                     </div>
                 </div>
             </div>
