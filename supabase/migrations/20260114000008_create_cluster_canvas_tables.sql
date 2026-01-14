@@ -89,7 +89,7 @@ create policy "Admins can view all clusters_runs"
   using (
     exists (
       select 1 from profiles
-      where profiles.id = auth.uid() and profiles.role = 'admin'
+      where profiles.user_id = auth.uid() and profiles.role = 'admin'
     )
   );
 
@@ -100,7 +100,7 @@ create policy "Admins can insert clusters_runs"
   with check (
     exists (
       select 1 from profiles
-      where profiles.id = auth.uid() and profiles.role = 'admin'
+      where profiles.user_id = auth.uid() and profiles.role = 'admin'
     )
   );
 
@@ -110,7 +110,7 @@ create policy "Admins can update clusters_runs"
   using (
     exists (
       select 1 from profiles
-      where profiles.id = auth.uid() and profiles.role = 'admin'
+      where profiles.user_id = auth.uid() and profiles.role = 'admin'
     )
   );
 
@@ -120,7 +120,7 @@ create policy "Admins can delete clusters_runs"
   using (
     exists (
       select 1 from profiles
-      where profiles.id = auth.uid() and profiles.role = 'admin'
+      where profiles.user_id = auth.uid() and profiles.role = 'admin'
     )
   );
 
@@ -197,7 +197,7 @@ create policy "Users can view clusters if they can view clusters_run"
         )
         or
         exists (
-           select 1 from profiles where id = auth.uid() and role = 'admin'
+           select 1 from profiles where user_id = auth.uid() and role = 'admin'
         )
       )
     )
@@ -216,7 +216,7 @@ create policy "Admins and Owners can insert clusters"
        and (
          clusters_runs.created_by = auth.uid()
          or
-         exists (select 1 from profiles where id = auth.uid() and role = 'admin')
+         exists (select 1 from profiles where user_id = auth.uid() and role = 'admin')
        )
      )
   );
@@ -230,7 +230,7 @@ create policy "Admins and Owners can update clusters"
        and (
          clusters_runs.created_by = auth.uid()
          or
-         exists (select 1 from profiles where id = auth.uid() and role = 'admin')
+         exists (select 1 from profiles where user_id = auth.uid() and role = 'admin')
        )
      )
   );
@@ -244,7 +244,7 @@ create policy "Admins and Owners can delete clusters"
        and (
          clusters_runs.created_by = auth.uid()
          or
-         exists (select 1 from profiles where id = auth.uid() and role = 'admin')
+         exists (select 1 from profiles where user_id = auth.uid() and role = 'admin')
        )
      )
   );
@@ -259,7 +259,7 @@ create policy "Users can view nodes if they can view clusters_run"
       and (
         clusters_runs.visibility = 'public'
         or clusters_runs.created_by = auth.uid()
-        or exists (select 1 from profiles where id = auth.uid() and role = 'admin')
+        or exists (select 1 from profiles where user_id = auth.uid() and role = 'admin')
         or exists (select 1 from project_members where project_id = clusters_runs.project_id and user_id = auth.uid())
       )
     )
@@ -273,7 +273,7 @@ create policy "Admins and Owners can insert nodes"
        where clusters_runs.id = cluster_nodes.clusters_run_id
        and (
          clusters_runs.created_by = auth.uid()
-         or exists (select 1 from profiles where id = auth.uid() and role = 'admin')
+         or exists (select 1 from profiles where user_id = auth.uid() and role = 'admin')
        )
      )
   );
@@ -286,7 +286,7 @@ create policy "Admins and Owners can update nodes"
        where clusters_runs.id = cluster_nodes.clusters_run_id
        and (
          clusters_runs.created_by = auth.uid()
-         or exists (select 1 from profiles where id = auth.uid() and role = 'admin')
+         or exists (select 1 from profiles where user_id = auth.uid() and role = 'admin')
        )
      )
   );
@@ -299,7 +299,7 @@ create policy "Admins and Owners can delete nodes"
        where clusters_runs.id = cluster_nodes.clusters_run_id
        and (
          clusters_runs.created_by = auth.uid()
-         or exists (select 1 from profiles where id = auth.uid() and role = 'admin')
+         or exists (select 1 from profiles where user_id = auth.uid() and role = 'admin')
        )
      )
   );
@@ -314,7 +314,7 @@ create policy "Users can view edges if they can view clusters_run"
       and (
         clusters_runs.visibility = 'public'
         or clusters_runs.created_by = auth.uid()
-        or exists (select 1 from profiles where id = auth.uid() and role = 'admin')
+        or exists (select 1 from profiles where user_id = auth.uid() and role = 'admin')
         or exists (select 1 from project_members where project_id = clusters_runs.project_id and user_id = auth.uid())
       )
     )
@@ -328,7 +328,7 @@ create policy "Admins and Owners can insert edges"
        where clusters_runs.id = cluster_edges.clusters_run_id
        and (
          clusters_runs.created_by = auth.uid()
-         or exists (select 1 from profiles where id = auth.uid() and role = 'admin')
+         or exists (select 1 from profiles where user_id = auth.uid() and role = 'admin')
        )
      )
   );
@@ -341,7 +341,7 @@ create policy "Admins and Owners can update edges"
        where clusters_runs.id = cluster_edges.clusters_run_id
        and (
          clusters_runs.created_by = auth.uid()
-         or exists (select 1 from profiles where id = auth.uid() and role = 'admin')
+         or exists (select 1 from profiles where user_id = auth.uid() and role = 'admin')
        )
      )
   );
@@ -354,7 +354,7 @@ create policy "Admins and Owners can delete edges"
        where clusters_runs.id = cluster_edges.clusters_run_id
        and (
          clusters_runs.created_by = auth.uid()
-         or exists (select 1 from profiles where id = auth.uid() and role = 'admin')
+         or exists (select 1 from profiles where user_id = auth.uid() and role = 'admin')
        )
      )
   );
