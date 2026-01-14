@@ -69,12 +69,16 @@ export function ProfileMenu({ email, nickname, role, avatarUrl }: ProfileMenuPro
 
                         <div className="h-px bg-white/5 my-1" />
 
-                        <form action="/auth/signout" method="post">
-                            <button className="w-full flex items-center gap-2 px-3 py-2 rounded-md hover:bg-red-500/10 text-zinc-400 hover:text-red-400 text-sm transition-colors text-left">
-                                <LogOut className="w-4 h-4" />
-                                Sair
-                            </button>
-                        </form>
+                        <button
+                            onClick={async () => {
+                                await fetch('/auth/signout', { method: 'POST' })
+                                window.location.href = '/login'
+                            }}
+                            className="w-full flex items-center gap-2 px-3 py-2 rounded-md hover:bg-red-500/10 text-zinc-400 hover:text-red-400 text-sm transition-colors text-left"
+                        >
+                            <LogOut className="w-4 h-4" />
+                            Sair
+                        </button>
                     </div>
                 </div>
             )}

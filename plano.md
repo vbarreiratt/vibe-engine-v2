@@ -146,6 +146,7 @@ O sistema é colaborativo, auditável e hierárquico, permitindo que **Admins** 
   - **Gallery Management**: Implementação de exclusão de imagens na galeria, com permissões granulares (Dono apaga próprias, Admin apaga qualquer uma). Limpeza automática no S3 e BD.
   - **User Onboarding**: Fluxo obrigatório de boas-vindas e configuração de perfil (Nickname, Bio) para novos usuários, com diferenciação de interface por cargo (Admin/Curator).
   - **Profile Management**: Implementação de Menu de Perfil e Página de Edição de Perfil para gestão de identidade editorial.
+  - **Admin User Insights**: Melhoria na listagem de usuários do Admin para exibir dados de perfil (Avatar, Nick, Bio) e status de onboarding.
 
 
 

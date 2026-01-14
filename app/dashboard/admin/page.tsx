@@ -57,12 +57,23 @@ export default async function AdminPage() {
                             <tr key={u.user_id} className="hover:bg-white/[0.02] transition-colors">
                                 <td className="px-6 py-4">
                                     <div className="flex items-center gap-3">
-                                        <div className="w-8 h-8 rounded-full bg-zinc-800 flex items-center justify-center text-zinc-400">
-                                            <User className="w-4 h-4" />
+                                        <div className="w-10 h-10 rounded-full bg-zinc-800 flex items-center justify-center text-zinc-400 border border-white/10 shadow-sm bg-cover bg-center shrink-0" style={{ backgroundImage: u.avatar_url ? `url(${u.avatar_url})` : undefined }}>
+                                            {!u.avatar_url && (u.nickname?.[0]?.toUpperCase() || u.email[0].toUpperCase())}
                                         </div>
-                                        <span className="font-medium text-zinc-200">{u.email}</span>
-                                        {u.user_id === user.id && <span className="text-[10px] bg-indigo-500/20 text-indigo-300 px-1.5 py-0.5 rounded ml-2">Você</span>}
+                                        <div className="flex flex-col">
+                                            <div className="flex items-center gap-2">
+                                                <span className="font-medium text-zinc-200">{u.nickname || u.email}</span>
+                                                {u.user_id === user.id && <span className="text-[10px] bg-indigo-500/20 text-indigo-300 px-1.5 py-0.5 rounded">Você</span>}
+                                                {!u.onboarding_completed && <span className="text-[10px] text-amber-500 bg-amber-500/10 px-1.5 py-0.5 rounded border border-amber-500/20">Onboarding</span>}
+                                            </div>
+                                            {u.nickname && <span className="text-xs text-zinc-500">{u.email}</span>}
+                                        </div>
                                     </div>
+                                    {u.bio && (
+                                        <div className="mt-2 text-xs text-zinc-600 max-w-xs truncate pl-14 italic">
+                                            "{u.bio}"
+                                        </div>
+                                    )}
                                 </td>
                                 <td className="px-6 py-4">
                                     <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border ${u.role === 'admin' ? 'bg-purple-500/10 text-purple-400 border-purple-500/20' : 'bg-zinc-800 text-zinc-400 border-zinc-700'}`}>
