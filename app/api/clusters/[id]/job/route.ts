@@ -6,8 +6,8 @@ import { ClusterEngine } from '@/lib/clustering/cluster-engine';
 export const maxDuration = 60; // 60 seconds
 
 // Helper to write exports
-import fs from 'fs/promises';
-import path from 'path';
+import * as fs from 'fs/promises';
+import * as path from 'path';
 
 // (Old exportRun removed in favor of ClusterLogger.exportLogs)
 
@@ -151,8 +151,8 @@ export async function POST(
             .single();
 
         // 6. Export to Filesystem (Task 6)
-        console.log(`Exporting cognitive logs to ${baseDir}...`);
-        await engine.logger.exportLogs(baseDir);
+        console.log(`Exporting cognitive logs to ${outputDir}...`);
+        await engine.logger.exportLogs(outputDir);
 
         return NextResponse.json({ success: true, run: finalRun, stats: { clusters: result.clusters.length, nodes: nodesPayload.length, edges: edgesPayload.length } });
 
