@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { updateUserRole } from './actions'
 import { Shield, ShieldAlert, User } from 'lucide-react'
+import { CreateUserForm } from './create-user-form'
 
 export default async function AdminPage() {
     const supabase = await createClient()
@@ -28,12 +29,18 @@ export default async function AdminPage() {
 
     return (
         <div className="space-y-8 max-w-5xl mx-auto">
-            <div>
-                <h1 className="text-3xl font-light text-white tracking-wide">Gestão de Acessos</h1>
-                <p className="text-zinc-500 mt-1">
-                    Gerencie perfis e permissões de acesso ao sistema.
-                </p>
+            <div className="flex items-center justify-between">
+                <div>
+                    <h1 className="text-3xl font-light text-white tracking-wide">Gestão de Acessos</h1>
+                    <p className="text-zinc-500 mt-1">
+                        Gerencie perfis e permissões de acesso ao sistema.
+                    </p>
+                </div>
+                <CreateUserForm />
             </div>
+
+            {/* <CreateUserForm /> renders a button initially, keeps layout clean */}
+
 
             <div className="bg-zinc-900/50 border border-white/5 rounded-xl overflow-hidden">
                 <table className="w-full text-left text-sm">

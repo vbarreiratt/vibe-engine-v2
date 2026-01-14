@@ -136,6 +136,7 @@ O sistema é colaborativo, auditável e hierárquico, permitindo que **Admins** 
   - **Feature Ingestões**: Implementação de múltiplas sessões de ingestão por projeto, com controle de visibilidade (Público/Privado) e isolamento de imagens via RLS.
   - **Feature Safe Delete**: Implementação da remoção completa de projetos por Admins, limpando registros no banco (Cascade) e arquivos no DigitalOcean Spaces (S3).
   - **Segurança Auth**: Remoção da funcionalidade de cadastro público (Signup) na tela de login. Apenas usuários criados por Admins podem acessar.
+  - **Admin User Management**: Implementação de formulário de criação de usuários na Dashboard de Admin, utilizando Service Role para bypass de restrições de signup.
 
 
 
