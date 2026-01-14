@@ -4,24 +4,56 @@ import { Uploader } from './uploader' // We'll make this next
 import { Play, Download, Settings, Sliders } from 'lucide-react'
 
 // MVP: Only Ingestion Phase implemented visually for now
-export default async function ProjectPage({ params }: { params: { id: string } }) {
+export default async function ProjectPage({ params }: { params: Promise<{ id: string }> }) {
     const supabase = await createClient()
-    const projectId = params.id
+    const projectId = (await params).id
 
     // Verify Access
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) redirect('/login')
 
     // Check membership
-    const memberCheck = await supabase.from('project_members').select('role').eq('project_id', projectId).eq('user_id', user.id).single()
-    const adminCheck = await supabase.from('profiles').select('role').eq('user_id', user.id).single()
+    const memberCheck = await supabase.from('project_members').select('role').eq('project_id', projectId).eq('user_id', user.id).maybeSingle()
+    const { data: profile } = await supabase.from('profiles').select('role').eq('user_id', user.id).single()
 
-    if (!memberCheck.data && adminCheck.data?.role !== 'admin') {
+    console.log('[DEBUG] Access Check:', {
+        projectId,
+        userId: user.id,
+        isMember: !!memberCheck.data,
+        userRole: profile?.role
+    })
+
+    if (!memberCheck.data && profile?.role !== 'admin') {
+        console.log('[DEBUG] Redirecting Forbidden')
         redirect('/dashboard') // Forbidden
     }
 
-    // Get Data
-    const { data: project } = await supabase.from('projects').select('*').eq('id', projectId).single()
+    // Get Data (Standard Client - RLS Subject)
+    const { data: project, error: projError } = await supabase.from('projects').select('*').eq('id', projectId).single()
+
+    if (projError || !project) {
+        console.error('[DEBUG] Standard Fetch Error:', projError)
+
+        // DEBUG: Try with Admin Client to see if it exists
+        const { createAdminClient } = await import('@/lib/supabase/admin')
+        const adminSupabase = createAdminClient()
+        const { data: adminProject, error: adminError } = await adminSupabase.from('projects').select('*').eq('id', projectId).single()
+
+        console.log('[DEBUG] Admin Client Check:', {
+            exists: !!adminProject,
+            adminError,
+            projectIdInUrl: projectId
+        })
+
+        if (adminProject) {
+            console.error('[CRITICAL] Project exists but RLS is blocking access.')
+            console.error('User ID:', user.id)
+            console.error('User Role in Profile:', profile?.role)
+        }
+
+        redirect('/dashboard')
+    }
+
     const { data: images } = await supabase.from('images').select('*').eq('project_id', projectId).order('created_at', { ascending: false })
 
     return (

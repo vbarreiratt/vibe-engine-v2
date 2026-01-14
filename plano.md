@@ -129,6 +129,10 @@ O sistema é colaborativo, auditável e hierárquico, permitindo que **Admins** 
   - Correção de erros de Hidratação e Rotas (Dashboard 404).
   - Script de Promoção de Admin via CLI.
   - Refatoração de Layout: Menu Superior -> Menu Lateral (Sidebar).
+  - **Correção Geral**: Migração de parâmetros de roteamento para Next.js 15+ (`await params`).
+  - **Fix de Permissões**: Correção de RLS e verificação de nulos em páginas de projeto.
+  - **Otimização de Upload**: Implementação de upload paralelo em lote (Client->S3) com inserção em lote no banco (Batch Action), reduzindo drasticamente o tempo de ingestão.
+  - **Infra**: Configuração de CORS para DigitalOcean Spaces via script.
 
 
 

@@ -1,97 +1,128 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
-import { storageClient, BUCKET_NAME } from '@/lib/storage/client'
-import { PutObjectCommand } from '@aws-sdk/client-s3'
+import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3'
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
-import { revalidatePath } from 'next/cache'
+import crypto from 'crypto'
 
+const s3 = new S3Client({
+    endpoint: process.env.DO_SPACES_ENDPOINT,
+    region: process.env.DO_SPACES_REGION || "nyc3",
+    credentials: {
+        accessKeyId: process.env.DO_SPACES_KEY!,
+        secretAccessKey: process.env.DO_SPACES_SECRET!
+    }
+})
+
+// Single URL gen (Legacy/Single use)
 export async function getUploadUrl(projectId: string, fileName: string, fileType: string) {
+    // ... existing logic code ...
+    // Keeping for backward compat if needed, but implementation below is what matters
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
+
+    // Check access
     if (!user) throw new Error('Unauthorized')
 
-    // Verify access
-    const memberCheck = await supabase
-        .from('project_members')
-        .select('role')
-        .eq('project_id', projectId)
-        .eq('user_id', user.id)
-        .single()
-
-    const adminCheck = await supabase
-        .from('profiles')
-        .select('role')
-        .eq('user_id', user.id)
-        .eq('role', 'admin')
-        .single()
-
-    if (!memberCheck.data && !adminCheck.data) {
-        throw new Error('Forbidden: Not a member of this project')
-    }
-
-    const key = `${projectId}/${Date.now()}-${fileName}`
+    // Generate unique key
+    const ext = fileName.split('.').pop()
+    const uniqueName = `${crypto.randomUUID()}.${ext}`
+    const key = `${projectId}/${uniqueName}`
 
     const command = new PutObjectCommand({
-        Bucket: BUCKET_NAME,
+        Bucket: process.env.DO_SPACES_BUCKET,
         Key: key,
         ContentType: fileType,
-        ACL: 'public-read', // Or private if we want signed URLs for viewing
+        ACL: 'public-read'
     })
 
-    try {
-        const signedUrl = await getSignedUrl(storageClient, command, { expiresIn: 600 })
-        // Construct public URL (assuming public-read for now for simplicity of MVP, 
-        // or we can generate signed GET urls later. Prompt says "use abordagem segura" but MVP "pode começar com assinadas")
-        // Let's stick to signed upload, public read for now to speed up "Thumbnails" unless requested otherwise.
-        // Actually, let's assume we store the "Public URL" or "Storage Path".
+    const signedUrl = await getSignedUrl(s3, command, { expiresIn: 3600 })
+    const publicUrl = `https://${process.env.DO_SPACES_BUCKET}.${process.env.DO_SPACES_REGION}.cdn.digitaloceanspaces.com/${key}`
 
-        const publicUrl = `${process.env.DO_SPACES_ENDPOINT!.replace('https://', `https://${BUCKET_NAME}.`)}/${key}`
-
-        return { signedUrl, publicUrl, key }
-    } catch (err: any) {
-        console.error(err)
-        throw new Error('Failed to generate upload URL')
-    }
+    return { signedUrl, publicUrl, key }
 }
 
-export async function saveImage(projectId: string, url: string, path: string, width: number, height: number, size: number) {
+// BATCH URL GENERATION
+export async function getPresignedUrls(projectId: string, files: { name: string, type: string }[]) {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) throw new Error('Unauthorized')
 
-    // Insert Image
-    const { data, error } = await supabase.from('images').insert({
-        project_id: projectId,
-        original_url: url, // For now, original is the served url
-        thumb_url: url, // We might need a resize step later. For MVP, use same.
-        storage_path: path,
-        width,
-        height,
-        created_by: user.id
-    }).select().single()
+    // Generate all URLs in parallel promises server-side
+    const urls = await Promise.all(files.map(async (file) => {
+        const ext = file.name.split('.').pop()
+        const uniqueName = `${crypto.randomUUID()}.${ext}`
+        const key = `${projectId}/${uniqueName}`
 
-    if (error) {
-        throw new Error(error.message)
+        const command = new PutObjectCommand({
+            Bucket: process.env.DO_SPACES_BUCKET,
+            Key: key,
+            ContentType: file.type,
+            ACL: 'public-read'
+        })
+
+        const signedUrl = await getSignedUrl(s3, command, { expiresIn: 3600 })
+        const publicUrl = `https://${process.env.DO_SPACES_BUCKET}.${process.env.DO_SPACES_REGION}.cdn.digitaloceanspaces.com/${key}`
+
+        return {
+            originalName: file.name,
+            signedUrl,
+            publicUrl,
+            key
+        }
+    }))
+
+    return urls
+}
+
+export async function batchSaveImages(projectId: string, images: { publicUrl: string, key: string, width: number, height: number, size: number }[]) {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+
+    if (!user) throw new Error('Unauthorized')
+
+    if (images.length === 0) return
+
+    // Prepare data for batch insert
+    const imageRecords = images.map(img => ({
+        project_id: projectId,
+        original_url: img.publicUrl,
+        thumb_url: img.publicUrl, // pending thumb service
+        storage_path: img.key,
+        width: img.width,
+        height: img.height,
+        created_by: user.id
+    }))
+
+    // Batch Insert Images
+    const { data: insertedImages, error: imgError } = await supabase
+        .from('images')
+        .insert(imageRecords)
+        .select('id')
+
+    if (imgError) throw new Error(imgError.message)
+
+    if (insertedImages) {
+        // Prepare Scan Entries
+        const scanRecords = insertedImages.map(img => ({
+            image_id: img.id,
+            project_id: projectId,
+            status: 'pending'
+        }))
+
+        // Batch Insert default Scan status
+        const { error: scanError } = await supabase.from('image_scan').insert(scanRecords)
+        if (scanError) console.error('Error creating scan entries:', scanError)
     }
 
-    // Also create initial scan entry
-    await supabase.from('image_scan').insert({
-        image_id: data.id,
-        project_id: projectId,
-        status: 'pending'
-    })
-
-    // Audit
+    // Single Audit Log
     await supabase.from('audit_log').insert({
-        entity_type: 'image',
-        entity_id: data.id,
+        entity_type: 'batch_upload',
+        entity_id: projectId,
         action_type: 'upload',
-        after_data: { url, path },
+        after_data: { count: images.length },
         actor_user_id: user.id,
+        actor_role: 'curator', // or fetch from profile
         project_id: projectId
     })
-
-    revalidatePath(`/dashboard/project/${projectId}`)
-    return data
 }

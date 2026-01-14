@@ -4,9 +4,9 @@ import { ResonanceLauncher } from './launcher'
 import { ArrowLeft, Layers } from 'lucide-react'
 import Link from 'next/link'
 
-export default async function ResonancePage({ params }: { params: { id: string } }) {
+export default async function ResonancePage({ params }: { params: Promise<{ id: string }> }) {
     const supabase = await createClient()
-    const projectId = params.id
+    const projectId = (await params).id
 
     // Verify Access
     const { data: { user } } = await supabase.auth.getUser()

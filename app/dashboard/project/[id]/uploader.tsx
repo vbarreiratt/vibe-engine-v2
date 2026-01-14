@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from 'react'
 import { UploadCloud, Loader2, Image as ImageIcon } from 'lucide-react'
-import { getUploadUrl, saveImage } from './actions'
+import { getPresignedUrls, batchSaveImages } from './actions'
 import { useRouter } from 'next/navigation'
 
 export function Uploader({ projectId }: { projectId: string }) {
@@ -15,34 +15,57 @@ export function Uploader({ projectId }: { projectId: string }) {
         setIsUploading(true)
 
         try {
-            for (let i = 0; i < files.length; i++) {
-                const file = files[i]
+            const fileArray = Array.from(files).filter(f => f.type.startsWith('image/'))
 
-                // 1. Get Presigned URL
-                const { signedUrl, publicUrl, key } = await getUploadUrl(projectId, file.name, file.type)
+            // 1. Get ALL Presigned URLs in ONE request
+            const fileMeta = fileArray.map(f => ({ name: f.name, type: f.type }))
+            const signedData = await getPresignedUrls(projectId, fileMeta)
 
-                // 2. Upload to S3/Spaces
-                const uploadRes = await fetch(signedUrl, {
-                    method: 'PUT',
-                    body: file,
-                    headers: {
-                        'Content-Type': file.type,
-                        'x-amz-acl': 'public-read' // Match server command
-                    }
-                })
+            console.log(`Got ${signedData.length} signed URLs. Starting parallel upload...`)
 
-                if (!uploadRes.ok) throw new Error('Upload failed')
+            const uploadResults: any[] = []
 
-                // 3. Persist (Mock dimensions for now, or read from file)
-                // To get dimensions we need to load image in JS.
-                const dimensions = await getImageDimensions(file)
+            // 2. Upload to S3 in Parallel
+            await Promise.all(signedData.map(async (data, index) => {
+                const file = fileArray[index] // Arrays index match strictly
 
-                await saveImage(projectId, publicUrl, key, dimensions.width, dimensions.height, file.size)
+                try {
+                    const uploadRes = await fetch(data.signedUrl, {
+                        method: 'PUT',
+                        body: file,
+                        headers: {
+                            'Content-Type': file.type,
+                            'x-amz-acl': 'public-read'
+                        }
+                    })
+
+                    if (!uploadRes.ok) throw new Error(`S3 Error: ${uploadRes.statusText}`)
+
+                    // Get Dimensions
+                    const dimensions = await getImageDimensions(file)
+
+                    uploadResults.push({
+                        publicUrl: data.publicUrl,
+                        key: data.key,
+                        width: dimensions.width,
+                        height: dimensions.height,
+                        size: file.size
+                    })
+
+                } catch (err) {
+                    console.error(`Upload failed for ${file.name}`, err)
+                }
+            }))
+
+            // 3. Batch Save to DB
+            if (uploadResults.length > 0) {
+                console.log(`Saving ${uploadResults.length} images to DB...`)
+                await batchSaveImages(projectId, uploadResults)
+                router.refresh()
             }
-            router.refresh()
-        } catch (e) {
-            console.error(e)
-            alert('Erro no upload. Tente novamente.')
+        } catch (e: any) {
+            console.error('Upload Process Error:', e)
+            alert(`Erro no upload: ${e.message}`)
         } finally {
             setIsUploading(false)
         }
