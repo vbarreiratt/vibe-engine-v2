@@ -196,17 +196,30 @@ export class ClusterEngine {
         // Graphology isolated nodes are implicitly handled by layout (they fly away) or Louvain puts them in own community.
         // Let's mark clusters with size 1 as outliers for now, or use degree.
 
-        const nodesFormatted = this.images.map(img => {
-            const pos = positions[img.id] || { x: 0, y: 0 };
-            const commId = String(communities[img.id]);
+        const nodesFormatted = this.images.map((img, idx) => {
+            // Get position with fallback for isolated nodes
+            let pos = positions[img.id];
+
+            // If position is undefined/null/NaN, use fallback
+            if (!pos || isNaN(pos.x) || isNaN(pos.y) || pos.x === null || pos.y === null) {
+                // Random position for isolated nodes
+                const angle = (idx / this.images.length) * 2 * Math.PI;
+                const radius = 100;
+                pos = {
+                    x: Math.cos(angle) * radius,
+                    y: Math.sin(angle) * radius
+                };
+            }
+
+            const commId = String(communities[img.id] ?? 0);
             const clusterSize = clustersMap[commId]?.length || 0;
             const degree = graph.degree(img.id);
 
             return {
                 id: img.id,
-                x: pos.x,
-                y: pos.y,
-                cluster_index: parseInt(commId),
+                x: pos.x || 0,
+                y: pos.y || 0,
+                cluster_index: parseInt(commId) || 0,
                 is_outlier: degree === 0 || clusterSize === 1
             };
         });
