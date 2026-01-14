@@ -38,6 +38,17 @@
   - Resolved name collision for `clusters` table by dropping legacy tables in the new migration.
   - Added `moddatetime` extension enabling to migration to fix trigger error.
   - Fixed `profiles.id` -> `profiles.user_id` column reference in RLS policies.
+  - Fixed `profiles.id` -> `profiles.user_id` column reference in RLS policies.
   - Removed reference to hypothetical function `modules_permissions_check` in RLS policies.
+
+- **API & Jobs**:
+  - Implemented CRUD API for `clusters_runs` (create, get, update nodes).
+  - Implemented background job for Resonance Engine (Vectorization + Graph + Layout).
+  - Integrated `graphology` and `louvain` for community detection.
+  - Configured Vertex AI (`text-embedding-004`) for embedding generation.
+- **UI (Alpha)**:
+  - Created `ClusterCanvasPage` skeleton for listing and creating runs.
+  - Created `ClusterMural` component for visualizing nodes and edges (using Framer Motion).
+
 
 

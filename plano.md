@@ -87,17 +87,17 @@ O sistema é colaborativo, auditável e hierárquico, permitindo que **Admins** 
   - [x] Definir schema das tabelas de clusters_run/cluster/nodes/edges
   - [x] Criar migrations no Supabase (`clusters_runs`, `clusters`, `cluster_nodes`, `cluster_edges`)
   - [x] Definir RLS (Admin vê tudo, Curador vê projetos atribuídos, Public/Private por run)
-- [ ] **TASK 2 — Contratos de API**
-  - [ ] Endpoint para criar clusters_run (enqueue)
-  - [ ] Endpoint para checar status
-  - [ ] Endpoint para obter payload completo (ready)
-  - [ ] Endpoint para salvar edições do canvas
-- [ ] **TASK 3 — Job assíncrono (Dumb Queue)**
-  - [ ] Implementar vetorização por camada (Estado, Matéria, Movimento)
-  - [ ] Implementar regras de ressonância (2 ou 3 camadas)
-  - [ ] Grafo + Detecção de Comunidades (Louvain/Leiden simplificado ou via lib `graphology`)
-  - [ ] 2D Layout (Force-directed ou UMAP via lib `graphology-layout` ou similar)
-  - [ ] Persistência de resultados
+- [x] **TASK 2 — Contratos de API**
+  - [x] Endpoint para criar clusters_run (enqueue)
+  - [x] Endpoint para checar status
+  - [x] Endpoint para obter payload completo (ready)
+  - [x] Endpoint para salvar edições do canvas (nodes/cluster edits)
+- [x] **TASK 3 — Job assíncrono (Dumb Queue)**
+  - [x] Implementar vetorização por camada (Estado, Matéria, Movimento)
+  - [x] Implementar regras de ressonância (2 ou 3 camadas)
+  - [x] Grafo + Detecção de Comunidades (Louvain/Leiden simplificado ou via lib `graphology`)
+  - [x] 2D Layout (Force-directed ou UMAP via lib `graphology-layout` ou similar)
+  - [x] Persistência de resultados
 - [ ] **TASK 4 — UI do Cluster Canvas (MVP)**
   - [ ] Estado vazio com seletor de leitura (`signals_run`)
   - [ ] Estado “semeadura” (polling do job)
