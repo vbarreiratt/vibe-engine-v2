@@ -1,5 +1,5 @@
 import { GoogleAuth } from 'google-auth-library';
-import fs from 'fs/promises';
+import * as fs from 'fs/promises';
 
 const SERVICE_ACCOUNT_PATH = '/Users/vbarreirat/utilidades/bicho_utilidades/vibe-engine/service-account.json';
 

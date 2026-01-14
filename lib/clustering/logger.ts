@@ -1,6 +1,6 @@
 
-import path from 'path';
-import fs from 'fs/promises';
+import * as path from 'path';
+import * as fs from 'fs/promises';
 
 /**
  * Sistema de logging auditável e cognitivo para o Vibe Engine.
@@ -69,6 +69,11 @@ export interface LogClusterInsight {
         target: string;
         weight: number;
     }[];
+    classification: 'STRONG' | 'WEAK' | 'PROTO' | 'NOISE';
+    strengthScore: number;
+    stabilityScore: number;
+    density: { avg: number; min: number; max: number };
+    recurrence: { state: number; matter: number; movement: number }; // % overlap of dominant signals
     justification: string;
 }
 
@@ -172,20 +177,50 @@ export class ClusterLogger {
             if (e.isSemanticBridge) md += `  - *Semantic Bridge (Alta similaridade apesar de poucos sinais exatos)*\n`;
         });
 
+        const grouped = {
+            STRONG: [] as LogClusterInsight[],
+            PROTO: [] as LogClusterInsight[],
+            WEAK: [] as LogClusterInsight[],
+            NOISE: [] as LogClusterInsight[]
+        };
+
+        Object.values(t.clusters).forEach(c => {
+            if (grouped[c.classification]) {
+                grouped[c.classification].push(c);
+            } else {
+                // Fallback for unexpected or mixed types if any
+                grouped.WEAK.push(c); 
+            }
+        });
+
+        const printGroup = (title: string, list: LogClusterInsight[]) => {
+            if (list.length === 0) return;
+            md += `### ${title}\n`;
+            list.forEach(c => {
+                 md += `**[Cluster ${c.clusterId}]** (Força: ${c.strengthScore?.toFixed(2) || 'N/A'}, Estabilidade: ${c.stabilityScore?.toFixed(2) || 'N/A'}, Densidade: ${c.density?.avg.toFixed(2) || 'N/A'})\n`;
+                 md += `- **Cadeia de Formação**:\n`;
+                 md += `  - Sinais Recorrentes: Estado=${(c.recurrence?.state * 100).toFixed(0)}%, Matéria=${(c.recurrence?.matter * 100).toFixed(0)}%, Movimento=${(c.recurrence?.movement * 100).toFixed(0)}%\n`;
+                 md += `  - Sinais Dominantes: ${c.dominantSignals.state[0] || '-'} / ${c.dominantSignals.matter[0] || '-'} / ${c.dominantSignals.movement[0] || '-'}\n`;
+                 md += `- **Interpretação**: ${c.justification}\n\n`;
+            });
+        };
+
         md += `\n## 3. Explicação dos Clusters\n`;
         md += `Método: ${t.formation.method}. Resultado: ${t.formation.totalClusters} clusters.\n\n`;
 
-        Object.values(t.clusters).forEach(c => {
-            md += `### Cluster ${c.clusterId}\n`;
-            md += `- **Medoid (Núcleo)**: \`${c.medoidNodeId}\`\n`;
-            md += `- **Tamanho**: ${c.nodeCount} imagens\n`;
-            md += `- **Sinais Dominantes**:\n`;
-            md += `  - Estado: ${c.dominantSignals.state.join(', ')}\n`;
-            md += `  - Matéria: ${c.dominantSignals.matter.join(', ')}\n`;
-            md += `  - Movimento: ${c.dominantSignals.movement.join(', ')}\n`;
-            md += `- **Justificativa**: ${c.justification}\n`;
-            md += `\n`;
-        });
+        printGroup('Clusters Fortes (Vibes Consolidadas)', grouped.STRONG);
+        printGroup('Proto-Clusters (Mundos Emergentes)', grouped.PROTO);
+        printGroup('Clusters Fracos (Limítrofes)', grouped.WEAK);
+        printGroup('Ruído / Outliers', grouped.NOISE);
+
+        md += `\n### Auditoria e Evidências\n`;
+        md += `Para garantir a rastreabilidade deste processo (Chain of Evidence), consulte os artefatos:\n`;
+        md += `- **Cálculos Detalhados**: \`evidence/cluster_metrics.json\`\n`;
+        md += `- **Atribuições**: \`evidence/cluster_assignments.csv\`\n`;
+        md += `- **Arestas Auditadas**: \`evidence/graph_edges.csv\`\n`;
+        md += `- **Inputs Canônicos**: \`evidence/inputs_canonical.csv\`\n\n`;
+        
+        md += `> _Relatório gerado automaticamente pelo Vibe Engine v2 (Audit Mode)._\n`;
 
         return md;
     }

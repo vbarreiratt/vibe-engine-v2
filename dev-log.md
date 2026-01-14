@@ -178,3 +178,17 @@ Transformar o Canvas de Ressonância de um "debug de pontos" para um **editor pr
 - Threshold Primário: 0.75 (cosine similarity)
 - Threshold Secundário: 0.65
 
+
+## [2026-01-14] Audit Mechanics & Real Logs
+
+### Objectives
+- Transformar sistema de logs em auditoria verificável.
+- Implementar normalização PT-BR para garantir ressonância correta.
+- Calcular métricas reais (Strength, Stability, Recurrence) sem placeholders.
+- Gerar arquivos de evidência (`.csv`, `.json`) para machine-readability.
+- Implementar "Near Clusters" e regras estritas de Classificação (NOISE/STRONG/PROTO).
+
+### Progress
+- 1. Normalização (`normalize.ts`) criada com dicionário EN->PT.
+- 2. Logger refatorado para apontar evidências.
+- 3. ClusterEngine sendo atualizado para cálculo real de métricas.

@@ -66,7 +66,11 @@ export async function POST(
         await engine.vectorize();
 
         // 3.2 Process (Graph + Louvain + Layout)
-        const result = engine.run();
+        // Define output directory for auditing
+        const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+        const outputDir = path.join(process.cwd(), 'outputs', `run_${timestamp}`);
+        
+        const result = await engine.run(clustersRunId, outputDir);
 
         // 4. Persist Results
         // 4.1 Clear previous results (if re-run)
@@ -130,17 +134,17 @@ export async function POST(
             if (eErr) throw eErr;
         }
 
-        // Prepare Export paths
-        const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-        const baseDir = path.join(process.cwd(), 'outputs', `run_${timestamp}`);
-
         // 5. Success (Update status and save logs)
+        // Check Audit Status
+        const auditStatus = result.audit?.status === 'FAILED_AUDIT' ? 'failed' : 'ready';
+        // We save the log regardless, but status reflects audit
+
         const { data: finalRun } = await supabase
             .from('clusters_runs')
             .update({ 
-                status: 'ready',
+                status: auditStatus,
                 log_text: result.log,
-                log_path: baseDir
+                log_path: outputDir
             })
             .eq('id', clustersRunId)
             .select()
