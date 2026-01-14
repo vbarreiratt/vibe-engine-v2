@@ -4,6 +4,7 @@ import { Uploader } from './uploader' // We'll make this next
 import { Play, Download, Settings, Sliders } from 'lucide-react'
 import { ProjectSettingsDialog } from './project-settings-dialog'
 import { ProjectGallery } from './gallery'
+import { StartScanButton } from './start-scan-button'
 
 // MVP: Only Ingestion Phase implemented visually for now
 export default async function ProjectPage({ params }: { params: Promise<{ id: string }> }) {
@@ -92,10 +93,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
                     {isAdmin && (
                         <ProjectSettingsDialog project={project} members={members || []} />
                     )}
-                    <button className="flex items-center gap-2 px-4 py-2 rounded-md bg-purple-600 text-white hover:bg-purple-500 transition-colors shadow-lg shadow-purple-500/20">
-                        <Play className="w-4 h-4 fill-current" />
-                        <span className="font-medium">Iniciar Varredura</span>
-                    </button>
+                    <StartScanButton projectId={projectId} />
                 </div>
             </div>
 
