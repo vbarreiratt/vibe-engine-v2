@@ -5,6 +5,7 @@ import { ArrowLeft, Clock, Plus, Lock, Globe, User } from 'lucide-react'
 import { getScanWithImages, getSignalRuns } from '../../scan/actions'
 import { Breadcrumbs } from '@/components/breadcrumbs'
 import { DeleteRunButton } from '@/components/delete-run-button'
+import { DashboardShell } from '@/components/dashboard-shell'
 
 export default async function ScanSignalsGalleryPage({ params }: { params: Promise<{ id: string, scanId: string }> }) {
     const { id: projectId, scanId } = await params
@@ -31,8 +32,9 @@ export default async function ScanSignalsGalleryPage({ params }: { params: Promi
     ]
 
     return (
-        <div className="space-y-8 max-w-7xl mx-auto p-8">
-            {/* Header */}
+        <DashboardShell>
+            <div className="space-y-8 max-w-7xl mx-auto">
+                {/* Header */}
             <div className="flex items-center justify-between border-b border-white/5 pb-8">
                 <div className="flex items-center gap-4">
                     <Link href={`/dashboard/project/${projectId}/signals`} className="p-2 rounded-full hover:bg-zinc-900 text-zinc-400 hover:text-white transition-colors">
@@ -106,6 +108,7 @@ export default async function ScanSignalsGalleryPage({ params }: { params: Promi
                     ))}
                 </div>
             )}
-        </div>
+            </div>
+        </DashboardShell>
     )
 }

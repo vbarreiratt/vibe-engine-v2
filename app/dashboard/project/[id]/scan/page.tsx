@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import { ScanGrid } from './scan-grid' // Client Component
 import { ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
+import { DashboardShell } from '@/components/dashboard-shell'
 
 export default async function ScanPage({ params, searchParams }: {
     params: Promise<{ id: string }>,
@@ -55,8 +56,9 @@ export default async function ScanPage({ params, searchParams }: {
     })) || []
 
     return (
-        <div className="space-y-6 max-w-[1600px] mx-auto">
-            <div className="flex items-center gap-4 mb-8">
+        <DashboardShell className="max-w-[1600px]">
+            <div className="space-y-6">
+                <div className="flex items-center gap-4 mb-8">
                 <Link href={`/dashboard/project/${projectId}`} className="p-2 rounded-full hover:bg-zinc-900 text-zinc-400 hover:text-white transition-colors">
                     <ArrowLeft className="w-5 h-5" />
                 </Link>
@@ -67,6 +69,7 @@ export default async function ScanPage({ params, searchParams }: {
             </div>
 
             <ScanGrid images={images} projectId={projectId} />
-        </div>
+            </div>
+        </DashboardShell>
     )
 }

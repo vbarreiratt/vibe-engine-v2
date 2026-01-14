@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { Save, Eye, EyeOff, MousePointer2, Hand, ZoomIn, ZoomOut, RotateCcw } from 'lucide-react';
 
 // Types
 interface Node {
@@ -131,18 +132,18 @@ export function ResonanceCanvas({ nodes, edges, clusters, onNodeMove, onSave }: 
     };
 
     return (
-        <div className="relative w-screen h-screen overflow-hidden bg-zinc-900">
+        <div className="absolute inset-0 w-full h-full overflow-hidden bg-zinc-900">
             {/* Floating Topbar */}
             <div
-                className={`absolute top-4 left-1/2 -translate-x-1/2 z-50 transition-all duration-300 ${showTopbar ? 'opacity-100' : 'opacity-0 pointer-events-none'
+                className={`absolute top-6 left-1/2 -translate-x-1/2 z-50 transition-all duration-300 ${showTopbar ? 'opacity-100' : 'opacity-0 pointer-events-none'
                     }`}
             >
-                <div className="bg-black/90 backdrop-blur-md border border-lime-500/30 rounded-2xl px-6 py-3 shadow-2xl">
-                    <div className="flex items-center gap-6">
-                        <h1 className="text-white font-medium text-lg">Editor de Ressonância</h1>
-                        <div className="text-sm text-lime-400 font-mono">
-                            Nodes: {nodes.length} | Clusters: {clusters.length}
-                        </div>
+                <div className="bg-zinc-900/90 backdrop-blur-md border border-white/10 rounded-full px-6 py-2.5 shadow-2xl flex items-center gap-6">
+                    <h1 className="text-white font-medium text-sm tracking-wide">Editor de Ressonância</h1>
+                    <div className="h-4 w-px bg-white/10" />
+                    <div className="flex gap-4 text-xs font-mono text-zinc-400">
+                        <span><strong className="text-white">{nodes.length}</strong> Nodes</span>
+                        <span><strong className="text-white">{clusters.length}</strong> Clusters</span>
                     </div>
                 </div>
             </div>
@@ -150,66 +151,73 @@ export function ResonanceCanvas({ nodes, edges, clusters, onNodeMove, onSave }: 
             {/* Floating Save Button */}
             <button
                 onClick={onSave}
-                className="absolute top-4 right-4 z-50 px-6 py-3 bg-lime-500 hover:bg-lime-400 text-black font-bold rounded-xl shadow-2xl transition-all hover:scale-105"
+                className="absolute top-6 right-6 z-50 px-5 py-2.5 bg-white hover:bg-zinc-200 text-black font-medium rounded-full shadow-lg transition-all flex items-center gap-2 text-sm"
             >
-                💾 Salvar Alterações
+                <Save className="w-4 h-4" />
+                Salvar
             </button>
 
             {/* Toggle Topbar Button */}
             <button
                 onClick={() => setShowTopbar(!showTopbar)}
-                className="absolute top-4 left-4 z-50 w-10 h-10 bg-black/80 hover:bg-black border border-white/20 rounded-lg text-white flex items-center justify-center transition-all"
+                className="absolute top-6 left-6 z-50 w-10 h-10 bg-zinc-900/90 hover:bg-zinc-800 border border-white/10 rounded-full text-zinc-400 hover:text-white flex items-center justify-center transition-all shadow-lg"
                 title="Toggle Info"
             >
-                {showTopbar ? '👁' : '👁‍🗨'}
+                {showTopbar ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
             </button>
 
-            {/* Left Floating Toolbar */}
+            {/* Bottom Center Floating Toolbar */}
             <div
-                className={`absolute left-4 top-20 flex flex-col gap-2 z-40 transition-all duration-300 ${showToolbar ? 'opacity-100' : 'opacity-0 pointer-events-none'
+                className={`absolute bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-2 z-40 transition-all duration-300 bg-zinc-900/90 backdrop-blur-md border border-white/10 p-1.5 rounded-full shadow-2xl ${showToolbar ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10 pointer-events-none'
                     }`}
             >
+                {/* 
+                REMOVIDO POR ENQUANTO (Conforme solicitado)
                 <button
                     onClick={() => setTool('select')}
-                    className={`w-14 h-14 rounded-xl border-2 transition-all ${tool === 'select'
-                            ? 'bg-lime-500 border-lime-400 text-black scale-110'
-                            : 'bg-black/80 border-white/30 text-white hover:border-lime-500/50'
+                    className={`p-3 rounded-full transition-all ${tool === 'select'
+                            ? 'bg-zinc-800 text-white shadow-inner'
+                            : 'text-zinc-400 hover:text-white hover:bg-white/5'
                         }`}
                     title="Selecionar"
                 >
-                    <div className="text-2xl">↖</div>
-                </button>
+                    <MousePointer2 className="w-5 h-5" />
+                </button> 
+                */}
+                
                 <button
                     onClick={() => setTool('pan')}
-                    className={`w-14 h-14 rounded-xl border-2 transition-all ${tool === 'pan'
-                            ? 'bg-lime-500 border-lime-400 text-black scale-110'
-                            : 'bg-black/80 border-white/30 text-white hover:border-lime-500/50'
+                    className={`p-3 rounded-full transition-all ${tool === 'pan'
+                            ? 'bg-white text-black shadow-lg'
+                            : 'text-zinc-400 hover:text-white hover:bg-white/5'
                         }`}
-                    title="Pan (Arrastar)"
+                    title="Pan/Mover (Padrão)"
                 >
-                    <div className="text-2xl">✋</div>
+                    <Hand className="w-5 h-5" />
                 </button>
-                <div className="h-px bg-white/20 my-2" />
+
+                <div className="h-6 w-px bg-white/10 mx-1" />
+
                 <button
-                    className="w-14 h-14 rounded-xl border-2 bg-black/80 border-white/30 text-white hover:border-lime-500/50 transition-all text-2xl font-bold"
-                    title="Zoom +"
+                    className="p-3 rounded-full text-zinc-400 hover:text-white hover:bg-white/5 transition-all"
+                    title="Zoom In"
                     onClick={() => setTransform(prev => ({ ...prev, scale: Math.min(prev.scale * 1.3, 3) }))}
                 >
-                    +
+                    <ZoomIn className="w-5 h-5" />
                 </button>
                 <button
-                    className="w-14 h-14 rounded-xl border-2 bg-black/80 border-white/30 text-white hover:border-lime-500/50 transition-all text-2xl font-bold"
-                    title="Zoom −"
+                    className="p-3 rounded-full text-zinc-400 hover:text-white hover:bg-white/5 transition-all"
+                    title="Zoom Out"
                     onClick={() => setTransform(prev => ({ ...prev, scale: Math.max(prev.scale / 1.3, 0.1) }))}
                 >
-                    −
+                    <ZoomOut className="w-5 h-5" />
                 </button>
                 <button
-                    className="w-14 h-14 rounded-xl border-2 bg-black/80 border-white/30 text-white hover:border-lime-500/50 transition-all text-lg"
-                    title="Resetar Zoom"
+                    className="p-3 rounded-full text-zinc-400 hover:text-white hover:bg-white/5 transition-all"
+                    title="Resetar Vista"
                     onClick={() => setTransform({ scale: 1, x: 0, y: 0 })}
                 >
-                    ⟲
+                    <RotateCcw className="w-4 h-4" />
                 </button>
             </div>
 
@@ -327,18 +335,44 @@ export function ResonanceCanvas({ nodes, edges, clusters, onNodeMove, onSave }: 
                                     )}
 
                                     {/* Node body */}
-                                    <rect
-                                        x={node.x - 35}
-                                        y={node.y - 35}
-                                        width="70"
-                                        height="70"
-                                        fill={color}
-                                        fillOpacity={node.is_outlier ? "0.3" : "0.8"}
-                                        stroke={isSelected ? 'white' : color}
-                                        strokeWidth={isSelected ? 4 : 3}
-                                        rx="12"
-                                        filter={isSelected ? 'url(#glow)' : 'none'}
-                                    />
+                                    {node.image_url ? (
+                                        <foreignObject
+                                            x={node.x - 35}
+                                            y={node.y - 35}
+                                            width="70"
+                                            height="70"
+                                            style={{ overflow: 'visible' }}
+                                        >
+                                            <div
+                                                className={`w-full h-full rounded-xl overflow-hidden transition-all border-[3px] ${node.is_outlier ? 'opacity-50 grayscale hover:grayscale-0 hover:opacity-100' : ''}`}
+                                                style={{
+                                                    borderColor: isSelected ? '#fff' : color,
+                                                    boxShadow: isSelected ? `0 0 20px ${color}` : 'none'
+                                                }}
+                                            >
+                                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                                <img
+                                                    src={node.image_url}
+                                                    alt="node"
+                                                    className="w-full h-full object-cover"
+                                                    draggable={false}
+                                                />
+                                            </div>
+                                        </foreignObject>
+                                    ) : (
+                                        <rect
+                                            x={node.x - 35}
+                                            y={node.y - 35}
+                                            width="70"
+                                            height="70"
+                                            fill={color}
+                                            fillOpacity={node.is_outlier ? "0.3" : "0.8"}
+                                            stroke={isSelected ? 'white' : color}
+                                            strokeWidth={isSelected ? 4 : 3}
+                                            rx="12"
+                                            filter={isSelected ? 'url(#glow)' : 'none'}
+                                        />
+                                    )}
 
                                     {/* Cluster badge */}
                                     <circle

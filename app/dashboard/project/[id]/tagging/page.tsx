@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import { TaggingInterface } from './tagging-interface' // Client Component
 import { ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
+import { DashboardShell } from '@/components/dashboard-shell'
 
 export default async function TaggingPage({ params }: { params: Promise<{ id: string }> }) {
     const supabase = await createClient()
@@ -33,6 +34,8 @@ export default async function TaggingPage({ params }: { params: Promise<{ id: st
     })) || []
 
     return (
-        <TaggingInterface images={images} projectId={projectId} />
+        <DashboardShell>
+            <TaggingInterface images={images} projectId={projectId} />
+        </DashboardShell>
     )
 }

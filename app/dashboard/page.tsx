@@ -1,7 +1,8 @@
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
-import { Plus, Folder } from 'lucide-react'
-import { DeleteProjectButton } from './delete-project-button'
+import { Plus, Folder } from 'lucide-react';
+import { DeleteProjectButton } from './delete-project-button';
+import { DashboardShell } from '@/components/dashboard-shell';
 
 export const dynamic = 'force-dynamic'
 
@@ -24,7 +25,8 @@ export default async function ProjectsPage() {
     const isAdmin = profile?.role === 'admin'
 
     return (
-        <div className="space-y-8 max-w-7xl mx-auto">
+        <DashboardShell>
+            <div className="space-y-8 max-w-7xl mx-auto">
             <div className="flex items-center justify-between">
                 <div>
                     <h1 className="text-3xl font-light text-white tracking-wide">
@@ -94,6 +96,7 @@ export default async function ProjectsPage() {
                     ))}
                 </div>
             )}
-        </div>
+            </div>
+        </DashboardShell>
     )
 }

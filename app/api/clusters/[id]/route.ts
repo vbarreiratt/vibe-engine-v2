@@ -40,7 +40,7 @@ export async function GET(
         // efficient parallel queries
         const [clustersParams, nodesParams, edgesParams] = await Promise.all([
             supabase.from('clusters').select('*').eq('clusters_run_id', id),
-            supabase.from('cluster_nodes').select('*').eq('clusters_run_id', id),
+            supabase.from('cluster_nodes').select('*, images(thumb_url, original_url)').eq('clusters_run_id', id),
             supabase.from('cluster_edges').select('*').eq('clusters_run_id', id)
         ]);
 
@@ -48,10 +48,16 @@ export async function GET(
         if (nodesParams.error) throw nodesParams.error;
         if (edgesParams.error) throw edgesParams.error;
 
+        // Flatten nodes data to include image_url directly
+        const nodes = nodesParams.data.map((node: any) => ({
+            ...node,
+            image_url: node.images?.thumb_url || node.images?.original_url
+        }));
+
         return NextResponse.json({
             run,
             clusters: clustersParams.data,
-            nodes: nodesParams.data,
+            nodes: nodes,
             edges: edgesParams.data
         });
 

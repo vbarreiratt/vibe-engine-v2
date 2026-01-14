@@ -7,6 +7,7 @@ import { ProjectGallery } from './gallery'
 import { StartScanButton } from './start-scan-button'
 import { ScansGallery } from './scans-gallery'
 import { getProjectScans } from './scan/actions'
+import { DashboardShell } from '@/components/dashboard-shell'
 
 export default async function ProjectPage({ params }: { params: Promise<{ id: string }> }) {
     const supabase = await createClient()
@@ -61,7 +62,8 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
     const hasSignals = scans?.some(s => (s.signals_run_count || 0) > 0)
 
     return (
-        <div className="space-y-8 max-w-7xl mx-auto">
+        <DashboardShell>
+            <div className="space-y-8 max-w-7xl mx-auto">
             {/* Header */}
             <div className="flex items-center justify-between border-b border-white/5 pb-8">
                 <div>
@@ -161,5 +163,6 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
                 </div>
             </div>
         </div>
+        </DashboardShell>
     )
 }

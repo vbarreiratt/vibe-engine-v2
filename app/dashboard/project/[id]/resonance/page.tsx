@@ -8,6 +8,7 @@ import { Card } from '@/components/ui/card';
 import { Loader2, Plus, ArrowLeft } from 'lucide-react';
 import { ResonanceCanvas } from '@/components/cluster-mural/resonance-canvas';
 import Link from 'next/link';
+import { DashboardShell } from '@/components/dashboard-shell';
 
 // Types
 type ClusterRun = {
@@ -171,93 +172,97 @@ export default function ResonancePage() {
 
     if (view === 'create') {
         return (
-            <div className="p-8 max-w-2xl mx-auto text-white">
-                <div className="flex items-center gap-4 mb-8">
-                    <Link href={`/dashboard/project/${id}`} className="p-2 rounded-full hover:bg-zinc-900 text-zinc-400 hover:text-white transition-colors">
-                        <ArrowLeft className="w-5 h-5" />
-                    </Link>
-                    <div>
-                        <h1 className="text-2xl font-light text-white">Criar Nova Ressonância</h1>
-                        <p className="text-zinc-500 text-sm">Selecione uma leitura de sinais para gerar o campo de ressonância.</p>
+            <DashboardShell>
+                <div className="max-w-2xl mx-auto text-white">
+                    <div className="flex items-center gap-4 mb-8">
+                        <Link href={`/dashboard/project/${id}`} className="p-2 rounded-full hover:bg-zinc-900 text-zinc-400 hover:text-white transition-colors">
+                            <ArrowLeft className="w-5 h-5" />
+                        </Link>
+                        <div>
+                            <h1 className="text-2xl font-light text-white">Criar Nova Ressonância</h1>
+                            <p className="text-zinc-500 text-sm">Selecione uma leitura de sinais para gerar o campo de ressonância.</p>
+                        </div>
+                    </div>
+
+                    <div className="grid gap-3">
+                        {signalsRuns.map(s => (
+                            <button
+                                key={s.id}
+                                onClick={() => handleCreateRun(s.id)}
+                                className="p-4 rounded border border-neutral-800 hover:border-lime-500 cursor-pointer bg-neutral-900 flex justify-between items-center group text-left w-full"
+                            >
+                                <div>
+                                    <h3 className="font-medium group-hover:text-lime-500 transition-colors">{s.name}</h3>
+                                    <span className="text-xs text-neutral-500">{new Date(s.created_at).toLocaleDateString()}</span>
+                                </div>
+                                <Plus className="opacity-0 group-hover:opacity-100 transition-opacity text-lime-500" />
+                            </button>
+                        ))}
+                        {signalsRuns.length === 0 && !loading && (
+                            <div className="p-4 border border-dashed border-neutral-800 text-neutral-500 text-center">
+                                Nenhuma leitura de sinais disponível. Faça um Scan e Leitura primeiro.
+                            </div>
+                        )}
                     </div>
                 </div>
-
-                <div className="grid gap-3">
-                    {signalsRuns.map(s => (
-                        <button
-                            key={s.id}
-                            onClick={() => handleCreateRun(s.id)}
-                            className="p-4 rounded border border-neutral-800 hover:border-lime-500 cursor-pointer bg-neutral-900 flex justify-between items-center group text-left w-full"
-                        >
-                            <div>
-                                <h3 className="font-medium group-hover:text-lime-500 transition-colors">{s.name}</h3>
-                                <span className="text-xs text-neutral-500">{new Date(s.created_at).toLocaleDateString()}</span>
-                            </div>
-                            <Plus className="opacity-0 group-hover:opacity-100 transition-opacity text-lime-500" />
-                        </button>
-                    ))}
-                    {signalsRuns.length === 0 && !loading && (
-                        <div className="p-4 border border-dashed border-neutral-800 text-neutral-500 text-center">
-                            Nenhuma leitura de sinais disponível. Faça um Scan e Leitura primeiro.
-                        </div>
-                    )}
-                </div>
-            </div>
+            </DashboardShell>
         );
     }
 
     // Default: List
     return (
-        <div className="p-8 space-y-8 text-neutral-200">
-            <header className="flex justify-between items-center">
-                <div className="flex items-center gap-4">
-                    <Link href={`/dashboard/project/${id}`} className="p-2 rounded-full hover:bg-zinc-900 text-zinc-400 hover:text-white transition-colors">
-                        <ArrowLeft className="w-5 h-5" />
-                    </Link>
-                    <div>
-                        <h1 className="text-2xl font-light tracking-tight text-white">Ressonância Vibe</h1>
-                        <p className="text-zinc-500 text-sm">Clusterização automática baseada em vetores semióticos.</p>
+        <DashboardShell>
+            <div className="space-y-8 text-neutral-200">
+                <header className="flex justify-between items-center">
+                    <div className="flex items-center gap-4">
+                        <Link href={`/dashboard/project/${id}`} className="p-2 rounded-full hover:bg-zinc-900 text-zinc-400 hover:text-white transition-colors">
+                            <ArrowLeft className="w-5 h-5" />
+                        </Link>
+                        <div>
+                            <h1 className="text-2xl font-light tracking-tight text-white">Ressonância Vibe</h1>
+                            <p className="text-zinc-500 text-sm">Clusterização automática baseada em vetores semióticos.</p>
+                        </div>
                     </div>
-                </div>
-            </header>
+                </header>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {/* New Button */}
-                <button
-                    onClick={() => setView('create')}
-                    className="flex flex-col items-center justify-center p-8 border border-dashed border-neutral-800 rounded-xl hover:bg-neutral-900/50 hover:border-neutral-700 transition-all text-neutral-500 hover:text-white gap-2 min-h-[160px]"
-                >
-                    <Plus />
-                    <span>Nova Ressonância</span>
-                </button>
-
-                {runs.map(run => (
-                    <Card
-                        key={run.id}
-                        onClick={() => { setActiveRunId(run.id); setView('editor'); }}
-                        className="p-6 bg-neutral-900 border-neutral-800 hover:border-lime-500/50 transition-all group cursor-pointer relative overflow-hidden min-h-[160px] flex flex-col justify-between"
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {/* New Button */}
+                    <button
+                        onClick={() => setView('create')}
+                        className="flex flex-col items-center justify-center p-8 border border-dashed border-neutral-800 rounded-xl hover:bg-neutral-900/50 hover:border-neutral-700 transition-all text-neutral-500 hover:text-white gap-2 min-h-[160px]"
                     >
-                        <div className="relative z-10">
-                            <h3 className="font-medium text-white group-hover:text-lime-400 transition-colors">{run.name}</h3>
-                            <p className="text-xs text-neutral-500 mt-1 uppercase tracking-wider">{run.status}</p>
-                        </div>
-                        {run.status === 'running' && (
-                            <div className="absolute inset-0 bg-lime-500/5 flex items-center justify-center pointer-events-none">
-                                <Loader2 className="animate-spin text-lime-500" />
-                            </div>
-                        )}
-                        <div className="text-xs text-neutral-600 self-end mt-4">
-                            Clique para abrir
-                        </div>
-                    </Card>
-                ))}
+                        <Plus />
+                        <span>Nova Ressonância</span>
+                    </button>
 
-                {runs.length === 0 && !loading && (
-                    <div className="col-span-full text-center py-12 text-neutral-600 italic">
-                        Nenhuma ressonância criada ainda.
-                    </div>
-                )}
+                    {runs.map(run => (
+                        <Card
+                            key={run.id}
+                            onClick={() => { setActiveRunId(run.id); setView('editor'); }}
+                            className="p-6 bg-neutral-900 border-neutral-800 hover:border-lime-500/50 transition-all group cursor-pointer relative overflow-hidden min-h-[160px] flex flex-col justify-between"
+                        >
+                            <div className="relative z-10">
+                                <h3 className="font-medium text-white group-hover:text-lime-400 transition-colors">{run.name}</h3>
+                                <p className="text-xs text-neutral-500 mt-1 uppercase tracking-wider">{run.status}</p>
+                            </div>
+                            {run.status === 'running' && (
+                                <div className="absolute inset-0 bg-lime-500/5 flex items-center justify-center pointer-events-none">
+                                    <Loader2 className="animate-spin text-lime-500" />
+                                </div>
+                            )}
+                            <div className="text-xs text-neutral-600 self-end mt-4">
+                                Clique para abrir
+                            </div>
+                        </Card>
+                    ))}
+
+                    {runs.length === 0 && !loading && (
+                        <div className="col-span-full text-center py-12 text-neutral-600 italic">
+                            Nenhuma ressonância criada ainda.
+                        </div>
+                    )}
+                </div>
             </div>
-        </div>
+        </DashboardShell>
     );
 }

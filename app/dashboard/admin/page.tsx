@@ -5,6 +5,7 @@ import { Shield, ShieldAlert, User } from 'lucide-react'
 import { CreateUserForm } from './create-user-form'
 import { UserAvatar } from '@/components/user-avatar'
 import { UserActionsDropdown } from './user-actions'
+import { DashboardShell } from '@/components/dashboard-shell'
 
 export default async function AdminPage() {
     const supabase = await createClient()
@@ -30,7 +31,8 @@ export default async function AdminPage() {
         .order('created_at', { ascending: false })
 
     return (
-        <div className="space-y-8 max-w-5xl mx-auto">
+        <DashboardShell>
+            <div className="space-y-8 max-w-5xl mx-auto">
             <div className="flex items-center justify-between">
                 <div>
                     <h1 className="text-3xl font-light text-white tracking-wide">Gestão de Acessos</h1>
@@ -111,5 +113,5 @@ export default async function AdminPage() {
                 </table>
             </div>
         </div>
-    )
+        </DashboardShell>
 }

@@ -5,6 +5,7 @@ import { ArrowLeft, AlertTriangle } from 'lucide-react'
 import Link from 'next/link'
 import { ScanSelector } from './scan-selector'
 import { Breadcrumbs } from '@/components/breadcrumbs'
+import { DashboardShell } from '@/components/dashboard-shell'
 
 export default async function SignalsPage({ params }: { params: Promise<{ id: string }> }) {
     const supabase = await createClient()
@@ -29,7 +30,8 @@ export default async function SignalsPage({ params }: { params: Promise<{ id: st
     // If no scans exist, show empty state
     if (!scans || scans.length === 0) {
         return (
-            <div className="space-y-6 max-w-7xl mx-auto">
+            <DashboardShell>
+                <div className="space-y-6 max-w-7xl mx-auto">
                 <div className="flex items-center gap-4 mb-8">
                     <Link href={`/dashboard/project/${projectId}`} className="p-2 rounded-full hover:bg-zinc-900 text-zinc-400 hover:text-white transition-colors">
                         <ArrowLeft className="w-5 h-5" />
@@ -57,13 +59,15 @@ export default async function SignalsPage({ params }: { params: Promise<{ id: st
                     </Link>
                 </div>
             </div>
+            </DashboardShell>
         )
     }
 
     // Show selector
     return (
-        <div className="space-y-6 max-w-7xl mx-auto">
-            <div className="flex items-center gap-4 mb-8">
+        <DashboardShell>
+            <div className="space-y-6 max-w-7xl mx-auto">
+                <div className="flex items-center gap-4 mb-8">
                 <Link href={`/dashboard/project/${projectId}`} className="p-2 rounded-full hover:bg-zinc-900 text-zinc-400 hover:text-white transition-colors">
                     <ArrowLeft className="w-5 h-5" />
                 </Link>
@@ -75,6 +79,7 @@ export default async function SignalsPage({ params }: { params: Promise<{ id: st
             </div>
 
             <ScanSelector scans={scans as any} projectId={projectId} currentUserId={user.id} />
-        </div>
+            </div>
+        </DashboardShell>
     )
 }
