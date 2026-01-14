@@ -48,7 +48,9 @@
   - Configured Vertex AI (`text-embedding-004`) for embedding generation.
 - **UI (Alpha)**:
   - Created `ClusterCanvasPage` skeleton for listing and creating runs.
+  - Created `ClusterCanvasPage` skeleton for listing and creating runs.
   - Created `ClusterMural` component for visualizing nodes and edges (using Framer Motion).
+  - Added UI components (`button`, `card`) to support the new pages.
 
 
 

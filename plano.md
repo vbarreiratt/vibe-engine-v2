@@ -98,12 +98,12 @@ O sistema é colaborativo, auditável e hierárquico, permitindo que **Admins** 
   - [x] Grafo + Detecção de Comunidades (Louvain/Leiden simplificado ou via lib `graphology`)
   - [x] 2D Layout (Force-directed ou UMAP via lib `graphology-layout` ou similar)
   - [x] Persistência de resultados
-- [ ] **TASK 4 — UI do Cluster Canvas (MVP)**
-  - [ ] Estado vazio com seletor de leitura (`signals_run`)
-  - [ ] Estado “semeadura” (polling do job)
-  - [ ] Render do Canvas (React Flow ou HTML5 Canvas customizado? Provavelmente React Flow é mais rápido de implementar interações)
-  - [ ] Interações: Drag, Criar Núcleo, Dissolver, Outlier, Renomear
-  - [ ] Visualização de "Seeds" e "Orbitas"
+- [x] **TASK 4 — UI do Cluster Canvas (MVP)**
+  - [x] Estado vazio com seletor de leitura (`signals_run`)
+  - [x] Estado “semeadura” (polling do job)
+  - [x] Render do Canvas (React Flow ou HTML5 Canvas customizado? Provavelmente React Flow é mais rápido de implementar interações)
+  - [x] Interações: Drag, Criar Núcleo, Dissolver, Outlier, Renomear
+  - [x] Visualização de "Seeds" e "Orbitas"
 - [ ] **TASK 5 — Salvamento versionado e listagem**
   - [ ] Modal de Salvar (Nome + Visibilidade)
   - [ ] Atualização da Dashboard do Projeto (Listagem de Clusters Runs por Scan)
