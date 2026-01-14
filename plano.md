@@ -138,6 +138,7 @@ O sistema é colaborativo, auditável e hierárquico, permitindo que **Admins** 
   - **Segurança Auth**: Remoção da funcionalidade de cadastro público (Signup) na tela de login. Apenas usuários criados por Admins podem acessar.
   - **Admin User Management**: Implementação de formulário de criação de usuários na Dashboard de Admin, utilizando Service Role para bypass de restrições de signup.
   - **Admin Project Settings**: Modal de gestão do projeto (Nome, Descrição) e gestão de curadores (Adicionar/Remover) na página do projeto.
+  - **Project Gallery Filter**: Implementação de filtro na galeria de imagens para alternar entre "Minhas Referências" e "Referências do Projeto" (Públicas).
 
 
 

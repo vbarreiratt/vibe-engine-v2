@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import { Uploader } from './uploader' // We'll make this next
 import { Play, Download, Settings, Sliders } from 'lucide-react'
 import { ProjectSettingsDialog } from './project-settings-dialog'
+import { ProjectGallery } from './gallery'
 
 // MVP: Only Ingestion Phase implemented visually for now
 export default async function ProjectPage({ params }: { params: Promise<{ id: string }> }) {
@@ -55,7 +56,16 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
         redirect('/dashboard')
     }
 
-    const { data: images } = await supabase.from('images').select('*').eq('project_id', projectId).order('created_at', { ascending: false })
+    const { data: images } = await supabase
+        .from('images')
+        .select(`
+            *,
+            ingestions (
+                visibility
+            )
+        `)
+        .eq('project_id', projectId)
+        .order('created_at', { ascending: false })
 
     // Fetch Members for Settings
     const { data: members } = await supabase
@@ -139,24 +149,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
 
                     {/* Gallery Grid */}
                     <div className="mt-8">
-                        <h3 className="text-lg font-light text-white mb-4">Galeria <span className="text-zinc-500 text-sm ml-2">({images?.length})</span></h3>
-
-                        {images && images.length > 0 ? (
-                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                                {images.map((img: any) => (
-                                    <div key={img.id} className="group relative aspect-square rounded-lg overflow-hidden bg-zinc-900 border border-white/5">
-                                        <img src={img.thumb_url} alt="" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 opacity-80 group-hover:opacity-100" />
-                                        <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                                            {/* Actions */}
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        ) : (
-                            <div className="text-center py-20 text-zinc-600 bg-zinc-900/20 rounded-xl border border-dashed border-zinc-800 font-mono text-sm">
-                                Aguardando input visual...
-                            </div>
-                        )}
+                        <ProjectGallery images={images || []} currentUserId={user.id} />
                     </div>
                 </div>
             </div>
