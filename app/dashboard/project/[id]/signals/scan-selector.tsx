@@ -9,6 +9,7 @@ interface Scan {
     visibility: 'public' | 'private'
     curator: { nickname: string | null, email: string } | null
     image_count: number
+    signals_run_count?: number
     created_at: string
 }
 
@@ -16,7 +17,7 @@ export function ScanSelector({ scans, projectId }: { scans: Scan[], projectId: s
     const router = useRouter()
 
     const handleSelect = (scanId: string) => {
-        router.push(`/dashboard/project/${projectId}/signals?scan=${scanId}`)
+        router.push(`/dashboard/project/${projectId}/signals/${scanId}`)
     }
 
     return (
@@ -48,6 +49,12 @@ export function ScanSelector({ scans, projectId }: { scans: Scan[], projectId: s
                                         <span className="flex items-center gap-1 text-xs text-zinc-500 bg-zinc-800 px-2 py-0.5 rounded-full">
                                             <Lock className="w-3 h-3" />
                                             Privada
+                                        </span>
+                                    )}
+                                    {/* Run Badge */}
+                                    {!!scan.signals_run_count && (
+                                        <span className="ml-2 px-2 py-0.5 rounded-full bg-purple-500/10 text-purple-400 text-xs border border-purple-500/20">
+                                            {scan.signals_run_count} leituras
                                         </span>
                                     )}
                                 </div>

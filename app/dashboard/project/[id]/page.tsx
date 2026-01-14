@@ -58,6 +58,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
 
     const isAdmin = profile?.role === 'admin'
     const hasScans = scans && scans.length > 0
+    const hasSignals = scans?.some(s => (s.signals_run_count || 0) > 0)
 
     return (
         <div className="space-y-8 max-w-7xl mx-auto">
@@ -97,7 +98,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
                             <div className="w-full bg-zinc-800 h-1.5 rounded-full overflow-hidden">
                                 <div
                                     className="bg-purple-500 h-full transition-all"
-                                    style={{ width: `${images?.length ? (hasScans ? 50 : 25) : 0}%` }}
+                                    style={{ width: `${images?.length ? (hasScans ? (hasSignals ? 75 : 50) : 25) : 0}%` }}
                                 />
                             </div>
                         </div>
@@ -108,17 +109,17 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
                         {[
                             { name: 'Ingestão', path: '', active: true, done: (images?.length || 0) > 0 },
                             { name: 'Varredura', path: '/scan', active: false, done: hasScans },
-                            { name: 'Sinais', path: '/signals', active: false, done: false, enabled: hasScans },
-                            { name: 'Ressonância', path: '/resonance', active: false, done: false, enabled: false }
+                            { name: 'Sinais', path: '/signals', active: false, done: hasSignals, enabled: hasScans },
+                            { name: 'Ressonância', path: '/resonance', active: false, done: false, enabled: hasSignals }
                         ].map((step, i) => (
                             <a
                                 key={step.name}
                                 href={step.enabled === false && !step.done ? undefined : `/dashboard/project/${projectId}${step.path}`}
                                 className={`px-4 py-3 rounded-lg text-sm font-medium flex items-center justify-between transition-colors ${step.active
-                                        ? 'bg-white/10 text-white'
-                                        : step.enabled === false && !step.done
-                                            ? 'text-zinc-700 cursor-not-allowed'
-                                            : 'text-zinc-500 hover:text-white hover:bg-white/5'
+                                    ? 'bg-white/10 text-white'
+                                    : step.enabled === false && !step.done
+                                        ? 'text-zinc-700 cursor-not-allowed'
+                                        : 'text-zinc-500 hover:text-white hover:bg-white/5'
                                     }`}
                             >
                                 <span>{i + 1}. {step.name}</span>

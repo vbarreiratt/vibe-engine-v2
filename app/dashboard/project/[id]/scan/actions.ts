@@ -166,14 +166,23 @@ export async function getProjectScans(projectId: string) {
         return { error: error.message, scans: [] }
     }
 
-    // Get image counts for each scan
+    // Get image counts and signals_run counts for each scan
     const scansWithCount = await Promise.all((scans || []).map(async (scan) => {
-        const { count } = await supabase
+        const { count: imageCount } = await supabase
             .from('scan_images')
             .select('*', { count: 'exact', head: true })
             .eq('scan_id', scan.id)
 
-        return { ...scan, image_count: count || 0 }
+        const { count: signalsRunCount } = await supabase
+            .from('signals_runs')
+            .select('*', { count: 'exact', head: true })
+            .eq('scan_id', scan.id)
+
+        return {
+            ...scan,
+            image_count: imageCount || 0,
+            signals_run_count: signalsRunCount || 0
+        }
     }))
 
     // Filter: show own scans + public scans
@@ -212,7 +221,10 @@ export async function getScanWithImages(scanId: string) {
     const { data: scanImages, error: imagesError } = await supabase
         .from('scan_images')
         .select(`
-            image:images(*)
+            image:images(
+                *,
+                image_signals(state, matter, movement)
+            )
         `)
         .eq('scan_id', scanId)
 
@@ -271,4 +283,173 @@ export async function deleteScan(scanId: string) {
 
     revalidatePath(`/dashboard/project/${scan.project_id}`)
     return { success: true }
+}
+// ============================================
+// SIGNALS
+// ============================================
+
+export async function createSignalRun(
+    projectId: string,
+    scanId: string,
+    name: string,
+    visibility: 'public' | 'private',
+    signalsData: Record<string, {
+        signals: { state: string[], matter: string[], movement: string[] },
+        ai: { description: string | null, reasoning: string | null, model: string | null, runId: string | null }
+    }>
+) {
+    const supabase = await createClient()
+
+    // 1. Create the Run
+    const { data: run, error: runError } = await supabase
+        .from('signals_runs')
+        .insert({
+            project_id: projectId,
+            scan_id: scanId,
+            name: name,
+            visibility: visibility,
+            curator_id: (await supabase.auth.getUser()).data.user?.id
+        })
+        .select()
+        .single()
+
+    if (runError) throw new Error(`Failed to create run: ${runError.message}`)
+
+    // 2. Prepare Signal Records
+    const records = Object.entries(signalsData).map(([imageId, data]) => ({
+        image_id: imageId,
+        run_id: run.id,
+        state: data.signals.state,
+        matter: data.signals.matter,
+        movement: data.signals.movement,
+        ai_description: data.ai.description,
+        raw_reasoning: data.ai.reasoning,
+        model_name: data.ai.model,
+        // The 'run_id' in AI data (e.g. from a past inference) is just metadata. 
+        // The 'run_id' column in the table is the FK to signals_runs. 
+        // We can store the AI Run ID in a metadata column if we had one, but strict prompt didn't ask for a separate column for "AI Run ID" vs "Signal Run ID".
+        // Given the prompt context "armazenar por imagem... run_id", and now "criar um signals_run", it's likely they are distinct concepts (AI Run vs User Session Run).
+        // However, the DB column 'run_id' is now FK. 
+        // We will ignore the AI's internal run_id for the FK column, or store it elsewhere if we had a column. Ref migration 003 added 'run_id' UUID.
+        // Migration 004 linked it. 
+        // So 'run_id' column IS the Signal Run ID.
+    }))
+
+    if (records.length > 0) {
+        const { error: signalsError } = await supabase
+            .from('image_signals')
+            .insert(records)
+
+        if (signalsError) throw new Error(`Failed to save signals: ${signalsError.message}`)
+    }
+
+    revalidatePath(`/dashboard/project/${projectId}`)
+    return { success: true, runId: run.id }
+}
+
+export async function updateSignalRun(
+    runId: string,
+    signalsData: Record<string, {
+        signals: { state: string[], matter: string[], movement: string[] },
+        ai: { description: string | null, reasoning: string | null, model: string | null, runId: string | null }
+    }>
+) {
+    const supabase = await createClient()
+
+    // 1. Update signals_runs timestamp
+    const { error: runError } = await supabase
+        .from('signals_runs')
+        .update({ updated_at: new Date().toISOString() })
+        .eq('id', runId)
+
+    if (runError) throw new Error(`Failed to update run: ${runError.message}`)
+
+    // 2. Prepare Signal Records
+    const records = Object.entries(signalsData).map(([imageId, data]) => ({
+        image_id: imageId,
+        run_id: runId,
+        state: data.signals.state,
+        matter: data.signals.matter,
+        movement: data.signals.movement,
+        ai_description: data.ai.description,
+        raw_reasoning: data.ai.reasoning,
+        model_name: data.ai.model,
+    }))
+
+    if (records.length > 0) {
+        // 3. Delete existing signals for this run (Clean state)
+        const { error: deleteError } = await supabase
+            .from('image_signals')
+            .delete()
+            .eq('run_id', runId)
+
+        if (deleteError) throw new Error(`Failed to clear old signals: ${deleteError.message}`)
+
+        // 4. Insert new signals
+        const { error: signalsError } = await supabase
+            .from('image_signals')
+            .insert(records)
+
+        if (signalsError) throw new Error(`Failed to save signals: ${signalsError.message}`)
+    }
+
+    return { success: true }
+}
+
+export async function getSignalRuns(scanId: string) {
+    const supabase = await createClient()
+    const { data: runs, error } = await supabase
+        .from('signals_runs')
+        .select(`
+            *,
+            curator:profiles!signals_runs_curator_id_fkey(nickname, email)
+        `)
+        .eq('scan_id', scanId)
+        .order('created_at', { ascending: false })
+
+    return { runs, error }
+}
+
+export async function getScanWithRunData(scanId: string, runId: string) {
+    const supabase = await createClient()
+
+    // 1. Get Run Details
+    const { data: run, error: runError } = await supabase
+        .from('signals_runs')
+        .select('*')
+        .eq('id', runId)
+        .single()
+
+    if (runError) return { error: runError.message }
+
+    // 2. Get Scan Images (Universe)
+    const { data: scanImages, error: imagesError } = await supabase
+        .from('scan_images')
+        .select(`
+            image:images(
+                id, original_url, thumb_url
+            )
+        `)
+        .eq('scan_id', scanId)
+
+    if (imagesError) return { error: imagesError.message }
+
+    // 3. Get Specific Signals for this Run
+    const { data: signals } = await supabase
+        .from('image_signals')
+        .select('*')
+        .eq('run_id', runId)
+
+    const signalsMap = new Map((signals || []).map(s => [s.image_id, s]))
+
+    // 4. Merge
+    const images = scanImages?.map((si: any) => ({
+        ...si.image,
+        image_signals: signalsMap.get(si.image.id) ? [signalsMap.get(si.image.id)] : []
+    })) || []
+
+    // 5. Get Scan Info
+    const { data: scan } = await supabase.from('scans').select('name').eq('id', scanId).single()
+
+    return { scan, run, images }
 }

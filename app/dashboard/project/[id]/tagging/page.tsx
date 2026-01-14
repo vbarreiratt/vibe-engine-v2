@@ -33,18 +33,6 @@ export default async function TaggingPage({ params }: { params: Promise<{ id: st
     })) || []
 
     return (
-        <div className="space-y-6 max-w-[1600px] mx-auto h-full">
-            <div className="flex items-center gap-4 mb-4">
-                <Link href={`/dashboard/project/${projectId}`} className="p-2 rounded-full hover:bg-zinc-900 text-zinc-400 hover:text-white transition-colors">
-                    <ArrowLeft className="w-5 h-5" />
-                </Link>
-                <div>
-                    <h1 className="text-2xl font-light text-white">Leitura de Sinais</h1>
-                    <p className="text-zinc-500 text-sm">Gere e refine as camadas semióticas de cada vibe.</p>
-                </div>
-            </div>
-
-            <TaggingInterface images={images} projectId={projectId} />
-        </div>
+        <TaggingInterface images={images} projectId={projectId} />
     )
 }

@@ -1,17 +1,13 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import { getProjectScans, getScanWithImages } from '../scan/actions'
-import { ArrowLeft, Images, AlertTriangle } from 'lucide-react'
+import { getProjectScans } from '../scan/actions' // Adjust path if needed, this file is in project/[id]/signals/
+import { ArrowLeft, AlertTriangle } from 'lucide-react'
 import Link from 'next/link'
 import { ScanSelector } from './scan-selector'
 
-export default async function SignalsPage({ params, searchParams }: {
-    params: Promise<{ id: string }>,
-    searchParams: Promise<{ scan?: string }>
-}) {
+export default async function SignalsPage({ params }: { params: Promise<{ id: string }> }) {
     const supabase = await createClient()
     const projectId = (await params).id
-    const selectedScanId = (await searchParams).scan
 
     // Verify Access
     const { data: { user } } = await supabase.auth.getUser()
@@ -53,85 +49,20 @@ export default async function SignalsPage({ params, searchParams }: {
         )
     }
 
-    // If no scan selected, show selector
-    if (!selectedScanId) {
-        return (
-            <div className="space-y-6 max-w-7xl mx-auto">
-                <div className="flex items-center gap-4 mb-8">
-                    <Link href={`/dashboard/project/${projectId}`} className="p-2 rounded-full hover:bg-zinc-900 text-zinc-400 hover:text-white transition-colors">
-                        <ArrowLeft className="w-5 h-5" />
-                    </Link>
-                    <div>
-                        <h1 className="text-2xl font-light text-white">Sinais</h1>
-                        <p className="text-zinc-500 text-sm">Selecione uma varredura para atribuir sinais</p>
-                    </div>
-                </div>
-
-                <ScanSelector scans={scans as any} projectId={projectId} />
-            </div>
-        )
-    }
-
-    // Get scan images
-    const scanResult = await getScanWithImages(selectedScanId)
-
-    if (scanResult.error) {
-        redirect(`/dashboard/project/${projectId}/signals`)
-    }
-
-    const { scan, images } = scanResult
-
-    // Audit: using scan for signals
-    await supabase.from('audit_log').insert({
-        project_id: projectId,
-        entity_type: 'scan',
-        entity_id: selectedScanId,
-        action_type: 'use_scan_for_signals',
-        actor_user_id: user.id
-    })
-
+    // Show selector
     return (
         <div className="space-y-6 max-w-7xl mx-auto">
-            <div className="flex items-center justify-between mb-8">
-                <div className="flex items-center gap-4">
-                    <Link href={`/dashboard/project/${projectId}`} className="p-2 rounded-full hover:bg-zinc-900 text-zinc-400 hover:text-white transition-colors">
-                        <ArrowLeft className="w-5 h-5" />
-                    </Link>
-                    <div>
-                        <h1 className="text-2xl font-light text-white">Sinais: {scan?.name}</h1>
-                        <p className="text-zinc-500 text-sm flex items-center gap-2">
-                            <Images className="w-4 h-4" />
-                            {images?.length || 0} imagens nesta varredura
-                        </p>
-                    </div>
-                </div>
-                <Link
-                    href={`/dashboard/project/${projectId}/signals`}
-                    className="text-sm text-zinc-500 hover:text-white transition-colors"
-                >
-                    Trocar varredura
+            <div className="flex items-center gap-4 mb-8">
+                <Link href={`/dashboard/project/${projectId}`} className="p-2 rounded-full hover:bg-zinc-900 text-zinc-400 hover:text-white transition-colors">
+                    <ArrowLeft className="w-5 h-5" />
                 </Link>
+                <div>
+                    <h1 className="text-2xl font-light text-white">Sinais</h1>
+                    <p className="text-zinc-500 text-sm">Selecione uma varredura para gerenciar sinais</p>
+                </div>
             </div>
 
-            {/* TODO: Signal tagging interface */}
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                {images?.map((img: any) => (
-                    <div
-                        key={img.id}
-                        className="aspect-square bg-zinc-900 rounded-lg overflow-hidden border border-white/5 hover:border-purple-500/50 transition-colors cursor-pointer group"
-                    >
-                        <img
-                            src={img.thumb_url || img.original_url}
-                            alt=""
-                            className="w-full h-full object-cover group-hover:opacity-80 transition-opacity"
-                        />
-                    </div>
-                ))}
-            </div>
-
-            <div className="text-center py-8 text-zinc-600">
-                <p>Interface de atribuição de sinais em construção...</p>
-            </div>
+            <ScanSelector scans={scans as any} projectId={projectId} />
         </div>
     )
 }
