@@ -2,6 +2,8 @@ import { generateEmbedding } from '../ai/embedding';
 import Graph from 'graphology';
 import louvain from 'graphology-communities-louvain';
 import forceAtlas2 from 'graphology-layout-forceatlas2';
+import { ClusterLogger } from './logger';
+import { applyTwoStageLayout } from './layout';
 
 // Types from the prompt
 interface ImageSignals {
@@ -12,7 +14,7 @@ interface ImageSignals {
     image_url?: string;
 }
 
-interface ClusterResult {
+export interface ClusterResult {
     clusters: {
         id: string; // will be index or uuid
         name_suggested: string; // "State + Matter"
@@ -32,6 +34,7 @@ interface ClusterResult {
         weight: number;
         layers: string[]; // ['state', 'movement']
     }[];
+    log?: string; // Human-readable log
 }
 
 // Helper: Cosine Similarity
@@ -50,6 +53,8 @@ function cosineSimilarity(vecA: number[], vecB: number[]): number {
 export class ClusterEngine {
     private images: ImageSignals[];
     private embeddings: Record<string, { state: number[], matter: number[], movement: number[] }> = {};
+    public logger: ClusterLogger;
+    private startTime: number = 0;
 
     // Thresholds
     private T_PRIMARY = 0.75; // Strong connection
@@ -57,6 +62,7 @@ export class ClusterEngine {
 
     constructor(images: ImageSignals[]) {
         this.images = images;
+        this.logger = new ClusterLogger();
     }
 
     // Step 1: Vectorize
@@ -148,24 +154,34 @@ export class ClusterEngine {
 
     // Step 4, 5, 6: Process
     run(): ClusterResult {
+        this.startTime = Date.now();
+
+        // Log job start
+        this.logger.logJobStart({
+            nodeCount: this.images.length,
+            embeddingModel: 'text-embedding-004',
+            embeddingDimension: 768,
+            similarityMetric: 'cosine similarity',
+            resonanceThreshold: this.T_PRIMARY,
+            clusteringMethod: 'louvain community detection'
+        });
+
         const graph = this.buildGraph();
 
         // Detect Communities
-        // Louvain assigns a community ID to each node
-        const communities = louvain(graph); // Record<nodeId, communityId> (number)
+        const communities = louvain(graph);
 
-        // Apply layout
-        // ForceAtlas2 respects edge weights
+        // Apply initial layout (will be replaced by 2-stage)
         const positions = forceAtlas2(graph, {
             iterations: 100,
             settings: {
                 gravity: 1,
-                scalingRatio: 10 // Spread out
+                scalingRatio: 10
             }
         });
 
         // Group by cluster
-        const clustersMap: Record<string, string[]> = {}; // communityId -> imageIds[]
+        const clustersMap: Record<string, string[]> = {};
 
         Object.entries(communities).forEach(([nodeId, commId]) => {
             const cId = String(commId);
@@ -173,36 +189,55 @@ export class ClusterEngine {
             clustersMap[cId].push(nodeId);
         });
 
-        // Format Items
+        // Format clusters and log each one
         const clustersFormatted = Object.entries(clustersMap).map(([cId, itemIds]) => {
-            // Heuristic Naming:
-            // Find most common tags in State and Matter within this cluster
             const allStates = itemIds.flatMap(id => this.images.find(i => i.id === id)?.state || []);
             const allMatters = itemIds.flatMap(id => this.images.find(i => i.id === id)?.matter || []);
+            const allMovements = itemIds.flatMap(id => this.images.find(i => i.id === id)?.movement || []);
 
-            const topState = this.getTopTag(allStates, ['vibra', 'neutro']); // Exclude generic
+            const topState = this.getTopTag(allStates, ['vibra', 'neutro']);
             const topMatter = this.getTopTag(allMatters, []);
+            const topMovement = this.getTopTag(allMovements, []);
+
+            const dominantSignals = {
+                state: this.getTopTags(allStates, 3),
+                matter: this.getTopTags(allMatters, 3),
+                movement: this.getTopTags(allMovements, 3)
+            };
+
+            // Generate justification
+            let justification = `Cluster formado por`;
+            if (dominantSignals.state.length > 0) {
+                justification += ` estado ${dominantSignals.state.join(', ')}`;
+            }
+            if (dominantSignals.matter.length > 0) {
+                justification += `, matéria ${dominantSignals.matter.join(', ')}`;
+            }
+            if (dominantSignals.movement.length > 0) {
+                justification += `, movimento ${dominantSignals.movement.join(', ')}`;
+            }
+            justification += `.`;
+
+            // Log cluster creation
+            this.logger.logClusterCreated({
+                cluster_id: `C${cId}`,
+                nodeCount: itemIds.length,
+                dominantSignals,
+                justification
+            });
 
             return {
                 id: cId,
-                name_suggested: `${topState || 'Vibe'} ${topMatter || 'Material'}`, // e.g., "Tense Metal"
-                motor: 'state' as const, // Placeholder logic
+                name_suggested: `${topState || 'Vibe'} ${topMatter || 'Material'}`,
+                motor: 'state' as const,
                 items: itemIds
             };
         });
 
-        // Identify Outliers (clusters with very few items, e.g., 1)
-        // Or nodes with 0 degree in the graph?
-        // Graphology isolated nodes are implicitly handled by layout (they fly away) or Louvain puts them in own community.
-        // Let's mark clusters with size 1 as outliers for now, or use degree.
-
         const nodesFormatted = this.images.map((img, idx) => {
-            // Get position with fallback for isolated nodes
             let pos = positions[img.id];
 
-            // If position is undefined/null/NaN, use fallback
             if (!pos || isNaN(pos.x) || isNaN(pos.y) || pos.x === null || pos.y === null) {
-                // Random position for isolated nodes
                 const angle = (idx / this.images.length) * 2 * Math.PI;
                 const radius = 100;
                 pos = {
@@ -236,11 +271,29 @@ export class ClusterEngine {
             };
         });
 
-        return {
+        let result: ClusterResult = {
             clusters: clustersFormatted,
             nodes: nodesFormatted,
             edges: edgesFormatted
         };
+
+        // Apply 2-stage layout
+        result = applyTwoStageLayout(result);
+
+        // Log job completion
+        const duration = (Date.now() - this.startTime) / 1000;
+        const outlierCount = result.nodes.filter(n => n.is_outlier).length;
+
+        this.logger.logJobEnd({
+            clustersGenerated: result.clusters.length,
+            outliers: outlierCount,
+            duration
+        });
+
+        // Attach human-readable log
+        result.log = this.logger.generateHumanReadableLog();
+
+        return result;
     }
 
     private getTopTag(tags: string[], ignore: string[]): string {
@@ -251,5 +304,17 @@ export class ClusterEngine {
             counts[norm] = (counts[norm] || 0) + 1;
         }
         return Object.entries(counts).sort((a, b) => b[1] - a[1])[0]?.[0] || '';
+    }
+
+    private getTopTags(tags: string[], topN: number = 3): string[] {
+        const counts: Record<string, number> = {};
+        for (const t of tags) {
+            const norm = t.toLowerCase().trim();
+            counts[norm] = (counts[norm] || 0) + 1;
+        }
+        return Object.entries(counts)
+            .sort((a, b) => b[1] - a[1])
+            .slice(0, topN)
+            .map(([tag]) => tag);
     }
 }
