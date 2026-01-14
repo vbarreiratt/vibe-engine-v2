@@ -144,6 +144,8 @@ O sistema é colaborativo, auditável e hierárquico, permitindo que **Admins** 
   - **Scan Selection Filter**: Implementação de toggle para visualizar apenas as imagens selecionadas diretamente no grid de varredura.
   - **Scan Stage Mode**: Implementação de "Modo Palco" (visualização full-screen imagem a imagem) com controles de teclado (V/N/Setas) para varredura rápida.
   - **Gallery Management**: Implementação de exclusão de imagens na galeria, com permissões granulares (Dono apaga próprias, Admin apaga qualquer uma). Limpeza automática no S3 e BD.
+  - **User Onboarding**: Fluxo obrigatório de boas-vindas e configuração de perfil (Nickname, Bio) para novos usuários, com diferenciação de interface por cargo (Admin/Curator).
+  - **Profile Management**: Implementação de Menu de Perfil e Página de Edição de Perfil para gestão de identidade editorial.
 
 
 

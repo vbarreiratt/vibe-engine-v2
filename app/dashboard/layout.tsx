@@ -1,7 +1,8 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
-import { LogOut, LayoutGrid, Users } from 'lucide-react'
+import { ProfileMenu } from './profile-menu'
+import { LayoutGrid, Users } from 'lucide-react'
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
     const supabase = await createClient()
@@ -13,9 +14,14 @@ export default async function DashboardLayout({ children }: { children: React.Re
 
     const { data: profile } = await supabase
         .from('profiles')
-        .select('role')
+        .select('*')
         .eq('user_id', user.id)
         .single()
+
+    // Enforce Onboarding
+    if (profile && !profile.onboarding_completed) {
+        redirect('/onboarding')
+    }
 
     return (
         <div className="flex h-screen bg-zinc-950 text-white font-sans selection:bg-purple-900/50 selection:text-white overflow-hidden">
@@ -45,21 +51,12 @@ export default async function DashboardLayout({ children }: { children: React.Re
                 </div>
 
                 <div className="mt-auto p-4 border-t border-white/5 bg-zinc-900/20">
-                    <div className="flex items-center gap-3 mb-4 px-2">
-                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-zinc-700 to-zinc-800 flex items-center justify-center text-xs font-bold border border-white/10">
-                            {user.email?.[0].toUpperCase()}
-                        </div>
-                        <div className="flex flex-col overflow-hidden">
-                            <span className="text-sm font-medium text-zinc-200 truncate">{user.email}</span>
-                            <span className="text-xs text-zinc-500 capitalize">{profile?.role}</span>
-                        </div>
-                    </div>
-                    <form action="/auth/signout" method="post">
-                        <button className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-md hover:bg-red-500/10 hover:text-red-400 transition-colors text-zinc-400 text-sm font-medium border border-transparent hover:border-red-500/20">
-                            <LogOut className="h-4 w-4" />
-                            <span>Sair</span>
-                        </button>
-                    </form>
+                    <ProfileMenu
+                        email={user.email!}
+                        nickname={profile?.nickname}
+                        role={profile?.role || 'curator'}
+                        avatarUrl={profile?.avatar_url}
+                    />
                 </div>
             </aside>
 
