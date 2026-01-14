@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import { MoreHorizontal, Trash2, KeyRound, Loader2, Copy, Check } from 'lucide-react'
+import { MoreHorizontal, Trash2, KeyRound, Loader2, Copy, Check, AlertTriangle, X } from 'lucide-react'
 import { deleteUser, resetUserPassword } from './actions'
 
 export function UserActionsDropdown({ userId, email }: { userId: string, email: string }) {
@@ -9,6 +9,7 @@ export function UserActionsDropdown({ userId, email }: { userId: string, email: 
     const [isLoading, setIsLoading] = useState(false)
     const [resetLink, setResetLink] = useState<string | null>(null)
     const [copied, setCopied] = useState(false)
+    const [confirmDelete, setConfirmDelete] = useState(false)
     const menuRef = useRef<HTMLDivElement>(null)
 
     useEffect(() => {
@@ -16,6 +17,7 @@ export function UserActionsDropdown({ userId, email }: { userId: string, email: 
             if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
                 setIsOpen(false)
                 setResetLink(null)
+                setConfirmDelete(false)
             }
         }
         document.addEventListener("mousedown", handleClickOutside)
@@ -23,16 +25,16 @@ export function UserActionsDropdown({ userId, email }: { userId: string, email: 
     }, [])
 
     const handleDelete = async () => {
-        if (!confirm(`Tem certeza que deseja DELETAR o usuário ${email}? Esta ação não pode ser desfeita.`)) return
-
         setIsLoading(true)
         const result = await deleteUser(userId)
         setIsLoading(false)
 
         if (result.error) {
             alert('Erro: ' + result.error)
+            setConfirmDelete(false)
         } else {
             setIsOpen(false)
+            setConfirmDelete(false)
         }
     }
 
@@ -69,8 +71,37 @@ export function UserActionsDropdown({ userId, email }: { userId: string, email: 
             </button>
 
             {isOpen && (
-                <div className="absolute right-0 top-full mt-1 w-56 bg-zinc-900 border border-white/10 rounded-lg shadow-xl z-50 overflow-hidden animate-in fade-in slide-in-from-top-2">
-                    {resetLink ? (
+                <div className="absolute right-0 top-full mt-1 w-64 bg-zinc-900 border border-white/10 rounded-lg shadow-xl z-50 overflow-hidden animate-in fade-in slide-in-from-top-2">
+                    {confirmDelete ? (
+                        // Confirmation State
+                        <div className="p-4 space-y-3">
+                            <div className="flex items-center gap-2 text-red-400">
+                                <AlertTriangle className="w-5 h-5" />
+                                <span className="font-medium text-sm">Confirmar Exclusão</span>
+                            </div>
+                            <p className="text-xs text-zinc-400">
+                                Tem certeza que deseja excluir <span className="text-white font-medium">{email}</span>? Esta ação não pode ser desfeita.
+                            </p>
+                            <div className="flex gap-2 pt-2">
+                                <button
+                                    onClick={() => setConfirmDelete(false)}
+                                    disabled={isLoading}
+                                    className="flex-1 py-2 px-3 rounded-md bg-zinc-800 text-zinc-300 hover:bg-zinc-700 text-xs font-medium transition-colors"
+                                >
+                                    Cancelar
+                                </button>
+                                <button
+                                    onClick={handleDelete}
+                                    disabled={isLoading}
+                                    className="flex-1 py-2 px-3 rounded-md bg-red-500 text-white hover:bg-red-400 text-xs font-medium transition-colors flex items-center justify-center gap-1"
+                                >
+                                    {isLoading ? <Loader2 className="w-3 h-3 animate-spin" /> : <Trash2 className="w-3 h-3" />}
+                                    Excluir
+                                </button>
+                            </div>
+                        </div>
+                    ) : resetLink ? (
+                        // Reset Link State
                         <div className="p-3 space-y-2">
                             <p className="text-xs text-zinc-400">Link de Recuperação:</p>
                             <div className="flex items-center gap-2">
@@ -95,6 +126,7 @@ export function UserActionsDropdown({ userId, email }: { userId: string, email: 
                             </button>
                         </div>
                     ) : (
+                        // Default Menu
                         <div className="p-1">
                             <button
                                 onClick={handleResetPassword}
@@ -105,11 +137,11 @@ export function UserActionsDropdown({ userId, email }: { userId: string, email: 
                                 Resetar Senha
                             </button>
                             <button
-                                onClick={handleDelete}
+                                onClick={() => setConfirmDelete(true)}
                                 disabled={isLoading}
                                 className="w-full flex items-center gap-2 px-3 py-2 rounded-md hover:bg-red-500/10 text-zinc-400 hover:text-red-400 text-sm transition-colors disabled:opacity-50"
                             >
-                                {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+                                <Trash2 className="w-4 h-4" />
                                 Excluir Usuário
                             </button>
                         </div>

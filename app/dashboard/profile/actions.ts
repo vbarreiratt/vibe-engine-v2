@@ -44,3 +44,40 @@ export async function updateProfileSettings(formData: FormData) {
     revalidatePath('/dashboard') // Update layout sidebar
     return { success: true }
 }
+
+import { createAdminClient } from '@/lib/supabase/admin'
+
+export async function deleteOwnAccount() {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) throw new Error('Unauthorized')
+
+    // Audit before deletion (store in memory, user will be deleted)
+    const userId = user.id
+    const userEmail = user.email
+
+    // Use admin client to delete user
+    const supabaseAdmin = createAdminClient()
+
+    // Delete from Auth
+    const { error: deleteError } = await supabaseAdmin.auth.admin.deleteUser(userId)
+
+    if (deleteError) {
+        console.error('Delete Own Account Error:', deleteError)
+        return { error: deleteError.message }
+    }
+
+    // Profile should cascade delete, but ensure
+    await supabaseAdmin.from('profiles').delete().eq('user_id', userId)
+
+    // Audit Log (use admin client since user is deleted)
+    await supabaseAdmin.from('audit_log').insert({
+        entity_type: 'user',
+        entity_id: userId,
+        action_type: 'self_delete',
+        after_data: { email: userEmail },
+        actor_user_id: userId
+    })
+
+    return { success: true }
+}
