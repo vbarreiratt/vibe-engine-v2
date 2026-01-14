@@ -149,6 +149,7 @@ O sistema é colaborativo, auditável e hierárquico, permitindo que **Admins** 
   - **Admin User Insights**: Melhoria na listagem de usuários do Admin para exibir dados de perfil (Avatar, Nick, Bio) e status de onboarding.
   - **Avatar Maker**: Implementação de montador de avatar customizado com seleção de forma (circle/square/octagon), cor, olhos, nariz e boca. Integrado ao Onboarding e Página de Perfil.
   - **Avatar Fine-tuning**: Ajuste fino de posicionamento e tamanho dos elementos faciais (olhos 95%, nariz 58%, boca 90%) e correção do border-radius por shape selecionado.
+  - **Admin User Management**: Implementação de ações administrativas para deletar usuários e gerar links de reset de senha, com UI de dropdown e confirmação.
 
 
 

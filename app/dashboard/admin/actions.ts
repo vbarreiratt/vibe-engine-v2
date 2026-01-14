@@ -98,3 +98,85 @@ export async function createUser(formData: FormData) {
     revalidatePath('/dashboard/admin')
     return { success: true }
 }
+
+export async function deleteUser(targetUserId: string) {
+    const supabase = await createClient()
+
+    // Authorization Check
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) throw new Error('Unauthorized')
+
+    const { data: currentUserProfile } = await supabase.from('profiles').select('role').eq('user_id', user.id).single()
+    if (currentUserProfile?.role !== 'admin') throw new Error('Forbidden')
+
+    // Prevent self-delete
+    if (targetUserId === user.id) {
+        return { error: 'Você não pode deletar sua própria conta.' }
+    }
+
+    // Service Role Operation
+    const supabaseAdmin = createAdminClient()
+
+    // Delete from Auth (this will cascade to profiles if FK is set, or we delete manually)
+    const { error: deleteError } = await supabaseAdmin.auth.admin.deleteUser(targetUserId)
+
+    if (deleteError) {
+        console.error('Delete User Error:', deleteError)
+        return { error: deleteError.message }
+    }
+
+    // Also ensure profile is deleted (in case cascade didn't work)
+    await supabaseAdmin.from('profiles').delete().eq('user_id', targetUserId)
+
+    // Audit
+    await supabase.from('audit_log').insert({
+        entity_type: 'user',
+        entity_id: targetUserId,
+        action_type: 'delete_user',
+        actor_user_id: user.id,
+        actor_role: 'admin'
+    })
+
+    revalidatePath('/dashboard/admin')
+    return { success: true }
+}
+
+export async function resetUserPassword(targetUserId: string, targetEmail: string) {
+    const supabase = await createClient()
+
+    // Authorization Check
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) throw new Error('Unauthorized')
+
+    const { data: currentUserProfile } = await supabase.from('profiles').select('role').eq('user_id', user.id).single()
+    if (currentUserProfile?.role !== 'admin') throw new Error('Forbidden')
+
+    // Service Role Operation - Generate password recovery link
+    const supabaseAdmin = createAdminClient()
+
+    const { data, error } = await supabaseAdmin.auth.admin.generateLink({
+        type: 'recovery',
+        email: targetEmail
+    })
+
+    if (error) {
+        console.error('Reset Password Error:', error)
+        return { error: error.message }
+    }
+
+    // Audit
+    await supabase.from('audit_log').insert({
+        entity_type: 'user',
+        entity_id: targetUserId,
+        action_type: 'reset_password',
+        actor_user_id: user.id,
+        actor_role: 'admin'
+    })
+
+    // Return the recovery link (Admin can share it or it's sent by email depending on Supabase config)
+    return {
+        success: true,
+        link: data?.properties?.action_link || null,
+        message: 'Link de recuperação gerado. O usuário pode acessá-lo para redefinir a senha.'
+    }
+}

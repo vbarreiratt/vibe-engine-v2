@@ -4,6 +4,7 @@ import { updateUserRole } from './actions'
 import { Shield, ShieldAlert, User } from 'lucide-react'
 import { CreateUserForm } from './create-user-form'
 import { UserAvatar } from '@/components/user-avatar'
+import { UserActionsDropdown } from './user-actions'
 
 export default async function AdminPage() {
     const supabase = await createClient()
@@ -89,16 +90,19 @@ export default async function AdminPage() {
                                 <td className="px-6 py-4 text-zinc-500 font-mono text-xs">
                                     {new Date(u.created_at).toLocaleDateString()}
                                 </td>
-                                <td className="px-6 py-4 text-right">
+                                <td className="px-6 py-4">
                                     {u.user_id !== user.id && (
-                                        <form action={async () => {
-                                            'use server'
-                                            await updateUserRole(u.user_id, u.role === 'admin' ? 'curator' : 'admin')
-                                        }}>
-                                            <button className="text-xs hover:underline text-zinc-400 hover:text-white transition-colors">
-                                                {u.role === 'admin' ? 'Remover Admin' : 'Promover a Admin'}
-                                            </button>
-                                        </form>
+                                        <div className="flex items-center justify-end gap-3">
+                                            <form action={async () => {
+                                                'use server'
+                                                await updateUserRole(u.user_id, u.role === 'admin' ? 'curator' : 'admin')
+                                            }}>
+                                                <button className="text-xs hover:underline text-zinc-400 hover:text-white transition-colors">
+                                                    {u.role === 'admin' ? 'Remover Admin' : 'Promover'}
+                                                </button>
+                                            </form>
+                                            <UserActionsDropdown userId={u.user_id} email={u.email} />
+                                        </div>
                                     )}
                                 </td>
                             </tr>
