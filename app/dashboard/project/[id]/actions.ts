@@ -75,7 +75,25 @@ export async function getPresignedUrls(projectId: string, files: { name: string,
     return urls
 }
 
-export async function batchSaveImages(projectId: string, images: { publicUrl: string, key: string, width: number, height: number, size: number }[]) {
+// Create Ingestion (Session)
+export async function createIngestion(projectId: string, name: string, isPublic: boolean) {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) throw new Error('Unauthorized')
+
+    const { data: ingestion, error } = await supabase.from('ingestions').insert({
+        project_id: projectId,
+        user_id: user.id,
+        name: name || `Ingestão ${new Date().toLocaleDateString()}`,
+        visibility: isPublic ? 'public' : 'private',
+        status: 'uploading'
+    }).select().single()
+
+    if (error) throw new Error(error.message)
+    return ingestion
+}
+
+export async function batchSaveImages(projectId: string, ingestionId: string | null, images: { publicUrl: string, key: string, width: number, height: number, size: number }[]) {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
 
@@ -86,8 +104,9 @@ export async function batchSaveImages(projectId: string, images: { publicUrl: st
     // Prepare data for batch insert
     const imageRecords = images.map(img => ({
         project_id: projectId,
+        ingestion_id: ingestionId, // Link to Ingestion
         original_url: img.publicUrl,
-        thumb_url: img.publicUrl, // pending thumb service
+        thumb_url: img.publicUrl,
         storage_path: img.key,
         width: img.width,
         height: img.height,
@@ -100,29 +119,32 @@ export async function batchSaveImages(projectId: string, images: { publicUrl: st
         .insert(imageRecords)
         .select('id')
 
+    // ... rest of logic (scan entries etc) logic remains similar ...
     if (imgError) throw new Error(imgError.message)
 
     if (insertedImages) {
-        // Prepare Scan Entries
+        // ... same scan logic ...
         const scanRecords = insertedImages.map(img => ({
             image_id: img.id,
             project_id: projectId,
             status: 'pending'
         }))
+        await supabase.from('image_scan').insert(scanRecords)
+    }
 
-        // Batch Insert default Scan status
-        const { error: scanError } = await supabase.from('image_scan').insert(scanRecords)
-        if (scanError) console.error('Error creating scan entries:', scanError)
+    // Update Ingestion Status if needed
+    if (ingestionId) {
+        await supabase.from('ingestions').update({ status: 'completed' }).eq('id', ingestionId)
     }
 
     // Single Audit Log
     await supabase.from('audit_log').insert({
-        entity_type: 'batch_upload',
-        entity_id: projectId,
-        action_type: 'upload',
-        after_data: { count: images.length },
+        entity_type: 'ingestion',
+        entity_id: ingestionId || projectId,
+        action_type: 'create_images',
+        after_data: { count: images.length, ingestionId },
         actor_user_id: user.id,
-        actor_role: 'curator', // or fetch from profile
+        actor_role: 'curator',
         project_id: projectId
     })
 }

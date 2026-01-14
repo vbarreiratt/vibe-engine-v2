@@ -133,6 +133,8 @@ O sistema é colaborativo, auditável e hierárquico, permitindo que **Admins** 
   - **Fix de Permissões**: Correção de RLS e verificação de nulos em páginas de projeto.
   - **Otimização de Upload**: Implementação de upload paralelo em lote (Client->S3) com inserção em lote no banco (Batch Action), reduzindo drasticamente o tempo de ingestão.
   - **Infra**: Configuração de CORS para DigitalOcean Spaces via script.
+  - **Feature Ingestões**: Implementação de múltiplas sessões de ingestão por projeto, com controle de visibilidade (Público/Privado) e isolamento de imagens via RLS.
+
 
 
 
