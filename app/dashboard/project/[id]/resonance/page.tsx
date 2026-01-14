@@ -5,8 +5,8 @@ import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Loader2, Plus, ArrowLeft, Save } from 'lucide-react';
-import { ClusterMural } from '@/components/cluster-mural/mural';
+import { Loader2, Plus, ArrowLeft } from 'lucide-react';
+import { ResonanceCanvas } from '@/components/cluster-mural/resonance-canvas';
 import Link from 'next/link';
 
 // Types
@@ -147,49 +147,24 @@ export default function ResonancePage() {
     // --- VIEWS ---
 
     if (view === 'editor' && activeRunId) {
-        return (
-            <div className="h-screen flex flex-col bg-neutral-900 text-white">
-                <header className="h-14 border-b border-neutral-800 flex items-center justify-between px-4 bg-black">
-                    <div className="flex items-center gap-4">
-                        <Button variant="ghost" size="sm" onClick={() => { setActiveRunId(null); setView('list'); }}>
-                            <ArrowLeft className="mr-2 h-4 w-4" /> Voltar
-                        </Button>
-                        <h1 className="font-medium">Editor de Ressonância</h1>
-                    </div>
-                    <div className="flex items-center gap-2">
-                        {isSaving ? (
-                            <span className="text-xs text-neutral-500">Salvando...</span>
-                        ) : (
-                            <Button variant="secondary" size="sm" onClick={handleSave}>
-                                <Save className="mr-2 h-4 w-4" /> Salvar Alterações
-                            </Button>
-                        )}
-                    </div>
-                </header>
-
-                <div className="flex-1 overflow-hidden relative">
-                    {loading ? (
-                        <div className="absolute inset-0 flex items-center justify-center">
-                            <div className="flex flex-col items-center gap-2">
-                                <Loader2 className="animate-spin text-lime-500 w-8 h-8" />
-                                <span className="text-sm text-neutral-500">Processando campo de ressonância...</span>
-                            </div>
-                        </div>
-                    ) : (
-                        nodes.length > 0 ? (
-                            <ClusterMural
-                                nodes={nodes}
-                                edges={edges}
-                                clusters={clusters}
-                                onNodeMove={handleNodeMove}
-                            />
-                        ) : (
-                            <div className="absolute inset-0 flex items-center justify-center text-neutral-500">
-                                Run ainda processando ou vazia. Tente recarregar.
-                            </div>
-                        )
-                    )}
+        return loading ? (
+            <div className="h-screen flex items-center justify-center bg-zinc-950">
+                <div className="flex flex-col items-center gap-2">
+                    <Loader2 className="animate-spin text-lime-500 w-8 h-8" />
+                    <span className="text-sm text-zinc-500">Carregando ressonância...</span>
                 </div>
+            </div>
+        ) : nodes.length > 0 ? (
+            <ResonanceCanvas
+                nodes={nodes}
+                edges={edges}
+                clusters={clusters}
+                onNodeMove={handleNodeMove}
+                onSave={handleSave}
+            />
+        ) : (
+            <div className="h-screen flex items-center justify-center bg-zinc-950 text-zinc-500">
+                Run ainda processando ou vazia. Tente recarregar.
             </div>
         );
     }

@@ -324,14 +324,13 @@ export function ResonanceCanvas({ nodes, edges, clusters, onNodeMove, onSave }: 
                         })()}
                     </div>
                     <button
-                        onClick={() => setSelected Node(null)}
-                    className="mt-4 w-full px-3 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-lg text-white text-sm transition-colors"
+                        onClick={() => setSelectedNode(null)}
+                        className="mt-4 w-full px-3 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-lg text-white text-sm transition-colors"
                     >
-                    Fechar
-                </button>
+                        Fechar
+                    </button>
                 </div>
-    )
-}
-        </div >
+            )}
+        </div>
     );
 }
