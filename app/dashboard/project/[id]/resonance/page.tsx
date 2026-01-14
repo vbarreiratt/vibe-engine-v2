@@ -41,6 +41,7 @@ export default function ResonancePage() {
     const [nodes, setNodes] = useState<any[]>([]);
     const [edges, setEdges] = useState<any[]>([]);
     const [clusters, setClusters] = useState<any[]>([]);
+    const [logText, setLogText] = useState<string | undefined>(undefined);
     const [isSaving, setIsSaving] = useState(false);
 
     const supabase = createClient();
@@ -89,6 +90,7 @@ export default function ResonancePage() {
                 setNodes(data.nodes || []);
                 setEdges(data.edges || []);
                 setClusters(data.clusters || []);
+                setLogText(data.run.log_text);
             }
         } catch (e) {
             console.error(e);
@@ -160,6 +162,7 @@ export default function ResonancePage() {
                 nodes={nodes}
                 edges={edges}
                 clusters={clusters}
+                logText={logText}
                 onNodeMove={handleNodeMove}
                 onSave={handleSave}
             />

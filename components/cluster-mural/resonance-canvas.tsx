@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Save, Eye, EyeOff, MousePointer2, Hand, ZoomIn, ZoomOut, RotateCcw } from 'lucide-react';
+import { Save, Eye, EyeOff, MousePointer2, Hand, ZoomIn, ZoomOut, RotateCcw, FileText, X } from 'lucide-react';
 
 // Types
 interface Node {
@@ -31,11 +31,12 @@ interface ResonanceCanvasProps {
     nodes: Node[];
     edges: Edge[];
     clusters: Cluster[];
+    logText?: string;
     onNodeMove?: (nodeId: string, x: number, y: number) => void;
     onSave?: () => void;
 }
 
-// Paleta de cores VIBRANTES para clusters (HSL para garantir visibilidade)
+// Paleta de cores VIBRANTES para clusters
 const CLUSTER_COLORS = [
     'hsl(0, 70%, 60%)',    // Vermelho vibrante
     'hsl(180, 70%, 50%)',  // Ciano
@@ -49,13 +50,14 @@ const CLUSTER_COLORS = [
     'hsl(300, 70%, 60%)',  // Magenta
 ];
 
-export function ResonanceCanvas({ nodes, edges, clusters, onNodeMove, onSave }: ResonanceCanvasProps) {
+export function ResonanceCanvas({ nodes, edges, clusters, logText, onNodeMove, onSave }: ResonanceCanvasProps) {
     const containerRef = useRef<HTMLDivElement>(null);
     const [transform, setTransform] = useState({ scale: 1, x: 0, y: 0 });
     const [selectedNode, setSelectedNode] = useState<string | null>(null);
     const [tool, setTool] = useState<'select' | 'pan'>('select');
     const [isDragging, setIsDragging] = useState(false);
     const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+    const [showLog, setShowLog] = useState(false);
 
     // UI toggles
     const [showTopbar, setShowTopbar] = useState(true);
@@ -147,6 +149,17 @@ export function ResonanceCanvas({ nodes, edges, clusters, onNodeMove, onSave }: 
                     </div>
                 </div>
             </div>
+
+            {/* Floating Log Button */}
+            {logText && (
+                <button
+                    onClick={() => setShowLog(true)}
+                    className="absolute top-6 right-36 z-50 px-5 py-2.5 bg-zinc-800 hover:bg-zinc-700 text-white font-medium rounded-full shadow-lg transition-all flex items-center gap-2 text-sm border border-white/10"
+                >
+                    <FileText className="w-4 h-4" />
+                    Ver Logs
+                </button>
+            )}
 
             {/* Floating Save Button */}
             <button
@@ -439,6 +452,43 @@ export function ResonanceCanvas({ nodes, edges, clusters, onNodeMove, onSave }: 
                             );
                         })()}
                     </div>
+                </div>
+            )}
+
+            {/* Log Modal Overlay */}
+            {showLog && logText && (
+                <div className="absolute inset-0 z-[60] bg-black/80 backdrop-blur-sm flex items-center justify-center p-12">
+                     <div className="bg-zinc-900 w-full max-w-4xl h-full max-h-[90vh] rounded-2xl border border-white/10 shadow-2xl flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+                        <div className="p-6 border-b border-white/10 flex items-center justify-between bg-zinc-900/50">
+                            <h2 className="text-xl font-bold text-white flex items-center gap-2">
+                                <FileText className="w-5 h-5 text-lime-400" />
+                                Log Cognitivo
+                            </h2>
+                            <div className="flex items-center gap-4">
+                                <button 
+                                    onClick={() => {
+                                        const blob = new Blob([logText], { type: 'text/markdown' });
+                                        const url = URL.createObjectURL(blob);
+                                        const a = document.createElement('a');
+                                        a.href = url;
+                                        a.download = 'cluster_log_cognitivo.md';
+                                        a.click();
+                                    }}
+                                    className="text-xs px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 rounded-md transition-colors"
+                                >
+                                    Download MD
+                                </button>
+                                <button onClick={() => setShowLog(false)} className="text-white/60 hover:text-white transition-colors">
+                                    <X className="w-6 h-6" />
+                                </button>
+                            </div>
+                        </div>
+                        <div className="flex-1 overflow-auto p-8 bg-zinc-950/50 selection:bg-lime-500/30">
+                            <pre className="text-zinc-300 text-sm font-mono whitespace-pre-wrap leading-relaxed max-w-3xl mx-auto">
+                                {logText}
+                            </pre>
+                        </div>
+                     </div>
                 </div>
             )}
         </div>

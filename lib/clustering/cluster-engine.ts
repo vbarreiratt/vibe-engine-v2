@@ -65,29 +65,71 @@ export class ClusterEngine {
         this.logger = new ClusterLogger();
     }
 
+
     // Step 1: Vectorize
     // Note: This is expensive if N is large. In MVP 1 signals_run, N ~ 20-50.
     // If N > 100, we should cache embeddings in DB.
     async vectorize() {
+        this.logger.logInput({
+            nodeCount: this.images.length,
+            model: 'text-embedding-004',
+            dimensions: 768
+        });
+
         console.log(`Vectorizing ${this.images.length} images...`);
         for (const img of this.images) {
-            // Join tags to form a sentence describing the layer
-            const stateText = img.state.join(', ');
-            const matterText = img.matter.join(', ');
-            const moveText = img.movement.join(', ');
+            // Normalization
+            const normalize = (list: string[]) => list.map(s => s.toLowerCase().trim()).filter(Boolean);
+            const nState = normalize(img.state);
+            const nMatter = normalize(img.matter);
+            const nMove = normalize(img.movement);
+
+            // Canonical Text Builder
+            const stateText = nState.join(', ');
+            const matterText = nMatter.join(', ');
+            const moveText = nMove.join(', ');
+            const finalText = `state: ${stateText} | matter: ${matterText} | movement: ${moveText}`;
+
+            // Log Canonical Text
+            this.logger.logCanonicalText({
+                imageId: img.id,
+                original: { state: img.state, matter: img.matter, movement: img.movement },
+                normalized: { state: nState, matter: nMatter, movement: nMove },
+                finalText
+            });
 
             // Parallel fetch for speed
-            const [embState, embMatter, embMove] = await Promise.all([
-                stateText ? generateEmbedding(stateText) : Promise.resolve(new Array(1536).fill(0)), // Handle empty
-                matterText ? generateEmbedding(matterText) : Promise.resolve(new Array(1536).fill(0)),
-                moveText ? generateEmbedding(moveText) : Promise.resolve(new Array(1536).fill(0))
-            ]);
+            const startTime = Date.now();
+            try {
+                const [embState, embMatter, embMove] = await Promise.all([
+                    stateText ? generateEmbedding(stateText) : Promise.resolve(new Array(768).fill(0)), // Handle empty, assume 768
+                    matterText ? generateEmbedding(matterText) : Promise.resolve(new Array(768).fill(0)),
+                    moveText ? generateEmbedding(moveText) : Promise.resolve(new Array(768).fill(0))
+                ]);
 
-            this.embeddings[img.id] = {
-                state: embState,
-                matter: embMatter,
-                movement: embMove
-            };
+                this.embeddings[img.id] = {
+                    state: embState,
+                    matter: embMatter,
+                    movement: embMove
+                };
+                
+                this.logger.logEmbedding({
+                    imageId: img.id,
+                    dimension: embState.length,
+                    success: true,
+                    durationMs: Date.now() - startTime
+                });
+
+            } catch (error: any) {
+                this.logger.logEmbedding({
+                    imageId: img.id,
+                    dimension: 0,
+                    success: false,
+                    error: error.message,
+                    durationMs: Date.now() - startTime
+                });
+                console.error(`Failed embedding for ${img.id}`, error);
+            }
         }
     }
 
@@ -107,8 +149,13 @@ export class ClusterEngine {
             for (let j = i + 1; j < ids.length; j++) {
                 const idA = ids[i];
                 const idB = ids[j];
+                
+                const imgA = this.images.find(x => x.id === idA)!;
+                const imgB = this.images.find(x => x.id === idB)!;
                 const empA = this.embeddings[idA];
                 const empB = this.embeddings[idB];
+
+                if (!empA || !empB) continue;
 
                 const simState = cosineSimilarity(empA.state, empB.state);
                 const simMatter = cosineSimilarity(empA.matter, empB.matter);
@@ -129,23 +176,45 @@ export class ClusterEngine {
                 if (simMatter > this.T_SECONDARY) layers.push('matter');
                 if (simMove > this.T_SECONDARY) layers.push('movement');
 
-                // Logic: Must have at least 2 layers contributing
-                if (sM || sV || mV || (matchState && matchMatter) || (matchState && matchMove) || (matchMatter && matchMove)) {
-                    // Average weight of contributing layers
+                const isConnected = sM || sV || mV || (matchState && matchMatter) || (matchState && matchMove) || (matchMatter && matchMove);
+
+                // Calculate Shared Signals (Intersection)
+                const getShared = (l1: string[], l2: string[]) => l1.filter(x => l2.map(y => y.toLowerCase()).includes(x.toLowerCase()));
+                const sharedState = getShared(imgA.state, imgB.state);
+                const sharedMatter = getShared(imgA.matter, imgB.matter);
+                const sharedMove = getShared(imgA.movement, imgB.movement);
+                const allShared = [...sharedState.map(s => `state:${s}`), ...sharedMatter.map(s => `matter:${s}`), ...sharedMove.map(s => `mov:${s}`)];
+
+                // Weight calculation
+                let weight = 0;
+                if (isConnected) {
                     let scoreSum = 0;
                     let count = 0;
                     if (layers.includes('state')) { scoreSum += simState; count++; }
                     if (layers.includes('matter')) { scoreSum += simMatter; count++; }
                     if (layers.includes('movement')) { scoreSum += simMove; count++; }
-
-                    const weight = count > 0 ? scoreSum / count : 0;
+                    weight = count > 0 ? scoreSum / count : 0;
 
                     graph.addEdge(idA, idB, {
                         weight,
                         layers,
-                        // Could store raw scores if needed
                     });
                 }
+
+                // Log Similarity Decision
+                // Check if semantic bridge (high cosine but few shared signals)
+                const overallCosine = (simState + simMatter + simMove) / 3;
+                const isSemanticBridge = isConnected && allShared.length < 2 && weight > 0.8;
+
+                this.logger.logSimilarity({
+                    sourceId: idA,
+                    targetId: idB,
+                    score: weight || overallCosine, // use weight if connected, else avg
+                    threshold: this.T_PRIMARY, // Ref MVP
+                    isEdgeCreated: !!isConnected,
+                    sharedSignals: allShared,
+                    isSemanticBridge
+                });
             }
         }
 
@@ -155,23 +224,22 @@ export class ClusterEngine {
     // Step 4, 5, 6: Process
     run(): ClusterResult {
         this.startTime = Date.now();
-
-        // Log job start
-        this.logger.logJobStart({
-            nodeCount: this.images.length,
-            embeddingModel: 'text-embedding-004',
-            embeddingDimension: 768,
-            similarityMetric: 'cosine similarity',
-            resonanceThreshold: this.T_PRIMARY,
-            clusteringMethod: 'louvain community detection'
-        });
-
+        // (Job start logged in vectorize now to capture model info, or we can move logical start earlier)
+        
         const graph = this.buildGraph();
 
         // Detect Communities
         const communities = louvain(graph);
+        const uniqueClusters = new Set(Object.values(communities));
 
-        // Apply initial layout (will be replaced by 2-stage)
+        this.logger.logFormation({
+            method: 'Louvain Modularity + ForceAtlas2',
+            parameters: { resolution: 1.0, threshold: this.T_PRIMARY },
+            totalClusters: uniqueClusters.size,
+            outliersCount: 0 // Will update later
+        });
+
+        // Apply initial layout
         const positions = forceAtlas2(graph, {
             iterations: 100,
             settings: {
@@ -197,32 +265,55 @@ export class ClusterEngine {
 
             const topState = this.getTopTag(allStates, ['vibra', 'neutro']);
             const topMatter = this.getTopTag(allMatters, []);
-            const topMovement = this.getTopTag(allMovements, []);
-
+            
             const dominantSignals = {
                 state: this.getTopTags(allStates, 3),
                 matter: this.getTopTags(allMatters, 3),
                 movement: this.getTopTags(allMovements, 3)
             };
 
-            // Generate justification
-            let justification = `Cluster formado por`;
-            if (dominantSignals.state.length > 0) {
-                justification += ` estado ${dominantSignals.state.join(', ')}`;
-            }
-            if (dominantSignals.matter.length > 0) {
-                justification += `, matéria ${dominantSignals.matter.join(', ')}`;
-            }
-            if (dominantSignals.movement.length > 0) {
-                justification += `, movimento ${dominantSignals.movement.join(', ')}`;
-            }
-            justification += `.`;
+            // Calculate Medoid (Node with highest internal degree within cluster)
+            let medoidId = itemIds[0];
+            let maxDegree = -1;
+            itemIds.forEach(nodeA => {
+                let internalDegree = 0;
+                itemIds.forEach(nodeB => {
+                    if (nodeA !== nodeB && graph.hasEdge(nodeA, nodeB)) internalDegree++;
+                });
+                if (internalDegree > maxDegree) {
+                    maxDegree = internalDegree;
+                    medoidId = nodeA;
+                }
+            });
 
-            // Log cluster creation
-            this.logger.logClusterCreated({
-                cluster_id: `C${cId}`,
+            // Find strong edges
+            const edgesInCluster = [];
+            for(let i=0; i<itemIds.length; i++) {
+                for(let j=i+1; j<itemIds.length; j++) {
+                    const src = itemIds[i]; 
+                    const tgt = itemIds[j];
+                    if (graph.hasEdge(src, tgt)) {
+                        edgesInCluster.push({
+                            source: src,
+                            target: tgt,
+                            weight: graph.getEdgeAttribute(src, tgt, 'weight')
+                        });
+                    }
+                }
+            }
+            const strongestEdges = edgesInCluster.sort((a,b) => b.weight - a.weight).slice(0, 5);
+
+            // Generate justification
+            let justification = `Cluster consolidado em torno de ${dominantSignals.state[0] || 'vibe'} + ${dominantSignals.matter[0] || 'matéria'}. `;
+            justification += `Alta densidade de arestas (${edgesInCluster.length}) sugerindo coesão forte.`;
+
+            // Log cluster insight
+            this.logger.logClusterInsight({
+                clusterId: cId,
                 nodeCount: itemIds.length,
+                medoidNodeId: medoidId,
                 dominantSignals,
+                strongestEdges,
                 justification
             });
 
@@ -281,17 +372,13 @@ export class ClusterEngine {
         result = applyTwoStageLayout(result);
 
         // Log job completion
-        const duration = (Date.now() - this.startTime) / 1000;
-        const outlierCount = result.nodes.filter(n => n.is_outlier).length;
+        // const duration = (Date.now() - this.startTime) / 1000;
+        // const outlierCount = result.nodes.filter(n => n.is_outlier).length;
 
-        this.logger.logJobEnd({
-            clustersGenerated: result.clusters.length,
-            outliers: outlierCount,
-            duration
-        });
+        // this.logger.logJobEnd(...) - Removed in favor of continuous tracing
 
         // Attach human-readable log
-        result.log = this.logger.generateHumanReadableLog();
+        result.log = this.logger.generateCognitiveMarkdown();
 
         return result;
     }

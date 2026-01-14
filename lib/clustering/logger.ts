@@ -1,148 +1,248 @@
+
+import path from 'path';
+import fs from 'fs/promises';
+
 /**
- * Sistema de logging para auditoria do processo de clusterização
+ * Sistema de logging auditável e cognitivo para o Vibe Engine.
+ * Mantém rastreabilidade completa (Normalização -> Vetor -> Grafo -> Cluster).
  */
 
-export interface ClusterJobLog {
-    type: 'job_start' | 'job_end' | 'cluster_created' | 'user_action';
+// --- Interfaces de Log Técnico e Cognitivo ---
+
+export interface LogEventInput {
+    nodeCount: number;
+    dimensions: number;
+    model: string;
+}
+
+export interface LogCanonicalText {
+    imageId: string;
+    original: {
+        state: string[];
+        matter: string[];
+        movement: string[];
+    };
+    normalized: {
+        state: string[];
+        matter: string[];
+        movement: string[];
+    };
+    finalText: string;
+}
+
+export interface LogEmbedding {
+    imageId: string;
+    dimension: number;
+    success: boolean;
+    error?: string;
+    durationMs: number;
+}
+
+export interface LogSimilarity {
+    sourceId: string;
+    targetId: string;
+    score: number;
+    threshold: number;
+    isEdgeCreated: boolean;
+    sharedSignals: string[];
+    isSemanticBridge: boolean;
+}
+
+export interface LogClusterFormation {
+    method: string; // e.g., 'Louvain', 'ConnectedComponents'
+    parameters: any;
+    totalClusters: number;
+    outliersCount: number;
+}
+
+export interface LogClusterInsight {
+    clusterId: string; // internal ID/Index
+    nodeCount: number;
+    medoidNodeId: string;
+    dominantSignals: {
+        state: string[];
+        matter: string[];
+        movement: string[];
+    };
+    strongestEdges: {
+        source: string;
+        target: string;
+        weight: number;
+    }[];
+    justification: string;
+}
+
+// Estrutura completa do Trace (Estado mutável durante o job)
+export interface ClusterTrace {
+    runId: string;
     timestamp: string;
-    data: any;
+    input: LogEventInput;
+    nodes: Record<string, LogCanonicalText>; // imageId -> info
+    embeddings: Record<string, LogEmbedding>;
+    edges: LogSimilarity[];
+    formation: LogClusterFormation;
+    clusters: Record<string, LogClusterInsight>; // clusterId -> info
+    logs: string[]; // Logs crus de texto para debug rápido
 }
 
 export class ClusterLogger {
-    private logs: ClusterJobLog[] = [];
+    private trace: ClusterTrace;
 
-    logJobStart(data: {
-        nodeCount: number;
-        embeddingModel: string;
-        embeddingDimension: number;
-        similarityMetric: string;
-        resonanceThreshold: number;
-        clusteringMethod: string;
-    }) {
-        this.logs.push({
-            type: 'job_start',
+    constructor(runId: string = 'unknown') {
+        this.trace = {
+            runId,
             timestamp: new Date().toISOString(),
-            data
-        });
-    }
-
-    logJobEnd(data: {
-        clustersGenerated: number;
-        outliers: number;
-        duration: number; // em segundos
-    }) {
-        this.logs.push({
-            type: 'job_end',
-            timestamp: new Date().toISOString(),
-            data
-        });
-    }
-
-    logClusterCreated(data: {
-        cluster_id: string;
-        nodeCount: number;
-        dominantSignals: {
-            state: string[];
-            matter: string[];
-            movement: string[];
+            input: { nodeCount: 0, dimensions: 0, model: 'unknown' },
+            nodes: {},
+            embeddings: {},
+            edges: [],
+            formation: { method: 'unknown', parameters: {}, totalClusters: 0, outliersCount: 0 },
+            clusters: {},
+            logs: []
         };
-        justification: string;
-    }) {
-        this.logs.push({
-            type: 'cluster_created',
-            timestamp: new Date().toISOString(),
-            data
-        });
     }
 
-    logUserAction(data: {
-        userId: string;
-        action: 'move_node' | 'create_cluster' | 'merge_clusters' | 'split_cluster' | 'mark_outlier' | 'rename_cluster';
-        target: string; // node_id ou cluster_id
-        beforeState?: any;
-        afterState?: any;
-        reason?: string;
-    }) {
-        this.logs.push({
-            type: 'user_action',
-            timestamp: new Date().toISOString(),
-            data
-        });
+    // --- Métodos de Captura (Instrumentação) ---
+
+    logInput(input: LogEventInput) {
+        this.trace.input = input;
+        this.log(`Job iniciado: ${input.nodeCount} node(s). Model: ${input.model}`);
     }
 
-    /**
-     * Gera log legível para humanos
-     */
-    generateHumanReadableLog(): string {
-        let output = '';
+    logCanonicalText(data: LogCanonicalText) {
+        this.trace.nodes[data.imageId] = data;
+    }
 
-        for (const log of this.logs) {
-            switch (log.type) {
-                case 'job_start':
-                    output += `[CLUSTER_JOB_START]\n`;
-                    output += `Nodes recebidos: ${log.data.nodeCount}\n`;
-                    output += `Modelo de embedding: ${log.data.embeddingModel}\n`;
-                    output += `Dimensão: ${log.data.embeddingDimension}\n`;
-                    output += `Métrica: ${log.data.similarityMetric}\n`;
-                    output += `Threshold de ressonância: ${log.data.resonanceThreshold}\n`;
-                    output += `Método de agrupamento: ${log.data.clusteringMethod}\n`;
-                    output += `\n`;
-                    break;
+    logEmbedding(data: LogEmbedding) {
+        this.trace.embeddings[data.imageId] = data;
+    }
 
-                case 'job_end':
-                    output += `[CLUSTER_JOB_END]\n`;
-                    output += `Clusters gerados: ${log.data.clustersGenerated}\n`;
-                    output += `Outliers: ${log.data.outliers}\n`;
-                    output += `Duração: ${log.data.duration.toFixed(2)}s\n`;
-                    output += `\n`;
-                    break;
-
-                case 'cluster_created':
-                    output += `[CLUSTER_AUTO]\n`;
-                    output += `cluster_id: ${log.data.cluster_id}\n`;
-                    output += `nodes: ${log.data.nodeCount}\n`;
-                    output += `sinais dominantes:\n`;
-                    if (log.data.dominantSignals.state.length > 0) {
-                        output += `  • Estado: ${log.data.dominantSignals.state.join(', ')}\n`;
-                    }
-                    if (log.data.dominantSignals.matter.length > 0) {
-                        output += `  • Matéria: ${log.data.dominantSignals.matter.join(', ')}\n`;
-                    }
-                    if (log.data.dominantSignals.movement.length > 0) {
-                        output += `  • Movimento: ${log.data.dominantSignals.movement.join(', ')}\n`;
-                    }
-                    output += `Justificativa:\n${log.data.justification}\n`;
-                    output += `\n`;
-                    break;
-
-                case 'user_action':
-                    output += `[USER_ACTION]\n`;
-                    output += `user: ${log.data.userId}\n`;
-                    output += `ação: ${log.data.action}\n`;
-                    output += `alvo: ${log.data.target}\n`;
-                    if (log.data.reason) {
-                        output += `motivo: "${log.data.reason}"\n`;
-                    }
-                    output += `timestamp: ${log.timestamp}\n`;
-                    output += `\n`;
-                    break;
-            }
+    logSimilarity(data: LogSimilarity) {
+        // Apenas guardamos se for relevante (ex: acima de um certo ponto) ou se gerou aresta
+        // Para não explodir a memória, podemos filtrar scores muito baixos se não gerarem aresta
+        // Mas o pedido é para auditoria completa. Vamos manter edges criados + rejeições 'quase' aceitas.
+        if (data.isEdgeCreated || data.score > 0.5) {
+            this.trace.edges.push(data);
         }
+    }
 
-        return output;
+    logFormation(data: LogClusterFormation) {
+        this.trace.formation = data;
+        this.log(`Clusters formados via ${data.method}: ${data.totalClusters} clusters, ${data.outliersCount} outliers.`);
+    }
+
+    logClusterInsight(data: LogClusterInsight) {
+        this.trace.clusters[data.clusterId] = data;
+    }
+
+    private log(msg: string) {
+        this.trace.logs.push(`[${new Date().toISOString()}] ${msg}`);
+        console.log(`[ClusterLogger] ${msg}`);
+    }
+
+    // --- Geradores de Saída ---
+
+    /**
+     * Gera o Markdown Cognitivo (Narrativa Humana)
+     */
+    generateCognitiveMarkdown(): string {
+        const t = this.trace;
+        let md = `# Relatório Cognitivo de Clusterização (Vibe Engine)\n\n`;
+        md += `**Run ID:** \`${t.runId}\`\n`;
+        md += `**Data:** ${t.timestamp}\n`;
+        md += `**Input:** ${t.input.nodeCount} imagens processadas via ${t.input.model} (${t.input.dimensions}d).\n\n`;
+
+        md += `## 1. Preparação e Normalização (Amostra)\n`;
+        md += `Exibindo primeiros 3 exemplos de transformação texto -> canônico:\n\n`;
+        Object.values(t.nodes).slice(0, 3).forEach(n => {
+            md += `### Imagem \`${n.imageId}\`\n`;
+            md += `- **Original**: S=[${n.original.state.join(', ')}] M=[${n.original.matter.join(', ')}] V=[${n.original.movement.join(', ')}]\n`;
+            md += `- **Canônico**: "${n.finalText}"\n\n`;
+        });
+
+        md += `## 2. Decisões de Grafo (Arestas)\n`;
+        md += `Total de conexões avaliadas relevantes: ${t.edges.length}\n\n`;
+        
+        // Amostra de arestas fortes
+        const strongEdges = t.edges.filter(e => e.isEdgeCreated).sort((a, b) => b.score - a.score).slice(0, 5);
+        md += `### Top 5 Conexões Mais Fortes\n`;
+        strongEdges.forEach(e => {
+            md += `- **${e.sourceId} ↔ ${e.targetId}** (Score: ${e.score.toFixed(3)})\n`;
+            md += `  - Shared Signals: ${e.sharedSignals.join(', ') || '(Similaridade vetorial latente)'}\n`;
+            if (e.isSemanticBridge) md += `  - *Semantic Bridge (Alta similaridade apesar de poucos sinais exatos)*\n`;
+        });
+
+        md += `\n## 3. Explicação dos Clusters\n`;
+        md += `Método: ${t.formation.method}. Resultado: ${t.formation.totalClusters} clusters.\n\n`;
+
+        Object.values(t.clusters).forEach(c => {
+            md += `### Cluster ${c.clusterId}\n`;
+            md += `- **Medoid (Núcleo)**: \`${c.medoidNodeId}\`\n`;
+            md += `- **Tamanho**: ${c.nodeCount} imagens\n`;
+            md += `- **Sinais Dominantes**:\n`;
+            md += `  - Estado: ${c.dominantSignals.state.join(', ')}\n`;
+            md += `  - Matéria: ${c.dominantSignals.matter.join(', ')}\n`;
+            md += `  - Movimento: ${c.dominantSignals.movement.join(', ')}\n`;
+            md += `- **Justificativa**: ${c.justification}\n`;
+            md += `\n`;
+        });
+
+        return md;
     }
 
     /**
-     * Exporta logs em JSON
+     * Retorna o objeto JSON completo para log técnico
      */
-    toJSON(): ClusterJobLog[] {
-        return this.logs;
+    generateTechnicalJson(): object {
+        return this.trace;
     }
 
     /**
-     * Carrega logs de JSON
+     * Gera CSV de Nodes
      */
-    fromJSON(logs: ClusterJobLog[]) {
-        this.logs = logs;
+    generateNodesCSV(): string {
+        const header = "node_id,canonical_text,top_signals_state,top_signals_matter,top_signals_movement,embedding_ok\n";
+        const rows = Object.values(this.trace.nodes).map(n => {
+            // escape text
+            const safeText = `"${n.finalText.replace(/"/g, '""')}"`;
+            const s = `"${n.normalized.state.join('|')}"`;
+            const m = `"${n.normalized.matter.join('|')}"`;
+            const v = `"${n.normalized.movement.join('|')}"`;
+            const embOk = this.trace.embeddings[n.imageId]?.success ?? false;
+            return `${n.imageId},${safeText},${s},${m},${v},${embOk}`;
+        });
+        return header + rows.join('\n');
+    }
+
+    /**
+     * Gera CSV de Edges
+     */
+    generateEdgesCSV(): string {
+        const header = "source,target,cosine,shared_signals,is_created,is_bridge\n";
+        const rows = this.trace.edges.map(e => {
+            const shared = `"${e.sharedSignals.join('|')}"`;
+            return `${e.sourceId},${e.targetId},${e.score.toFixed(4)},${shared},${e.isEdgeCreated},${e.isSemanticBridge}`;
+        });
+        return header + rows.join('\n');
+    }
+
+    /**
+     * Exporta tudo para disco
+     */
+    async exportLogs(baseDir: string) {
+        try {
+            await fs.mkdir(baseDir, { recursive: true });
+
+            await fs.writeFile(path.join(baseDir, 'cluster_log_cognitivo.md'), this.generateCognitiveMarkdown());
+            await fs.writeFile(path.join(baseDir, 'cluster_log_tecnico.json'), JSON.stringify(this.generateTechnicalJson(), null, 2));
+            await fs.writeFile(path.join(baseDir, 'cluster_nodes.csv'), this.generateNodesCSV());
+            await fs.writeFile(path.join(baseDir, 'cluster_graph.csv'), this.generateEdgesCSV());
+            
+            console.log(`Logs exportados com sucesso para ${baseDir}`);
+        } catch (error) {
+            console.error("Erro ao exportar logs:", error);
+        }
     }
 }
+// End of Logger
+

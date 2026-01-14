@@ -98,6 +98,14 @@ Transformar o Canvas de Ressonância de um "debug de pontos" para um **editor pr
   - **Clusters como Ilhas**: Círculos translúcidos coloridos com bordas tracejadas
   - **Nodes Visíveis**: Quadrados 70x70px preenchidos com cor do cluster
   - **Badges**: Número do cluster em círculo branco sobreposto
+
+#### 4. Log Cognitivo Robusto (Auditabilidade) ✅
+- **Implementação**: Sistema de logging duplo (Técnico + Cognitivo) em `lib/clustering/logger.ts`.
+- **Rastreabilidade**: Pipeline instrumentado (`ClusterEngine`) para registrar normalização, vetorização, similaridade e formação.
+- **Transparência**: Markdown de log gerado com justificativas humanas ("Cluster formado por...").
+- **Persistência**: Logs salvos em `outputs/run_<timestamp>/` (MD, JSON, CSV) e no banco (`clusters_runs.log_text`).
+- **UI**: Botão "Ver Logs" no Canvas com modal e download.
+- **Migration**: `20260114000009_add_log_text_to_runs.sql`.
   - **Glow Effect**: Efeito de brilho ao selecionar node
 - **Interações**:
   - Zoom & Pan funcionais (scroll + botões)
