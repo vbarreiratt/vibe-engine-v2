@@ -1,7 +1,7 @@
 'use client'
 
-import { useState } from 'react'
-import { Check, Loader2, Layers, RotateCcw } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { Check, Loader2, Layers, RotateCcw, Maximize2, X, ChevronLeft, ChevronRight, Keyboard } from 'lucide-react'
 import { batchSubmitScan } from './actions'
 
 interface ImageItem {
@@ -16,6 +16,10 @@ export function ScanGrid({ images, projectId }: { images: ImageItem[], projectId
     // Filter State
     const [showOnlySelected, setShowOnlySelected] = useState(false)
 
+    // Stage Mode State
+    const [isStageMode, setIsStageMode] = useState(false)
+    const [currentIndex, setCurrentIndex] = useState(0)
+
     const toggleSelection = (id: string) => {
         const next = new Set(selectedIds)
         if (next.has(id)) {
@@ -23,6 +27,13 @@ export function ScanGrid({ images, projectId }: { images: ImageItem[], projectId
         } else {
             next.add(id)
         }
+        setSelectedIds(next)
+    }
+
+    const setSelection = (id: string, vibra: boolean) => {
+        const next = new Set(selectedIds)
+        if (vibra) next.add(id)
+        else next.delete(id)
         setSelectedIds(next)
     }
 
@@ -45,6 +56,36 @@ export function ScanGrid({ images, projectId }: { images: ImageItem[], projectId
         }
     }
 
+    // Keyboard Handler
+    useEffect(() => {
+        if (!isStageMode) return
+
+        const handleKeyDown = (e: KeyboardEvent) => {
+            const currentImg = images[currentIndex]
+            if (!currentImg) return
+
+            if (e.key.toLowerCase() === 'v') {
+                setSelection(currentImg.id, true)
+                if (currentIndex < images.length - 1) setCurrentIndex(prev => prev + 1)
+            }
+            if (e.key.toLowerCase() === 'n') {
+                setSelection(currentImg.id, false)
+                if (currentIndex < images.length - 1) setCurrentIndex(prev => prev + 1)
+            }
+            if (e.key === 'ArrowRight') {
+                if (currentIndex < images.length - 1) setCurrentIndex(prev => prev + 1)
+            }
+            if (e.key === 'ArrowLeft') {
+                if (currentIndex > 0) setCurrentIndex(prev => prev - 1)
+            }
+            if (e.key === 'Escape') setIsStageMode(false)
+        }
+
+        window.addEventListener('keydown', handleKeyDown)
+        return () => window.removeEventListener('keydown', handleKeyDown)
+    }, [isStageMode, currentIndex, images, setSelection]) // selectedIds not strictly needed in dep array for setter function form if used, but direct set needs it? No, setSelection reads state properly if updated. Actually closure might be stale.
+    // Including selectedIds in deps means effect re-binds on every selection. Acceptable for this scale.
+
     // Determine what to show in grid
     const visibleImages = showOnlySelected
         ? images.filter(img => selectedIds.has(img.id))
@@ -64,6 +105,83 @@ export function ScanGrid({ images, projectId }: { images: ImageItem[], projectId
                     <a href={`/dashboard/project/${projectId}`} className="px-4 py-2 bg-zinc-800 text-white rounded-md text-sm hover:bg-zinc-700 transition-colors">
                         Voltar ao Projeto
                     </a>
+                </div>
+            </div>
+        )
+    }
+
+    // STAGE MODE RENDER
+    if (isStageMode && images[currentIndex]) {
+        const currentImg = images[currentIndex]
+        const isSelected = selectedIds.has(currentImg.id)
+
+        return (
+            <div className="fixed inset-0 z-50 bg-black flex flex-col animate-in fade-in duration-200">
+                {/* Header */}
+                <div className="flex items-center justify-between p-4 bg-zinc-900/50 backdrop-blur border-b border-white/5">
+                    <div className="flex items-center gap-4 text-sm text-zinc-400">
+                        <span className="font-mono text-white">{currentIndex + 1} / {images.length}</span>
+                        <div className="flex items-center gap-2 px-2 py-1 bg-white/5 rounded hidden md:flex">
+                            <Keyboard className="w-3 h-3" />
+                            <span>V = Vibra, N = Não, Setas = Navegar, Esc = Sair</span>
+                        </div>
+                    </div>
+                    <button onClick={() => setIsStageMode(false)} className="p-2 hover:bg-white/10 rounded-full transition-colors">
+                        <X className="w-5 h-5 text-white" />
+                    </button>
+                </div>
+
+                {/* Main Content */}
+                <div className="flex-1 relative flex items-center justify-center p-8 overflow-hidden">
+                    <div className="relative h-full w-full flex items-center justify-center">
+                        <img
+                            src={currentImg.thumb_url}
+                            className={`max-h-full max-w-full object-contain shadow-2xl rounded-lg transition-all duration-200 ${isSelected ? 'ring-4 ring-emerald-500' : ''}`}
+                        />
+                        {isSelected && (
+                            <div className="absolute top-4 right-4 bg-emerald-500 text-white px-3 py-1 rounded-full font-medium shadow-xl flex items-center gap-2 animate-in zoom-in">
+                                <Check className="w-4 h-4" /> Vibra
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Navigation Arrows */}
+                    <button
+                        onClick={() => currentIndex > 0 && setCurrentIndex(curr => curr - 1)}
+                        className="absolute left-4 p-4 rounded-full bg-black/50 hover:bg-white/10 text-white transition-colors disabled:opacity-0"
+                        disabled={currentIndex === 0}
+                    >
+                        <ChevronLeft className="w-8 h-8" />
+                    </button>
+                    <button
+                        onClick={() => currentIndex < images.length - 1 && setCurrentIndex(curr => curr + 1)}
+                        className="absolute right-4 p-4 rounded-full bg-black/50 hover:bg-white/10 text-white transition-colors disabled:opacity-0"
+                        disabled={currentIndex === images.length - 1}
+                    >
+                        <ChevronRight className="w-8 h-8" />
+                    </button>
+                </div>
+
+                {/* Controls Footer */}
+                <div className="p-6 bg-zinc-900 border-t border-white/5 flex justify-center gap-6">
+                    <button
+                        onClick={() => {
+                            setSelection(currentImg.id, false)
+                            if (currentIndex < images.length - 1) setCurrentIndex(prev => prev + 1)
+                        }}
+                        className={`min-w-[140px] px-6 py-3 rounded-lg font-medium border transition-all ${!isSelected ? 'bg-zinc-800 text-zinc-300 border-zinc-700' : 'bg-transparent text-zinc-500 border-zinc-800 hover:text-white'}`}
+                    >
+                        (N) Não Vibra
+                    </button>
+                    <button
+                        onClick={() => {
+                            setSelection(currentImg.id, true)
+                            if (currentIndex < images.length - 1) setCurrentIndex(prev => prev + 1)
+                        }}
+                        className={`min-w-[140px] px-6 py-3 rounded-lg font-medium border transition-all ${isSelected ? 'bg-emerald-600 text-white border-emerald-500 shadow-[0_0_20px_rgba(16,185,129,0.4)]' : 'bg-zinc-800 text-white border-zinc-700 hover:bg-emerald-500/20 hover:border-emerald-500/50'}`}
+                    >
+                        (V) Vibra!
+                    </button>
                 </div>
             </div>
         )
@@ -119,6 +237,22 @@ export function ScanGrid({ images, projectId }: { images: ImageItem[], projectId
                     <span className="text-white font-medium">{selectedIds.size}</span> vibram
                 </span>
 
+                {/* Stage Mode Toggle */}
+                {images.length > 0 && !showOnlySelected && (
+                    <button
+                        onClick={() => {
+                            setIsStageMode(true)
+                            setCurrentIndex(0)
+                        }}
+                        className="p-2 rounded-full hover:bg-white/5 text-zinc-400 hover:text-white transition-colors"
+                        title="Modo Palco (Teclado)"
+                    >
+                        <Maximize2 className="w-5 h-5" />
+                    </button>
+                )}
+
+                <div className="h-6 w-px bg-white/10 mx-1" />
+
                 {/* Toggle View Mode Button */}
                 {selectedIds.size > 0 && (
                     <button
@@ -130,7 +264,7 @@ export function ScanGrid({ images, projectId }: { images: ImageItem[], projectId
                     </button>
                 )}
 
-                <div className="h-6 w-px bg-white/10 mx-1" />
+                {(selectedIds.size > 0 || isStageMode) && <div className="h-6 w-px bg-white/10 mx-1" />}
 
                 <button
                     onClick={handleFinish}
@@ -138,7 +272,7 @@ export function ScanGrid({ images, projectId }: { images: ImageItem[], projectId
                     className="bg-white text-black hover:bg-zinc-200 px-6 py-2.5 rounded-full text-sm font-medium transition-colors shadow-lg shadow-white/5 flex items-center gap-2"
                 >
                     {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
-                    Concluir Varredura
+                    Concluir
                 </button>
             </div>
         </div>
