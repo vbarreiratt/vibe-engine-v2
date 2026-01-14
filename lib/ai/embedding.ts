@@ -1,61 +1,79 @@
-import { VertexAI } from '@google-cloud/vertexai'
-import fs from 'fs/promises'
+import { GoogleAuth } from 'google-auth-library';
+import fs from 'fs/promises';
 
-const SERVICE_ACCOUNT_PATH = '/Users/vbarreirat/utilidades/bicho_utilidades/vibe-engine/service-account.json'
+const SERVICE_ACCOUNT_PATH = '/Users/vbarreirat/utilidades/bicho_utilidades/vibe-engine/service-account.json';
 
-// Cache Vertex client definition
-let vertexAI: VertexAI | null = null
+let authClient: any = null;
+let projectId: string | null = null;
 
-async function getVertexClient() {
-    if (vertexAI) return vertexAI
+async function getAuthClient() {
+    if (authClient && projectId) return { authClient, projectId };
 
     try {
-        const serviceAccountRaw = await fs.readFile(SERVICE_ACCOUNT_PATH, 'utf-8')
-        const serviceAccount = JSON.parse(serviceAccountRaw)
+        const serviceAccountRaw = await fs.readFile(SERVICE_ACCOUNT_PATH, 'utf-8');
+        const serviceAccount = JSON.parse(serviceAccountRaw);
 
-        const project = serviceAccount.project_id
-        const location = 'us-central1'
+        projectId = serviceAccount.project_id;
 
-        vertexAI = new VertexAI({
-            project: project,
-            location: location,
-            googleAuthOptions: {
-                credentials: {
-                    client_email: serviceAccount.client_email,
-                    private_key: serviceAccount.private_key,
-                }
-            }
-        })
-        return vertexAI
+        const auth = new GoogleAuth({
+            credentials: {
+                client_email: serviceAccount.client_email,
+                private_key: serviceAccount.private_key,
+            },
+            scopes: ['https://www.googleapis.com/auth/cloud-platform'],
+        });
+
+        authClient = await auth.getClient();
+        return { authClient, projectId };
     } catch (error) {
-        console.error("Failed to init Vertex AI:", error)
-        throw error
+        console.error("Failed to init Google Auth:", error);
+        throw error;
     }
 }
 
-export async function generateEmbedding(text: string) {
+export async function generateEmbedding(text: string): Promise<number[]> {
     try {
-        const client = await getVertexClient()
+        const { authClient, projectId } = await getAuthClient();
 
-        // Use textEmbedding method for embedding models
-        const textEmbeddingModel = client.preview.getGenerativeModel({
-            model: 'text-embedding-004',
+        // Vertex AI Text Embeddings API endpoint
+        const location = 'us-central1';
+        const model = 'text-embedding-004';
+        const url = `https://${location}-aiplatform.googleapis.com/v1/projects/${projectId}/locations/${location}/publishers/google/models/${model}:predict`;
+
+        // Get access token
+        const accessToken = await authClient.getAccessToken();
+
+        // Make request to Vertex AI
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${accessToken.token}`,
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                instances: [
+                    {
+                        content: text,
+                    }
+                ]
+            })
         });
 
-        // Call embedContent with the proper format
-        const result = await textEmbeddingModel.embedContent({
-            content: { role: 'user', parts: [{ text }] }
-        });
-
-        const embedding = result?.embedding?.values;
-
-        if (!embedding) {
-            throw new Error("No embedding returned")
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`Vertex AI API error (${response.status}): ${errorText}`);
         }
 
-        return embedding
+        const result = await response.json();
+        const embedding = result?.predictions?.[0]?.embeddings?.values;
+
+        if (!embedding || !Array.isArray(embedding)) {
+            throw new Error("No valid embedding returned from Vertex AI");
+        }
+
+        return embedding;
     } catch (error) {
-        console.error("Embedding Error (Vertex):", error)
-        throw error
+        console.error("Embedding Error (Vertex):", error);
+        throw error;
     }
 }
