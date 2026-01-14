@@ -29,14 +29,21 @@ export function UserActionsDropdown({ userId, email }: { userId: string, email: 
     const handleDelete = async () => {
         setIsLoading(true)
         setError(null)
-        const result = await deleteUser(userId)
-        setIsLoading(false)
 
-        if (result.error) {
-            setError(result.error)
-        } else {
-            setIsOpen(false)
-            setConfirmDelete(false)
+        try {
+            const result = await deleteUser(userId)
+            setIsLoading(false)
+
+            if (result.error) {
+                setError(result.error)
+            } else {
+                setIsOpen(false)
+                setConfirmDelete(false)
+            }
+        } catch (e: any) {
+            console.error('Delete User Frontend Error:', e)
+            setError(e.message || 'Erro desconhecido')
+            setIsLoading(false)
         }
     }
 
@@ -85,9 +92,14 @@ export function UserActionsDropdown({ userId, email }: { userId: string, email: 
                             <p className="text-xs text-zinc-400">
                                 Tem certeza que deseja excluir <span className="text-white font-medium">{email}</span>? Esta ação não pode ser desfeita.
                             </p>
+                            {error && (
+                                <p className="text-xs text-red-400 bg-red-500/10 px-2 py-1 rounded">
+                                    Erro: {error}
+                                </p>
+                            )}
                             <div className="flex gap-2 pt-2">
                                 <button
-                                    onClick={() => setConfirmDelete(false)}
+                                    onClick={() => { setConfirmDelete(false); setError(null); }}
                                     disabled={isLoading}
                                     className="flex-1 py-2 px-3 rounded-md bg-zinc-800 text-zinc-300 hover:bg-zinc-700 text-xs font-medium transition-colors"
                                 >

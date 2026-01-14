@@ -117,16 +117,36 @@ export async function deleteUser(targetUserId: string) {
     // Service Role Operation
     const supabaseAdmin = createAdminClient()
 
-    // Delete from Auth (this will cascade to profiles if FK is set, or we delete manually)
+    // --- Clean up FK dependencies BEFORE deleting user ---
+
+    // 1. Remove from project_members
+    await supabaseAdmin.from('project_members').delete().eq('user_id', targetUserId)
+
+    // 2. Update images to null creator
+    await supabaseAdmin.from('images').update({ created_by: null }).eq('created_by', targetUserId)
+
+    // 3. Update ingestions to null user
+    await supabaseAdmin.from('ingestions').update({ user_id: null }).eq('user_id', targetUserId)
+
+    // 4. Update image_scan to null scanned_by
+    await supabaseAdmin.from('image_scan').update({ scanned_by: null }).eq('scanned_by', targetUserId)
+
+    // 5. Update image_signals to null updated_by
+    await supabaseAdmin.from('image_signals').update({ updated_by: null }).eq('updated_by', targetUserId)
+
+    // 6. Update audit_log to null actor
+    await supabaseAdmin.from('audit_log').update({ actor_user_id: null }).eq('actor_user_id', targetUserId)
+
+    // 7. Delete profile
+    await supabaseAdmin.from('profiles').delete().eq('user_id', targetUserId)
+
+    // --- Now delete from Auth ---
     const { error: deleteError } = await supabaseAdmin.auth.admin.deleteUser(targetUserId)
 
     if (deleteError) {
         console.error('Delete User Error:', deleteError)
         return { error: deleteError.message }
     }
-
-    // Also ensure profile is deleted (in case cascade didn't work)
-    await supabaseAdmin.from('profiles').delete().eq('user_id', targetUserId)
 
     // Audit
     await supabase.from('audit_log').insert({

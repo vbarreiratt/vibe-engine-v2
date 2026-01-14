@@ -59,16 +59,36 @@ export async function deleteOwnAccount() {
     // Use admin client to delete user
     const supabaseAdmin = createAdminClient()
 
-    // Delete from Auth
+    // --- Clean up FK dependencies BEFORE deleting user ---
+
+    // 1. Remove from project_members
+    await supabaseAdmin.from('project_members').delete().eq('user_id', userId)
+
+    // 2. Update images to null creator
+    await supabaseAdmin.from('images').update({ created_by: null }).eq('created_by', userId)
+
+    // 3. Update ingestions to null user
+    await supabaseAdmin.from('ingestions').update({ user_id: null }).eq('user_id', userId)
+
+    // 4. Update image_scan to null scanned_by
+    await supabaseAdmin.from('image_scan').update({ scanned_by: null }).eq('scanned_by', userId)
+
+    // 5. Update image_signals to null updated_by
+    await supabaseAdmin.from('image_signals').update({ updated_by: null }).eq('updated_by', userId)
+
+    // 6. Update audit_log to null actor
+    await supabaseAdmin.from('audit_log').update({ actor_user_id: null }).eq('actor_user_id', userId)
+
+    // 7. Delete profile
+    await supabaseAdmin.from('profiles').delete().eq('user_id', userId)
+
+    // --- Now delete from Auth ---
     const { error: deleteError } = await supabaseAdmin.auth.admin.deleteUser(userId)
 
     if (deleteError) {
         console.error('Delete Own Account Error:', deleteError)
         return { error: deleteError.message }
     }
-
-    // Profile should cascade delete, but ensure
-    await supabaseAdmin.from('profiles').delete().eq('user_id', userId)
 
     // Audit Log (use admin client since user is deleted)
     await supabaseAdmin.from('audit_log').insert({
