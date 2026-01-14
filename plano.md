@@ -77,8 +77,9 @@ O sistema é colaborativo, auditável e hierárquico, permitindo que **Admins** 
 ### Fase 3: Fluxo de Vibe - Parte 1 (Scan & Tags)
 - [x] Tela de Varredura (Grid Rápido: Vibra/Não Vibra).
 - [x] Auditoria de Decisões de Varredura.
-- [ ] Integração LLM para Sugestão de Tags (Estado, Matéria, Movimento).
-- [ ] Interface de Revisão de Tags (Human-in-the-loop).
+- [x] Integração LLM para Sugestão de Tags (Estado, Matéria, Movimento).
+- [x] Interface de Revisão de Tags (Human-in-the-loop).
+
 
 
 ### Fase 4: Fluxo de Vibe - Parte 2 (Ressonância)
@@ -119,5 +120,9 @@ O sistema é colaborativo, auditável e hierárquico, permitindo que **Admins** 
   - Configuração do DigitalOcean Spaces (S3).
   - Implementação do Upload de Imagens com Presigned URLs.
   - Dashboard do Projeto (Fluxo de Ingestão).
+  - Fluxo de Varredura (Scan Grid).
+  - Integração OpenAI para Tagging.
+  - Interface de Leitura de Sinais (Tags).
+
 
 
