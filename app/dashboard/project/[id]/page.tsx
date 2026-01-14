@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { Uploader } from './uploader' // We'll make this next
 import { Play, Download, Settings, Sliders } from 'lucide-react'
+import { ProjectSettingsDialog } from './project-settings-dialog'
 
 // MVP: Only Ingestion Phase implemented visually for now
 export default async function ProjectPage({ params }: { params: Promise<{ id: string }> }) {
@@ -56,6 +57,18 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
 
     const { data: images } = await supabase.from('images').select('*').eq('project_id', projectId).order('created_at', { ascending: false })
 
+    // Fetch Members for Settings
+    const { data: members } = await supabase
+        .from('project_members')
+        .select(`
+            user_id,
+            role,
+            profiles ( email )
+        `)
+        .eq('project_id', projectId)
+
+    const isAdmin = profile?.role === 'admin'
+
     return (
         <div className="space-y-8 max-w-7xl mx-auto">
             {/* Header */}
@@ -66,9 +79,9 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
                     <p className="text-zinc-400 max-w-2xl">{project.description}</p>
                 </div>
                 <div className="flex gap-2">
-                    <button className="flex items-center gap-2 px-4 py-2 rounded-md bg-white/5 text-zinc-300 hover:bg-white/10 hover:text-white transition-colors">
-                        <Settings className="w-4 h-4" />
-                    </button>
+                    {isAdmin && (
+                        <ProjectSettingsDialog project={project} members={members || []} />
+                    )}
                     <button className="flex items-center gap-2 px-4 py-2 rounded-md bg-purple-600 text-white hover:bg-purple-500 transition-colors shadow-lg shadow-purple-500/20">
                         <Play className="w-4 h-4 fill-current" />
                         <span className="font-medium">Iniciar Varredura</span>

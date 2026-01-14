@@ -148,3 +148,70 @@ export async function batchSaveImages(projectId: string, ingestionId: string | n
         project_id: projectId
     })
 }
+
+import { revalidatePath } from 'next/cache'
+
+// --- ADMIN PROJECT CONFIGURATION ---
+
+export async function updateProjectSettings(projectId: string, formData: FormData) {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+
+    const { data: profile } = await supabase.from('profiles').select('role').eq('user_id', user?.id).single()
+    if (profile?.role !== 'admin') throw new Error('Forbidden')
+
+    const name = formData.get('name') as string
+    const description = formData.get('description') as string
+
+    await supabase.from('projects')
+        .update({ name, description })
+        .eq('id', projectId)
+
+    revalidatePath(`/dashboard/project/${projectId}`)
+}
+
+export async function addProjectMember(projectId: string, email: string) {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+
+    const { data: profile } = await supabase.from('profiles').select('role').eq('user_id', user?.id).single()
+    if (profile?.role !== 'admin') throw new Error('Forbidden')
+
+    // Find User by Email
+    const { data: targetUser } = await supabase.from('profiles').select('user_id').eq('email', email).single()
+
+    if (!targetUser) return { error: 'Usuário não encontrado com este email.' }
+
+    // Check if already member
+    const { data: exists } = await supabase.from('project_members')
+        .select('id')
+        .eq('project_id', projectId)
+        .eq('user_id', targetUser.user_id)
+        .single()
+
+    if (exists) return { error: 'Usuário já é membro deste projeto.' }
+
+    const { error } = await supabase.from('project_members').insert({
+        project_id: projectId,
+        user_id: targetUser.user_id,
+        role: 'curator'
+    })
+
+    if (error) return { error: error.message }
+    revalidatePath(`/dashboard/project/${projectId}`)
+    return { success: true }
+}
+
+export async function removeProjectMember(projectId: string, userId: string) {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+
+    const { data: profile } = await supabase.from('profiles').select('role').eq('user_id', user?.id).single()
+    if (profile?.role !== 'admin') throw new Error('Forbidden')
+
+    await supabase.from('project_members').delete()
+        .eq('project_id', projectId)
+        .eq('user_id', userId)
+
+    revalidatePath(`/dashboard/project/${projectId}`)
+}
