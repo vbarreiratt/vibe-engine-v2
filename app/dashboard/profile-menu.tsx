@@ -3,17 +3,23 @@
 import { useState, useRef, useEffect } from 'react'
 import { LogOut, User as UserIcon, Shield, MoreVertical } from 'lucide-react'
 import Link from 'next/link'
+import { createClient } from '@/lib/supabase/client'
+import { useRouter } from 'next/navigation'
+import { UserAvatar } from '@/components/user-avatar'
+import { AvatarConfig } from '@/lib/avatar-assets'
 
 interface ProfileMenuProps {
     email: string
     nickname?: string
     role: string
-    avatarUrl?: string
+    avatarConfig?: AvatarConfig | null
 }
 
-export function ProfileMenu({ email, nickname, role, avatarUrl }: ProfileMenuProps) {
+export function ProfileMenu({ email, nickname, role, avatarConfig }: ProfileMenuProps) {
     const [isOpen, setIsOpen] = useState(false)
     const menuRef = useRef<HTMLDivElement>(null)
+    const router = useRouter()
+    const supabase = createClient()
 
     useEffect(() => {
         function handleClickOutside(event: MouseEvent) {
@@ -31,9 +37,13 @@ export function ProfileMenu({ email, nickname, role, avatarUrl }: ProfileMenuPro
                 onClick={() => setIsOpen(!isOpen)}
                 className="w-full flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 transition-colors group text-left"
             >
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-zinc-700 to-zinc-800 flex items-center justify-center text-sm font-bold border border-white/10 shadow-sm group-hover:border-white/20 transition-colors bg-cover bg-center" style={{ backgroundImage: avatarUrl ? `url(${avatarUrl})` : undefined }}>
-                    {!avatarUrl && (nickname?.[0]?.toUpperCase() || email[0].toUpperCase())}
-                </div>
+                {avatarConfig ? (
+                    <UserAvatar config={avatarConfig} className="w-10 h-10 rounded-full border border-white/10 shadow-sm shrink-0" />
+                ) : (
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-zinc-700 to-zinc-800 flex items-center justify-center text-sm font-bold border border-white/10 shadow-sm shrink-0">
+                        {nickname?.[0]?.toUpperCase() || email[0].toUpperCase()}
+                    </div>
+                )}
                 <div className="flex flex-col overflow-hidden flex-1">
                     <span className="text-sm font-medium text-zinc-200 truncate">{nickname || email}</span>
                     <span className="text-[10px] text-zinc-500 capitalize flex items-center gap-1">
@@ -71,8 +81,9 @@ export function ProfileMenu({ email, nickname, role, avatarUrl }: ProfileMenuPro
 
                         <button
                             onClick={async () => {
-                                await fetch('/auth/signout', { method: 'POST' })
-                                window.location.href = '/login'
+                                await supabase.auth.signOut()
+                                router.replace('/login')
+                                router.refresh()
                             }}
                             className="w-full flex items-center gap-2 px-3 py-2 rounded-md hover:bg-red-500/10 text-zinc-400 hover:text-red-400 text-sm transition-colors text-left"
                         >

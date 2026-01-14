@@ -55,7 +55,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
                         email={user.email!}
                         nickname={profile?.nickname}
                         role={profile?.role || 'curator'}
-                        avatarUrl={profile?.avatar_url}
+                        avatarConfig={profile?.avatar_config}
                     />
                 </div>
             </aside>

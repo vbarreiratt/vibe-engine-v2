@@ -3,14 +3,22 @@
 import { useState } from 'react'
 import { updateProfileSettings } from './actions'
 import { Loader2, Hash, AlignLeft, Mail, Save } from 'lucide-react'
+import { AvatarBuilder } from '@/components/avatar-builder'
+import { UserAvatar } from '@/components/user-avatar'
+import { AvatarConfig } from '@/lib/avatar-assets'
 
 export function ProfileForm({ profile, userEmail }: { profile: any, userEmail: string }) {
     const [isSaving, setIsSaving] = useState(false)
     const [message, setMessage] = useState('')
+    const [avatarConfig, setAvatarConfig] = useState<AvatarConfig | null>(profile?.avatar_config || null)
+    const [showBuilder, setShowBuilder] = useState(false)
 
     async function handleSubmit(formData: FormData) {
         setIsSaving(true)
         setMessage('')
+
+        // Append avatar config to form data
+        formData.set('avatarConfig', JSON.stringify(avatarConfig))
 
         const res = await updateProfileSettings(formData)
         setIsSaving(false)
@@ -24,15 +32,33 @@ export function ProfileForm({ profile, userEmail }: { profile: any, userEmail: s
 
     return (
         <form action={handleSubmit} className="space-y-8 bg-zinc-900/50 p-8 rounded-xl border border-white/5">
-            {/* Avatar Section (Read Only for now) */}
-            <div className="flex items-center gap-6">
-                <div className="w-20 h-20 rounded-full bg-gradient-to-br from-zinc-700 to-zinc-800 flex items-center justify-center text-xl font-bold border-2 border-white/10 shadow-lg text-white">
-                    {profile?.nickname?.[0]?.toUpperCase() || userEmail[0].toUpperCase()}
+            {/* Avatar Section */}
+            <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                        <UserAvatar config={avatarConfig} className="w-20 h-20 rounded-full border-2 border-white/10 shadow-lg" />
+                        <div>
+                            <h3 className="text-white font-medium">Seu Avatar</h3>
+                            <p className="text-zinc-500 text-sm">Personalize sua identidade visual.</p>
+                        </div>
+                    </div>
+                    <button
+                        type="button"
+                        onClick={() => setShowBuilder(!showBuilder)}
+                        className="text-xs text-purple-400 hover:text-purple-300 transition-colors"
+                    >
+                        {showBuilder ? 'Fechar Editor' : 'Editar Avatar'}
+                    </button>
                 </div>
-                <div>
-                    <h3 className="text-white font-medium">Avatar</h3>
-                    <p className="text-zinc-500 text-sm">Gerado automaticamente a partir do seu nickname.</p>
-                </div>
+
+                {showBuilder && (
+                    <div className="bg-black/30 p-6 rounded-xl border border-white/5 animate-in fade-in slide-in-from-top-2">
+                        <AvatarBuilder
+                            initialConfig={avatarConfig}
+                            onConfigChange={setAvatarConfig}
+                        />
+                    </div>
+                )}
             </div>
 
             <div className="space-y-4">

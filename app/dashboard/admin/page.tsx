@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import { updateUserRole } from './actions'
 import { Shield, ShieldAlert, User } from 'lucide-react'
 import { CreateUserForm } from './create-user-form'
+import { UserAvatar } from '@/components/user-avatar'
 
 export default async function AdminPage() {
     const supabase = await createClient()
@@ -57,9 +58,13 @@ export default async function AdminPage() {
                             <tr key={u.user_id} className="hover:bg-white/[0.02] transition-colors">
                                 <td className="px-6 py-4">
                                     <div className="flex items-center gap-3">
-                                        <div className="w-10 h-10 rounded-full bg-zinc-800 flex items-center justify-center text-zinc-400 border border-white/10 shadow-sm bg-cover bg-center shrink-0" style={{ backgroundImage: u.avatar_url ? `url(${u.avatar_url})` : undefined }}>
-                                            {!u.avatar_url && (u.nickname?.[0]?.toUpperCase() || u.email[0].toUpperCase())}
-                                        </div>
+                                        {u.avatar_config ? (
+                                            <UserAvatar config={u.avatar_config} className="w-10 h-10 rounded-full border border-white/10 shadow-sm shrink-0" />
+                                        ) : (
+                                            <div className="w-10 h-10 rounded-full bg-zinc-800 flex items-center justify-center text-zinc-400 border border-white/10 shadow-sm shrink-0">
+                                                {u.nickname?.[0]?.toUpperCase() || u.email[0].toUpperCase()}
+                                            </div>
+                                        )}
                                         <div className="flex flex-col">
                                             <div className="flex items-center gap-2">
                                                 <span className="font-medium text-zinc-200">{u.nickname || u.email}</span>

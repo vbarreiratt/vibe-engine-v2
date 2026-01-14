@@ -2,11 +2,12 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
+import { AvatarConfig } from '@/lib/avatar-assets'
 
 export async function completeOnboarding(payload: {
     nickname: string
     bio: string
-    avatarUrl?: string
+    avatarConfig?: AvatarConfig | null
 }) {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
@@ -23,7 +24,7 @@ export async function completeOnboarding(payload: {
     const { error } = await supabase.from('profiles').update({
         nickname: payload.nickname,
         bio: payload.bio,
-        avatar_url: payload.avatarUrl || null,
+        avatar_config: payload.avatarConfig || null,
         onboarding_completed: true,
         updated_at: new Date().toISOString()
     }).eq('user_id', user.id)

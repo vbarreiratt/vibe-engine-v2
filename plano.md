@@ -147,6 +147,7 @@ O sistema é colaborativo, auditável e hierárquico, permitindo que **Admins** 
   - **User Onboarding**: Fluxo obrigatório de boas-vindas e configuração de perfil (Nickname, Bio) para novos usuários, com diferenciação de interface por cargo (Admin/Curator).
   - **Profile Management**: Implementação de Menu de Perfil e Página de Edição de Perfil para gestão de identidade editorial.
   - **Admin User Insights**: Melhoria na listagem de usuários do Admin para exibir dados de perfil (Avatar, Nick, Bio) e status de onboarding.
+  - **Avatar Maker**: Implementação de montador de avatar customizado com seleção de forma (circle/square/octagon), cor, olhos, nariz e boca. Integrado ao Onboarding e Página de Perfil.
 
 
 

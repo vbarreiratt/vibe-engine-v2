@@ -5,13 +5,15 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { completeOnboarding } from './actions'
 import { useRouter } from 'next/navigation'
 import { ArrowRight, User, Hash, AlignLeft, Check, Loader2, Shield, Edit3 } from 'lucide-react'
+import { AvatarBuilder } from '@/components/avatar-builder'
+import { AvatarConfig } from '@/lib/avatar-assets'
 
 export function OnboardingWizard({ role, userEmail }: { role: string, userEmail: string }) {
     const [step, setStep] = useState(1)
     const [formData, setFormData] = useState({
         nickname: '',
         bio: '',
-        avatarUrl: ''
+        avatarConfig: null as AvatarConfig | null
     })
     const [isSubmitting, setIsSubmitting] = useState(false)
     const router = useRouter()
@@ -20,7 +22,11 @@ export function OnboardingWizard({ role, userEmail }: { role: string, userEmail:
 
     const handleSubmit = async () => {
         setIsSubmitting(true)
-        const res = await completeOnboarding(formData)
+        const res = await completeOnboarding({
+            nickname: formData.nickname,
+            bio: formData.bio,
+            avatarConfig: formData.avatarConfig
+        })
 
         if (res.error) {
             alert(res.error)
@@ -117,30 +123,20 @@ export function OnboardingWizard({ role, userEmail }: { role: string, userEmail:
         )
     }
 
-    // Step 3: Avatar
+    // Step 3: Avatar Builder
     if (step === 3) {
         return (
-            <WizardStep>
+            <WizardStep wide>
                 <div className="space-y-6">
-                    <h2 className="text-2xl font-light text-white">Escolha um avatar</h2>
-                    <p className="text-zinc-500 text-sm">O avatar ajuda a identificar quem está por trás das decisões. Não precisa ser uma foto.</p>
+                    <h2 className="text-2xl font-light text-white">Monte seu avatar</h2>
+                    <p className="text-zinc-500 text-sm">O avatar ajuda a identificar quem está por trás das decisões. Personalize como quiser.</p>
 
-                    <div className="flex justify-center py-8">
-                        <div className="relative group">
-                            <div className="w-24 h-24 rounded-full bg-gradient-to-br from-zinc-700 to-zinc-800 flex items-center justify-center border-2 border-white/10 text-2xl font-medium text-white shadow-xl">
-                                {formData.nickname?.[0]?.toUpperCase()}
-                            </div>
-                            <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-zinc-800 text-xs px-2 py-1 rounded text-zinc-400 whitespace-nowrap border border-white/5">
-                                Padrão
-                            </div>
-                        </div>
-                    </div>
+                    <AvatarBuilder
+                        initialConfig={formData.avatarConfig}
+                        onConfigChange={(config) => setFormData({ ...formData, avatarConfig: config })}
+                    />
 
-                    <p className="text-center text-xs text-zinc-600 mb-8">
-                        (Upload de imagem customizada estará disponível em breve. Usaremos suas iniciais por enquanto.)
-                    </p>
-
-                    <button onClick={handleNext} className="w-full bg-white text-black font-medium py-3 rounded-lg hover:bg-zinc-200 transition-colors flex items-center justify-center gap-2">
+                    <button onClick={handleNext} className="w-full bg-white text-black font-medium py-3 rounded-lg hover:bg-zinc-200 transition-colors flex items-center justify-center gap-2 mt-4">
                         Continuar
                     </button>
                 </div>
@@ -200,12 +196,12 @@ export function OnboardingWizard({ role, userEmail }: { role: string, userEmail:
     return null
 }
 
-function WizardStep({ children }: { children: React.ReactNode }) {
+function WizardStep({ children, wide }: { children: React.ReactNode, wide?: boolean }) {
     return (
         <motion.div
             initial={{ opacity: 0, scale: 0.95, y: 10 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            className="w-full max-w-md bg-zinc-900/50 border border-white/5 p-8 rounded-2xl backdrop-blur-xl shadow-2xl"
+            className={`w-full bg-zinc-900/50 border border-white/5 p-8 rounded-2xl backdrop-blur-xl shadow-2xl ${wide ? 'max-w-2xl' : 'max-w-md'}`}
         >
             {children}
         </motion.div>

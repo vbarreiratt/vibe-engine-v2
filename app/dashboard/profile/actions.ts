@@ -10,6 +10,12 @@ export async function updateProfileSettings(formData: FormData) {
 
     const nickname = formData.get('nickname') as string
     const bio = formData.get('bio') as string
+    const avatarConfigRaw = formData.get('avatarConfig') as string
+
+    let avatarConfig = null
+    try {
+        avatarConfig = avatarConfigRaw ? JSON.parse(avatarConfigRaw) : null
+    } catch { }
 
     if (!nickname || nickname.length < 2) {
         return { error: 'Nickname muito curto.' }
@@ -18,6 +24,7 @@ export async function updateProfileSettings(formData: FormData) {
     const { error } = await supabase.from('profiles').update({
         nickname,
         bio,
+        avatar_config: avatarConfig,
         updated_at: new Date().toISOString()
     }).eq('user_id', user.id)
 
