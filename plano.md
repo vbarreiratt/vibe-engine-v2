@@ -70,7 +70,7 @@ O sistema é colaborativo, auditável e hierárquico, permitindo que **Admins** 
 ### Fase 2: Ingestão e Mídia
 - [x] Configuração DigitalOcean Spaces (S3 Client).
 - [x] Upload de Imagens (Drag & Drop + S3 Presigned).
-- [ ] Geração de Thumbnails (Server-side/Sharp ou Edge).
+- [X] Geração de Thumbnails (Server-side/Sharp ou Edge).
 - [x] Persistência de URLs e metadados no DB.
 
 
@@ -82,11 +82,35 @@ O sistema é colaborativo, auditável e hierárquico, permitindo que **Admins** 
 
 
 
-### Fase 4: Fluxo de Vibe - Parte 2 (Ressonância)
-- [ ] Geração de Embeddings (Batch Job).
-- [ ] Motor de Ressonância (Clusterização Lógica).
-- [ ] Interface de Revisão de Clusters (Launcher + Listagem).
-- [ ] Persistência da "Vibe" final.
+### Fase 4: Fluxo de Vibe - Parte 2 (Ressonância / Cluster Canvas)
+- [x] **TASK 1 — Modelagem de dados**
+  - [x] Definir schema das tabelas de clusters_run/cluster/nodes/edges
+  - [x] Criar migrations no Supabase (`clusters_runs`, `clusters`, `cluster_nodes`, `cluster_edges`)
+  - [x] Definir RLS (Admin vê tudo, Curador vê projetos atribuídos, Public/Private por run)
+- [ ] **TASK 2 — Contratos de API**
+  - [ ] Endpoint para criar clusters_run (enqueue)
+  - [ ] Endpoint para checar status
+  - [ ] Endpoint para obter payload completo (ready)
+  - [ ] Endpoint para salvar edições do canvas
+- [ ] **TASK 3 — Job assíncrono (Dumb Queue)**
+  - [ ] Implementar vetorização por camada (Estado, Matéria, Movimento)
+  - [ ] Implementar regras de ressonância (2 ou 3 camadas)
+  - [ ] Grafo + Detecção de Comunidades (Louvain/Leiden simplificado ou via lib `graphology`)
+  - [ ] 2D Layout (Force-directed ou UMAP via lib `graphology-layout` ou similar)
+  - [ ] Persistência de resultados
+- [ ] **TASK 4 — UI do Cluster Canvas (MVP)**
+  - [ ] Estado vazio com seletor de leitura (`signals_run`)
+  - [ ] Estado “semeadura” (polling do job)
+  - [ ] Render do Canvas (React Flow ou HTML5 Canvas customizado? Provavelmente React Flow é mais rápido de implementar interações)
+  - [ ] Interações: Drag, Criar Núcleo, Dissolver, Outlier, Renomear
+  - [ ] Visualização de "Seeds" e "Orbitas"
+- [ ] **TASK 5 — Salvamento versionado e listagem**
+  - [ ] Modal de Salvar (Nome + Visibilidade)
+  - [ ] Atualização da Dashboard do Projeto (Listagem de Clusters Runs por Scan)
+- [ ] **TASK 6 — Exportáveis e Auditoria**
+  - [ ] Geração de JSON/MD/CSV na pasta `outputs/`
+  - [ ] Integração com `audit_log` para ações de edição
+
 
 
 ### Fase 5: Auditoria e Polimento

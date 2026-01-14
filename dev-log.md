@@ -23,3 +23,13 @@
 - Fixed "infinite loading" in AI pipeline.
 - Fixed `SyntaxError` in JSON parsing from AI.
 - Fixed "+" button not saving inputs in Tag Section.
+
+## [2026-01-14] Cluster Canvas - Foundation
+
+### Features
+- **Database**:
+  - Created schema for `clusters_runs`, `clusters`, `cluster_nodes`, `cluster_edges`.
+  - Configured RLS policies for the new tables (Admin full access, Curator project-scoped access).
+- **Planning**:
+  - Detailed task breakdown for Cluster Canvas (Mural UI, Async Job, Persistence).
+
