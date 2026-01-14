@@ -134,6 +134,7 @@ O sistema é colaborativo, auditável e hierárquico, permitindo que **Admins** 
   - **Otimização de Upload**: Implementação de upload paralelo em lote (Client->S3) com inserção em lote no banco (Batch Action), reduzindo drasticamente o tempo de ingestão.
   - **Infra**: Configuração de CORS para DigitalOcean Spaces via script.
   - **Feature Ingestões**: Implementação de múltiplas sessões de ingestão por projeto, com controle de visibilidade (Público/Privado) e isolamento de imagens via RLS.
+  - **Feature Safe Delete**: Implementação da remoção completa de projetos por Admins, limpando registros no banco (Cascade) e arquivos no DigitalOcean Spaces (S3).
 
 
 

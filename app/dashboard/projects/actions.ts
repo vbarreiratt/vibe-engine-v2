@@ -64,3 +64,89 @@ export async function createProject(formData: FormData) {
     revalidatePath('/dashboard')
     redirect(`/dashboard/project/${project.id}`)
 }
+
+import { S3Client, ListObjectsV2Command, DeleteObjectsCommand } from '@aws-sdk/client-s3'
+
+export async function deleteProject(projectId: string) {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) throw new Error('Unauthorized')
+
+    // Check if Admin
+    const { data: profile } = await supabase.from('profiles').select('role').eq('user_id', user.id).single()
+    if (profile?.role !== 'admin') {
+        throw new Error('Forbidden: Only admins can delete projects')
+    }
+
+    // 1. Clean up Storage (S3)
+    const s3 = new S3Client({
+        endpoint: process.env.DO_SPACES_ENDPOINT,
+        region: process.env.DO_SPACES_REGION || "nyc3",
+        credentials: {
+            accessKeyId: process.env.DO_SPACES_KEY!,
+            secretAccessKey: process.env.DO_SPACES_SECRET!
+        }
+    })
+
+    const bucket = process.env.DO_SPACES_BUCKET
+    const prefix = `${projectId}/`
+    let continuationToken: string | undefined = undefined
+
+    try {
+        let isTruncated = true
+
+        while (isTruncated) {
+            const listCmd = new ListObjectsV2Command({
+                Bucket: bucket,
+                Prefix: prefix,
+                ContinuationToken: continuationToken
+            })
+
+            const listRes = await s3.send(listCmd) as any
+
+            if (listRes.Contents && listRes.Contents.length > 0) {
+                const keys = listRes.Contents
+                    .map((obj: any) => obj.Key)
+                    .filter((key: any): key is string => !!key)
+
+                if (keys.length > 0) {
+                    const deleteCmd = new DeleteObjectsCommand({
+                        Bucket: bucket,
+                        Delete: {
+                            Objects: keys.map((Key: string) => ({ Key })),
+                            Quiet: true
+                        }
+                    })
+                    await s3.send(deleteCmd)
+                    console.log(`Deleted ${keys.length} files from S3 for project ${projectId}`)
+                }
+            }
+
+            continuationToken = listRes.NextContinuationToken
+            isTruncated = listRes.IsTruncated ?? false
+        }
+    } catch (e) {
+        console.error('Failed to cleanup S3 files:', e)
+        // We continue to delete DB even if S3 fails, to avoid zombie projects in UI
+    }
+
+    // 2. Delete from DB (Cascade will handle children: images, ingestions, logs, etc)
+    const { error } = await supabase.from('projects').delete().eq('id', projectId)
+
+    if (error) {
+        console.error('Delete Project Error', error)
+        throw new Error(error.message)
+    }
+
+    // Audit
+    await supabase.from('audit_log').insert({
+        entity_type: 'project',
+        entity_id: projectId,
+        action_type: 'delete',
+        after_data: { deleted: true },
+        actor_user_id: user.id,
+        actor_role: 'admin'
+    })
+
+    revalidatePath('/dashboard')
+}

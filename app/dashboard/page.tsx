@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
 import { Plus, Folder } from 'lucide-react'
+import { DeleteProjectButton } from './delete-project-button'
 
 export const dynamic = 'force-dynamic'
 
@@ -66,9 +67,16 @@ export default async function ProjectsPage() {
                                     <span className={`px-2.5 py-1 rounded-full text-[10px] uppercase tracking-wider font-semibold border ${project.status === 'active' ? 'border-emerald-500/20 text-emerald-400 bg-emerald-500/10' : 'border-zinc-700 text-zinc-500 bg-zinc-800/50'}`}>
                                         {project.status === 'active' ? 'Ativo' : 'Arquivado'}
                                     </span>
-                                    <span className="text-xs text-zinc-600 font-mono tracking-tight opacity-50 group-hover:opacity-100 transition-opacity">
-                                        {new Date(project.created_at).toLocaleDateString()}
-                                    </span>
+                                    <div className="flex items-center gap-2">
+                                        <span className="text-xs text-zinc-600 font-mono tracking-tight opacity-50 group-hover:opacity-100 transition-opacity">
+                                            {new Date(project.created_at).toLocaleDateString()}
+                                        </span>
+                                        {isAdmin && (
+                                            <div className="relative z-10 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                <DeleteProjectButton projectId={project.id} projectName={project.name} />
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
                                 <div>
                                     <h3 className="text-xl font-medium text-white mb-2 group-hover:text-purple-300 transition-colors">{project.name}</h3>
