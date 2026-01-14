@@ -1,4 +1,4 @@
-import { login, signup } from './actions'
+import { login } from './actions'
 
 export default function LoginPage() {
     return (
@@ -36,17 +36,14 @@ export default function LoginPage() {
                     </div>
 
                     <div className="flex gap-4 pt-2">
-                        <button formAction={login} className="flex-1 bg-white text-black py-2.5 rounded-md font-medium hover:bg-zinc-200 transition-colors shadow-lg shadow-white/10 text-sm">
+                        <button formAction={login} className="w-full bg-white text-black py-2.5 rounded-md font-medium hover:bg-zinc-200 transition-colors shadow-lg shadow-white/10 text-sm">
                             Entrar
-                        </button>
-                        <button formAction={signup} className="flex-1 bg-transparent border border-zinc-700 text-zinc-300 py-2.5 rounded-md font-medium hover:bg-zinc-800 transition-colors text-sm hover:text-white">
-                            Criar Conta
                         </button>
                     </div>
 
                     <p className="text-xs text-center text-zinc-600">
-                        A criação de conta atribui papel de Curador automaticamente.<br />
-                        Admins devem ser promovidos via banco de dados.
+                        Acesso restrito a curadores autorizados.<br />
+                        Solicite acesso ao administrador.
                     </p>
                 </form>
             </div>
