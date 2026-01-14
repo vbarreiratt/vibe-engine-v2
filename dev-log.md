@@ -38,5 +38,6 @@
   - Resolved name collision for `clusters` table by dropping legacy tables in the new migration.
   - Added `moddatetime` extension enabling to migration to fix trigger error.
   - Fixed `profiles.id` -> `profiles.user_id` column reference in RLS policies.
+  - Removed reference to hypothetical function `modules_permissions_check` in RLS policies.
 
 

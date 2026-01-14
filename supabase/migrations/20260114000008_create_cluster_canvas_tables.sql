@@ -185,10 +185,6 @@ create policy "Users can view clusters if they can view clusters_run"
         or
         (clusters_runs.created_by = auth.uid())
         or
-        exists (
-             select 1 from modules_permissions_check(clusters_runs.project_id) -- hypothetical helper
-        )
-        or
         -- Manual expansion of curator logic
         exists (
              select 1 from project_members
