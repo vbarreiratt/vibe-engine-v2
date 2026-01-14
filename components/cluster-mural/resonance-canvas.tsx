@@ -1,7 +1,6 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { motion } from 'framer-motion';
 
 // Types
 interface Node {
@@ -35,34 +34,46 @@ interface ResonanceCanvasProps {
     onSave?: () => void;
 }
 
-// Paleta de cores para clusters
+// Paleta de cores VIBRANTES para clusters (HSL para garantir visibilidade)
 const CLUSTER_COLORS = [
-    '#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8',
-    '#F7DC6F', '#BB8FCE', '#85C1E2', '#52B788', '#FFB347'
+    'hsl(0, 70%, 60%)',    // Vermelho vibrante
+    'hsl(180, 70%, 50%)',  // Ciano
+    'hsl(45, 90%, 55%)',   // Amarelo ouro
+    'hsl(120, 60%, 50%)',  // Verde
+    'hsl(270, 70%, 60%)',  // Roxo
+    'hsl(30, 80%, 55%)',   // Laranja
+    'hsl(200, 70%, 55%)',  // Azul claro
+    'hsl(330, 70%, 55%)',  // Rosa
+    'hsl(90, 60%, 50%)',   // Verde limão
+    'hsl(300, 70%, 60%)',  // Magenta
 ];
 
 export function ResonanceCanvas({ nodes, edges, clusters, onNodeMove, onSave }: ResonanceCanvasProps) {
-    const canvasRef = useRef<HTMLDivElement>(null);
+    const containerRef = useRef<HTMLDivElement>(null);
     const [transform, setTransform] = useState({ scale: 1, x: 0, y: 0 });
     const [selectedNode, setSelectedNode] = useState<string | null>(null);
     const [tool, setTool] = useState<'select' | 'pan'>('select');
     const [isDragging, setIsDragging] = useState(false);
     const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
 
+    // UI toggles
+    const [showTopbar, setShowTopbar] = useState(true);
+    const [showToolbar, setShowToolbar] = useState(true);
+
     // Fit to view on mount
     useEffect(() => {
-        if (!canvasRef.current || nodes.length === 0) return;
+        if (!containerRef.current || nodes.length === 0) return;
 
         const bounds = calculateBounds(nodes);
-        const { width, height } = canvasRef.current.getBoundingClientRect();
+        const { width, height } = containerRef.current.getBoundingClientRect();
 
-        const padding = 100;
+        const padding = 150;
         const availableWidth = width - padding * 2;
         const availableHeight = height - padding * 2;
 
-        const scaleX = availableWidth / bounds.width;
-        const scaleY = availableHeight / bounds.height;
-        const scale = Math.min(scaleX, scaleY, 1.2);
+        const scaleX = availableWidth / (bounds.width || 1);
+        const scaleY = availableHeight / (bounds.height || 1);
+        const scale = Math.min(scaleX, scaleY, 1.5);
 
         const centerX = (bounds.minX + bounds.maxX) / 2;
         const centerY = (bounds.minY + bounds.maxY) / 2;
@@ -74,16 +85,14 @@ export function ResonanceCanvas({ nodes, edges, clusters, onNodeMove, onSave }: 
     }, [nodes]);
 
     const calculateBounds = (nodes: Node[]) => {
+        if (nodes.length === 0) return { minX: 0, maxX: 0, minY: 0, maxY: 0, width: 0, height: 0 };
         const xs = nodes.map(n => n.x);
         const ys = nodes.map(n => n.y);
-        return {
-            minX: Math.min(...xs),
-            maxX: Math.max(...xs),
-            minY: Math.min(...ys),
-            maxY: Math.max(...ys),
-            width: Math.max(...xs) - Math.min(...xs),
-            height: Math.max(...ys) - Math.min(...ys)
-        };
+        const minX = Math.min(...xs);
+        const maxX = Math.max(...xs);
+        const minY = Math.min(...ys);
+        const maxY = Math.max(...ys);
+        return { minX, maxX, minY, maxY, width: maxX - minX, height: maxY - minY };
     };
 
     const handleWheel = useCallback((e: WheelEvent) => {
@@ -94,20 +103,20 @@ export function ResonanceCanvas({ nodes, edges, clusters, onNodeMove, onSave }: 
     }, [transform.scale]);
 
     useEffect(() => {
-        const canvas = canvasRef.current;
-        if (!canvas) return;
-        canvas.addEventListener('wheel', handleWheel, { passive: false });
-        return () => canvas.removeEventListener('wheel', handleWheel);
+        const container = containerRef.current;
+        if (!container) return;
+        container.addEventListener('wheel', handleWheel, { passive: false });
+        return () => container.removeEventListener('wheel', handleWheel);
     }, [handleWheel]);
 
-    const handleCanvasMouseDown = (e: React.MouseEvent) => {
+    const handleMouseDown = (e: React.MouseEvent) => {
         if (tool === 'pan' || e.button === 1) {
             setIsDragging(true);
             setDragStart({ x: e.clientX - transform.x, y: e.clientY - transform.y });
         }
     };
 
-    const handleCanvasMouseMove = (e: React.MouseEvent) => {
+    const handleMouseMove = (e: React.MouseEvent) => {
         if (isDragging && tool === 'pan') {
             setTransform(prev => ({
                 ...prev,
@@ -117,73 +126,102 @@ export function ResonanceCanvas({ nodes, edges, clusters, onNodeMove, onSave }: 
         }
     };
 
-    const handleCanvasMouseUp = () => {
+    const handleMouseUp = () => {
         setIsDragging(false);
     };
 
     return (
-        <div className="relative w-full h-screen overflow-hidden bg-zinc-950">
-            {/* TopBar */}
-            <div className="absolute top-0 left-0 right-0 h-14 bg-black/80 border-b border-white/10 flex items-center justify-between px-4 z-50 backdrop-blur-sm">
-                <div className="flex items-center gap-4">
-                    <button className="text-zinc-400 hover:text-white transition-colors">
-                        ← Voltar
-                    </button>
-                    <h1 className="text-white font-medium">Editor de Ressonância</h1>
-                    <div className="text-xs text-zinc-500">
-                        Nodes: {nodes.length} | Clusters: {clusters.length}
+        <div className="relative w-screen h-screen overflow-hidden bg-zinc-900">
+            {/* Floating Topbar */}
+            <div
+                className={`absolute top-4 left-1/2 -translate-x-1/2 z-50 transition-all duration-300 ${showTopbar ? 'opacity-100' : 'opacity-0 pointer-events-none'
+                    }`}
+            >
+                <div className="bg-black/90 backdrop-blur-md border border-lime-500/30 rounded-2xl px-6 py-3 shadow-2xl">
+                    <div className="flex items-center gap-6">
+                        <h1 className="text-white font-medium text-lg">Editor de Ressonância</h1>
+                        <div className="text-sm text-lime-400 font-mono">
+                            Nodes: {nodes.length} | Clusters: {clusters.length}
+                        </div>
                     </div>
                 </div>
-                <button
-                    onClick={onSave}
-                    className="px-4 py-2 bg-lime-500 text-black rounded-lg hover:bg-lime-400 transition-colors font-medium text-sm"
-                >
-                    Salvar Alterações
-                </button>
             </div>
 
-            {/* Left Toolbar */}
-            <div className="absolute left-4 top-20 flex flex-col gap-2 z-40">
+            {/* Floating Save Button */}
+            <button
+                onClick={onSave}
+                className="absolute top-4 right-4 z-50 px-6 py-3 bg-lime-500 hover:bg-lime-400 text-black font-bold rounded-xl shadow-2xl transition-all hover:scale-105"
+            >
+                💾 Salvar Alterações
+            </button>
+
+            {/* Toggle Topbar Button */}
+            <button
+                onClick={() => setShowTopbar(!showTopbar)}
+                className="absolute top-4 left-4 z-50 w-10 h-10 bg-black/80 hover:bg-black border border-white/20 rounded-lg text-white flex items-center justify-center transition-all"
+                title="Toggle Info"
+            >
+                {showTopbar ? '👁' : '👁‍🗨'}
+            </button>
+
+            {/* Left Floating Toolbar */}
+            <div
+                className={`absolute left-4 top-20 flex flex-col gap-2 z-40 transition-all duration-300 ${showToolbar ? 'opacity-100' : 'opacity-0 pointer-events-none'
+                    }`}
+            >
                 <button
                     onClick={() => setTool('select')}
-                    className={`w-12 h-12 rounded-lg border ${tool === 'select' ? 'bg-lime-500 border-lime-400' : 'bg-zinc-900 border-white/10 text-zinc-400'
-                        } hover:bg-lime-500/20 transition-colors flex items-center justify-center`}
+                    className={`w-14 h-14 rounded-xl border-2 transition-all ${tool === 'select'
+                            ? 'bg-lime-500 border-lime-400 text-black scale-110'
+                            : 'bg-black/80 border-white/30 text-white hover:border-lime-500/50'
+                        }`}
                     title="Selecionar"
                 >
-                    ↖
+                    <div className="text-2xl">↖</div>
                 </button>
                 <button
                     onClick={() => setTool('pan')}
-                    className={`w-12 h-12 rounded-lg border ${tool === 'pan' ? 'bg-lime-500 border-lime-400' : 'bg-zinc-900 border-white/10 text-zinc-400'
-                        } hover:bg-lime-500/20 transition-colors flex items-center justify-center`}
-                    title="Pan"
+                    className={`w-14 h-14 rounded-xl border-2 transition-all ${tool === 'pan'
+                            ? 'bg-lime-500 border-lime-400 text-black scale-110'
+                            : 'bg-black/80 border-white/30 text-white hover:border-lime-500/50'
+                        }`}
+                    title="Pan (Arrastar)"
                 >
-                    ✋
+                    <div className="text-2xl">✋</div>
                 </button>
+                <div className="h-px bg-white/20 my-2" />
                 <button
-                    className="w-12 h-12 rounded-lg border bg-zinc-900 border-white/10 text-zinc-400 hover:bg-lime-500/20 transition-colors flex items-center justify-center"
+                    className="w-14 h-14 rounded-xl border-2 bg-black/80 border-white/30 text-white hover:border-lime-500/50 transition-all text-2xl font-bold"
                     title="Zoom +"
-                    onClick={() => setTransform(prev => ({ ...prev, scale: Math.min(prev.scale * 1.2, 3) }))}
+                    onClick={() => setTransform(prev => ({ ...prev, scale: Math.min(prev.scale * 1.3, 3) }))}
                 >
                     +
                 </button>
                 <button
-                    className="w-12 h-12 rounded-lg border bg-zinc-900 border-white/10 text-zinc-400 hover:bg-lime-500/20 transition-colors flex items-center justify-center"
-                    title="Zoom -"
-                    onClick={() => setTransform(prev => ({ ...prev, scale: Math.max(prev.scale / 1.2, 0.1) }))}
+                    className="w-14 h-14 rounded-xl border-2 bg-black/80 border-white/30 text-white hover:border-lime-500/50 transition-all text-2xl font-bold"
+                    title="Zoom −"
+                    onClick={() => setTransform(prev => ({ ...prev, scale: Math.max(prev.scale / 1.3, 0.1) }))}
                 >
                     −
                 </button>
+                <button
+                    className="w-14 h-14 rounded-xl border-2 bg-black/80 border-white/30 text-white hover:border-lime-500/50 transition-all text-lg"
+                    title="Resetar Zoom"
+                    onClick={() => setTransform({ scale: 1, x: 0, y: 0 })}
+                >
+                    ⟲
+                </button>
             </div>
 
-            {/* Canvas */}
+            {/* Main Canvas */}
             <div
-                ref={canvasRef}
-                className="w-full h-full cursor-crosshair"
-                onMouseDown={handleCanvasMouseDown}
-                onMouseMove={handleCanvasMouseMove}
-                onMouseUp={handleCanvasMouseUp}
-                onMouseLeave={handleCanvasMouseUp}
+                ref={containerRef}
+                className="w-full h-full"
+                onMouseDown={handleMouseDown}
+                onMouseMove={handleMouseMove}
+                onMouseUp={handleMouseUp}
+                onMouseLeave={handleMouseUp}
+                style={{ cursor: tool === 'pan' ? 'grab' : 'default' }}
             >
                 <svg className="w-full h-full">
                     <g transform={`translate(${transform.x},${transform.y}) scale(${transform.scale})`}>
@@ -194,31 +232,54 @@ export function ResonanceCanvas({ nodes, edges, clusters, onNodeMove, onSave }: 
 
                             const cx = clusterNodes.reduce((sum, n) => sum + n.x, 0) / clusterNodes.length;
                             const cy = clusterNodes.reduce((sum, n) => sum + n.y, 0) / clusterNodes.length;
-                            const radius = Math.max(80, clusterNodes.length * 25);
+                            const radius = Math.max(100, clusterNodes.length * 30);
 
                             const color = CLUSTER_COLORS[idx % CLUSTER_COLORS.length];
 
                             return (
                                 <g key={cluster.id}>
+                                    {/* Ilha do cluster (glow) */}
+                                    <circle
+                                        cx={cx}
+                                        cy={cy}
+                                        r={radius + 20}
+                                        fill={color}
+                                        fillOpacity="0.05"
+                                        stroke="none"
+                                    />
                                     <circle
                                         cx={cx}
                                         cy={cy}
                                         r={radius}
                                         fill={color}
-                                        fillOpacity="0.1"
+                                        fillOpacity="0.15"
                                         stroke={color}
-                                        strokeWidth="2"
-                                        strokeOpacity="0.3"
+                                        strokeWidth="3"
+                                        strokeOpacity="0.6"
+                                        strokeDasharray="5,5"
                                     />
+                                    {/* Label do cluster */}
                                     <text
                                         x={cx}
-                                        y={cy - radius - 10}
+                                        y={cy - radius - 20}
                                         textAnchor="middle"
                                         fill={color}
-                                        fontSize="14"
-                                        fontWeight="600"
+                                        fontSize="18"
+                                        fontWeight="700"
+                                        style={{ textShadow: '0 2px 8px rgba(0,0,0,0.8)' }}
                                     >
-                                        {cluster.name_suggested} ({clusterNodes.length})
+                                        {cluster.name_suggested}
+                                    </text>
+                                    <text
+                                        x={cx}
+                                        y={cy - radius - 2}
+                                        textAnchor="middle"
+                                        fill="white"
+                                        fontSize="12"
+                                        fontWeight="500"
+                                        fillOpacity="0.7"
+                                    >
+                                        {clusterNodes.length} nodes
                                     </text>
                                 </g>
                             );
@@ -237,8 +298,8 @@ export function ResonanceCanvas({ nodes, edges, clusters, onNodeMove, onSave }: 
                                     y1={source.y}
                                     x2={target.x}
                                     y2={target.y}
-                                    stroke="rgba(255,255,255,0.1)"
-                                    strokeWidth={edge.weight * 2}
+                                    stroke="rgba(255,255,255,0.2)"
+                                    strokeWidth={edge.weight * 3}
                                 />
                             );
                         })}
@@ -254,47 +315,47 @@ export function ResonanceCanvas({ nodes, edges, clusters, onNodeMove, onSave }: 
                                     onClick={() => setSelectedNode(node.id)}
                                     style={{ cursor: 'pointer' }}
                                 >
-                                    {node.image_url ? (
-                                        <image
-                                            x={node.x - 30}
-                                            y={node.y - 30}
-                                            width="60"
-                                            height="60"
-                                            href={node.image_url}
-                                            style={{
-                                                border: isSelected ? `3px solid ${color}` : `2px solid ${color}`,
-                                                borderRadius: '8px',
-                                                filter: node.is_outlier ? 'grayscale(50%)' : 'none'
-                                            }}
-                                        />
-                                    ) : (
-                                        <rect
-                                            x={node.x - 30}
-                                            y={node.y - 30}
-                                            width="60"
-                                            height="60"
+                                    {/* Glow effect */}
+                                    {isSelected && (
+                                        <circle
+                                            cx={node.x}
+                                            cy={node.y}
+                                            r="50"
                                             fill={color}
                                             fillOpacity="0.2"
-                                            stroke={color}
-                                            strokeWidth={isSelected ? 3 : 2}
-                                            rx="8"
                                         />
                                     )}
-                                    <circle
-                                        cx={node.x + 24}
-                                        cy={node.y - 24}
-                                        r="12"
+
+                                    {/* Node body */}
+                                    <rect
+                                        x={node.x - 35}
+                                        y={node.y - 35}
+                                        width="70"
+                                        height="70"
                                         fill={color}
-                                        stroke="black"
-                                        strokeWidth="2"
+                                        fillOpacity={node.is_outlier ? "0.3" : "0.8"}
+                                        stroke={isSelected ? 'white' : color}
+                                        strokeWidth={isSelected ? 4 : 3}
+                                        rx="12"
+                                        filter={isSelected ? 'url(#glow)' : 'none'}
+                                    />
+
+                                    {/* Cluster badge */}
+                                    <circle
+                                        cx={node.x + 28}
+                                        cy={node.y - 28}
+                                        r="16"
+                                        fill="white"
+                                        stroke={color}
+                                        strokeWidth="3"
                                     />
                                     <text
-                                        x={node.x + 24}
-                                        y={node.y - 20}
+                                        x={node.x + 28}
+                                        y={node.y - 23}
                                         textAnchor="middle"
                                         fill="black"
-                                        fontSize="10"
-                                        fontWeight="700"
+                                        fontSize="12"
+                                        fontWeight="900"
                                     >
                                         C{node.cluster_index}
                                     </text>
@@ -302,33 +363,48 @@ export function ResonanceCanvas({ nodes, edges, clusters, onNodeMove, onSave }: 
                             );
                         })}
                     </g>
+
+                    {/* SVG Filters */}
+                    <defs>
+                        <filter id="glow">
+                            <feGaussianBlur stdDeviation="4" result="coloredBlur" />
+                            <feMerge>
+                                <feMergeNode in="coloredBlur" />
+                                <feMergeNode in="SourceGraphic" />
+                            </feMerge>
+                        </filter>
+                    </defs>
                 </svg>
             </div>
 
-            {/* Inspector Panel (Right) */}
+            {/* Inspector Panel (Floating Right) */}
             {selectedNode && (
-                <div className="absolute right-4 top-20 w-80 bg-zinc-900/95 border border-white/10 rounded-xl p-4 z-40 backdrop-blur-sm">
-                    <h3 className="text-white font-medium mb-2">Node Selecionado</h3>
-                    <div className="text-xs text-zinc-400 space-y-1">
-                        <p>ID: {selectedNode}</p>
+                <div className="absolute right-4 top-24 w-80 bg-black/90 backdrop-blur-md border border-lime-500/30 rounded-2xl p-6 z-40 shadow-2xl">
+                    <div className="flex items-center justify-between mb-4">
+                        <h3 className="text-white font-bold text-lg">Node Selecionado</h3>
+                        <button
+                            onClick={() => setSelectedNode(null)}
+                            className="text-white/60 hover:text-white transition-colors text-2xl"
+                        >
+                            ×
+                        </button>
+                    </div>
+                    <div className="text-sm text-lime-400 space-y-2 font-mono">
+                        <p>ID: <span className="text-white">{selectedNode.slice(0, 8)}...</span></p>
                         {(() => {
                             const node = nodes.find(n => n.id === selectedNode);
                             if (!node) return null;
+                            const color = CLUSTER_COLORS[node.cluster_index % CLUSTER_COLORS.length];
                             return (
                                 <>
-                                    <p>Cluster: {node.cluster_index}</p>
-                                    <p>Outlier: {node.is_outlier ? 'Sim' : 'Não'}</p>
-                                    <p>Posição: ({node.x.toFixed(0)}, {node.y.toFixed(0)})</p>
+                                    <p>Cluster: <span className="text-white font-bold">{node.cluster_index}</span></p>
+                                    <p>Cor: <span style={{ color }}>{color}</span></p>
+                                    <p>Outlier: <span className="text-white">{node.is_outlier ? 'Sim' : 'Não'}</span></p>
+                                    <p>Posição: <span className="text-white">({node.x.toFixed(0)}, {node.y.toFixed(0)})</span></p>
                                 </>
                             );
                         })()}
                     </div>
-                    <button
-                        onClick={() => setSelectedNode(null)}
-                        className="mt-4 w-full px-3 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-lg text-white text-sm transition-colors"
-                    >
-                        Fechar
-                    </button>
                 </div>
             )}
         </div>
