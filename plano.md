@@ -150,9 +150,8 @@ O sistema é colaborativo, auditável e hierárquico, permitindo que **Admins** 
   - **Avatar Maker**: Implementação de montador de avatar customizado com seleção de forma (circle/square/octagon), cor, olhos, nariz e boca. Integrado ao Onboarding e Página de Perfil.
   - **Avatar Fine-tuning**: Ajuste fino de posicionamento e tamanho dos elementos faciais (olhos 95%, nariz 58%, boca 90%) e correção do border-radius por shape selecionado.
   - **Admin User Management**: Implementação de ações administrativas para deletar usuários e gerar links de reset de senha, com UI de dropdown e confirmação.
-
-
-
+  - **User Deletion FK Fix**: Correção de constraints de Foreign Key para permitir exclusão de usuários. Limpeza automática de dependências em ingestions, image_scan, image_signals, audit_log antes de deletar. Migration criada para ON DELETE SET NULL.
+  - **Self-Delete Account**: Usuários podem deletar sua própria conta na página de Perfil, com confirmação por digitação de "DELETAR".
 
 
 
