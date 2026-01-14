@@ -453,3 +453,37 @@ export async function getScanWithRunData(scanId: string, runId: string) {
 
     return { scan, run, images }
 }
+
+export async function deleteSignalRun(runId: string) {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) throw new Error('Unauthorized')
+
+    // Get run to check ownership and project_id for audit/revalidate
+    const { data: run, error: runError } = await supabase
+        .from('signals_runs')
+        .select('*, project_id')
+        .eq('id', runId)
+        .single()
+
+    if (runError) return { error: runError.message }
+
+    // Check permission: owner or admin
+    if (run.curator_id !== user.id) {
+        const { data: profile } = await supabase.from('profiles').select('role').eq('user_id', user.id).single()
+        if (profile?.role !== 'admin') {
+            return { error: 'Você não tem permissão para excluir esta leitura' }
+        }
+    }
+
+    // Delete (cascade removes image_signals)
+    const { error: deleteError } = await supabase
+        .from('signals_runs')
+        .delete()
+        .eq('id', runId)
+
+    if (deleteError) return { error: deleteError.message }
+
+    revalidatePath(`/dashboard/project/${run.project_id}`)
+    return { success: true }
+}

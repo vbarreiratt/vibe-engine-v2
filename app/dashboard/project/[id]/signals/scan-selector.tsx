@@ -1,23 +1,33 @@
 'use client'
-
 import { useRouter } from 'next/navigation'
 import { Globe, Lock, User, Calendar, Images, ArrowRight } from 'lucide-react'
+import { deleteScan } from '../scan/actions'
+import { DeleteWithConfirmation } from '@/components/delete-with-confirmation'
 
 interface Scan {
     id: string
     name: string
     visibility: 'public' | 'private'
+    curator_id: string
     curator: { nickname: string | null, email: string } | null
     image_count: number
     signals_run_count?: number
     created_at: string
 }
 
-export function ScanSelector({ scans, projectId }: { scans: Scan[], projectId: string }) {
+export function ScanSelector({ scans, projectId, currentUserId }: { scans: Scan[], projectId: string, currentUserId: string }) {
     const router = useRouter()
 
     const handleSelect = (scanId: string) => {
         router.push(`/dashboard/project/${projectId}/signals/${scanId}`)
+    }
+
+    const handleDelete = async (scanId: string) => {
+        const result = await deleteScan(scanId)
+        if (result && !result.error) {
+            router.refresh()
+        }
+        return result
     }
 
     return (
@@ -29,10 +39,10 @@ export function ScanSelector({ scans, projectId }: { scans: Scan[], projectId: s
 
             <div className="grid gap-4 max-w-2xl mx-auto">
                 {scans.map((scan) => (
-                    <button
+                    <div
                         key={scan.id}
+                        className="bg-zinc-900/50 border border-white/5 rounded-xl p-5 hover:border-purple-500/50 transition-all group relative cursor-pointer"
                         onClick={() => handleSelect(scan.id)}
-                        className="bg-zinc-900/50 border border-white/5 rounded-xl p-5 hover:border-purple-500/50 transition-all text-left group"
                     >
                         <div className="flex items-center justify-between">
                             <div className="flex-1 min-w-0">
@@ -75,11 +85,23 @@ export function ScanSelector({ scans, projectId }: { scans: Scan[], projectId: s
                                 </div>
                             </div>
 
-                            <div className="ml-4 text-zinc-600 group-hover:text-purple-400 transition-colors">
-                                <ArrowRight className="w-6 h-6" />
+                            <div className="ml-4 flex items-center gap-3">
+                                {/* Delete Button - Only for Curator */}
+                                {scan.curator_id === currentUserId && (
+                                    <DeleteWithConfirmation
+                                        title="Excluir Varredura"
+                                        description={<span>Tem certeza que deseja excluir <strong>{scan.name}</strong>?</span>}
+                                        warning="Todas as leituras associadas também serão excluídas."
+                                        onDelete={() => handleDelete(scan.id)}
+                                        triggerClassName="p-2 text-zinc-600 hover:text-red-500 hover:bg-red-500/10 rounded-full transition-all opacity-0 group-hover:opacity-100"
+                                    />
+                                )}
+                                <div className="text-zinc-600 group-hover:text-purple-400 transition-colors">
+                                    <ArrowRight className="w-6 h-6" />
+                                </div>
                             </div>
                         </div>
-                    </button>
+                    </div>
                 ))}
             </div>
         </div>

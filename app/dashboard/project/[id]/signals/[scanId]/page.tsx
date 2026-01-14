@@ -3,6 +3,8 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeft, Clock, Plus, Lock, Globe, User } from 'lucide-react'
 import { getScanWithImages, getSignalRuns } from '../../scan/actions'
+import { Breadcrumbs } from '@/components/breadcrumbs'
+import { DeleteRunButton } from '@/components/delete-run-button'
 
 export default async function ScanSignalsGalleryPage({ params }: { params: Promise<{ id: string, scanId: string }> }) {
     const { id: projectId, scanId } = await params
@@ -15,6 +17,19 @@ export default async function ScanSignalsGalleryPage({ params }: { params: Promi
     // 2. Get Runs
     const { runs } = await getSignalRuns(scanId)
 
+    // 3. User Check
+    const { data: { user } } = await supabase.auth.getUser()
+
+    // 4. Project Name
+    const { data: project } = await supabase.from('projects').select('name').eq('id', projectId).single()
+    const projectName = project?.name || 'Projeto'
+
+    const breadcrumbs = [
+        { label: projectName, href: `/dashboard/project/${projectId}` },
+        { label: 'Varreduras', href: `/dashboard/project/${projectId}/signals` },
+        { label: scan.name }
+    ]
+
     return (
         <div className="space-y-8 max-w-7xl mx-auto p-8">
             {/* Header */}
@@ -24,7 +39,8 @@ export default async function ScanSignalsGalleryPage({ params }: { params: Promi
                         <ArrowLeft className="w-5 h-5" />
                     </Link>
                     <div>
-                        <div className="text-xs font-mono text-zinc-500 uppercase tracking-widest mb-1">Leituras</div>
+                        <Breadcrumbs items={breadcrumbs} />
+                        <div className="text-xs font-mono text-zinc-500 uppercase tracking-widest mb-1 mt-2">Leituras</div>
                         <h1 className="text-3xl font-light text-white">{scan.name}</h1>
                     </div>
                 </div>
@@ -78,9 +94,13 @@ export default async function ScanSignalsGalleryPage({ params }: { params: Promi
                                     )}
                                 </div>
                             </div>
-                            <div className="text-zinc-700 group-hover:text-purple-500 transition-colors">
-                                {/* Arrow or indicator */}
-                                <ArrowLeft className="w-5 h-5 rotate-180" />
+                            <div className="flex items-center gap-4">
+                                {user && run.curator_id === user.id && (
+                                    <DeleteRunButton runId={run.id} />
+                                )}
+                                <div className="text-zinc-700 group-hover:text-purple-500 transition-colors">
+                                    <ArrowLeft className="w-5 h-5 rotate-180" />
+                                </div>
                             </div>
                         </Link>
                     ))}

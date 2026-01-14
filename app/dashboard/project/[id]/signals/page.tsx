@@ -4,6 +4,7 @@ import { getProjectScans } from '../scan/actions' // Adjust path if needed, this
 import { ArrowLeft, AlertTriangle } from 'lucide-react'
 import Link from 'next/link'
 import { ScanSelector } from './scan-selector'
+import { Breadcrumbs } from '@/components/breadcrumbs'
 
 export default async function SignalsPage({ params }: { params: Promise<{ id: string }> }) {
     const supabase = await createClient()
@@ -16,6 +17,15 @@ export default async function SignalsPage({ params }: { params: Promise<{ id: st
     // Get all available scans
     const { scans } = await getProjectScans(projectId)
 
+    // Fetch project name for breadcrumbs
+    const { data: project } = await supabase.from('projects').select('name').eq('id', projectId).single()
+    const projectName = project?.name || 'Projeto'
+
+    const breadcrumbs = [
+        { label: projectName, href: `/dashboard/project/${projectId}` },
+        { label: 'Varreduras' }
+    ]
+
     // If no scans exist, show empty state
     if (!scans || scans.length === 0) {
         return (
@@ -25,7 +35,8 @@ export default async function SignalsPage({ params }: { params: Promise<{ id: st
                         <ArrowLeft className="w-5 h-5" />
                     </Link>
                     <div>
-                        <h1 className="text-2xl font-light text-white">Sinais</h1>
+                        <Breadcrumbs items={breadcrumbs} />
+                        <h1 className="text-2xl font-light text-white mt-2">Sinais</h1>
                         <p className="text-zinc-500 text-sm">Atribua sinais (Estado, Matéria, Movimento) às imagens</p>
                     </div>
                 </div>
@@ -57,12 +68,13 @@ export default async function SignalsPage({ params }: { params: Promise<{ id: st
                     <ArrowLeft className="w-5 h-5" />
                 </Link>
                 <div>
-                    <h1 className="text-2xl font-light text-white">Sinais</h1>
+                    <Breadcrumbs items={breadcrumbs} />
+                    <h1 className="text-2xl font-light text-white mt-2">Sinais</h1>
                     <p className="text-zinc-500 text-sm">Selecione uma varredura para gerenciar sinais</p>
                 </div>
             </div>
 
-            <ScanSelector scans={scans as any} projectId={projectId} />
+            <ScanSelector scans={scans as any} projectId={projectId} currentUserId={user.id} />
         </div>
     )
 }

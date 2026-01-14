@@ -416,6 +416,31 @@ export function SignalWorkspace({ images, projectId, scanName, scanId, initialRu
         })
     }
 
+    const editTag = (section: SectionKey, tagIndex: number, newValue: string) => {
+        if (!currentImage || !newValue.trim()) return
+        setImageStates(prev => {
+            const curr = prev[currentImage.id]
+            const oldTags = curr.signals[section]
+            // check duplicates (excluding self)
+            if (oldTags.some((t, i) => i !== tagIndex && t === newValue)) return prev
+
+            const newTags = [...oldTags]
+            newTags[tagIndex] = newValue
+
+            return {
+                ...prev,
+                [currentImage.id]: {
+                    ...curr,
+                    isDirty: true,
+                    signals: {
+                        ...curr.signals,
+                        [section]: newTags
+                    }
+                }
+            }
+        })
+    }
+
 
     /* -------------------------------------------------------------------------- */
     /*                                   RENDER                                   */
@@ -542,6 +567,7 @@ export function SignalWorkspace({ images, projectId, scanName, scanId, initialRu
                                 tags={currentState?.signals[section.key] || []}
                                 onAddTag={(val) => addTag(section.key, val)}
                                 onRemoveTag={(idx) => removeTag(section.key, idx)}
+                                onEditTag={(idx, val) => editTag(section.key, idx, val)}
                             />
                         ))}
 
@@ -754,14 +780,26 @@ function TagSectionRenderer({
     section,
     tags,
     onAddTag,
-    onRemoveTag
+    onRemoveTag,
+    onEditTag
 }: {
     section: TagSection
     tags: string[]
     onAddTag: (val: string) => void
     onRemoveTag: (idx: number) => void
+    onEditTag: (idx: number, val: string) => void
 }) {
     const [inputValue, setInputValue] = useState('')
+    const [editingIndex, setEditingIndex] = useState<number | null>(null)
+    const [editValue, setEditValue] = useState('')
+
+    // Add Input Handlers
+    const handleAddBlur = () => {
+        if (inputValue.trim()) {
+            onAddTag(inputValue)
+            setInputValue('')
+        }
+    }
 
     const handleInputKeyDown = (e: React.KeyboardEvent) => {
         if (e.key === 'Enter') {
@@ -770,6 +808,27 @@ function TagSectionRenderer({
                 onAddTag(inputValue)
                 setInputValue('')
             }
+        }
+    }
+
+    // Edit Handlers
+    const startEditing = (idx: number, val: string) => {
+        setEditingIndex(idx)
+        setEditValue(val)
+    }
+
+    const saveEdit = () => {
+        if (editingIndex !== null && editValue.trim()) {
+            onEditTag(editingIndex, editValue)
+        }
+        setEditingIndex(null)
+        setEditValue('')
+    }
+
+    const handleEditKeyDown = (e: React.KeyboardEvent) => {
+        if (e.key === 'Enter') {
+            e.preventDefault()
+            saveEdit()
         }
     }
 
@@ -782,27 +841,47 @@ function TagSectionRenderer({
 
             <div className="flex flex-wrap gap-2">
                 {tags.map((tag, i) => (
-                    <div key={i} className="group flex items-center gap-1.5 px-3 py-1.5 bg-white/5 text-zinc-200 text-sm rounded-md border border-white/5 hover:border-white/20 transition-all cursor-default">
-                        <span>{tag}</span>
-                        <button
-                            onClick={() => onRemoveTag(i)}
-                            className="text-zinc-600 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-all"
+                    editingIndex === i ? (
+                        <input
+                            key={i}
+                            autoFocus
+                            value={editValue}
+                            onChange={(e) => setEditValue(e.target.value)}
+                            onBlur={saveEdit}
+                            onKeyDown={handleEditKeyDown}
+                            className="px-3 py-1.5 bg-zinc-900 text-white text-sm rounded-md border border-purple-500 outline-none w-auto min-w-[60px]"
+                        />
+                    ) : (
+                        <div
+                            key={i}
+                            className="group flex items-center gap-1.5 px-3 py-1.5 bg-white/5 text-zinc-200 text-sm rounded-md border border-white/5 hover:border-white/20 hover:bg-white/10 transition-all cursor-pointer"
+                            onClick={() => startEditing(i, tag)}
+                            title="Clique para editar"
                         >
-                            <X className="w-3 h-3" />
-                        </button>
-                    </div>
+                            <span>{tag}</span>
+                            <button
+                                onClick={(e) => {
+                                    e.stopPropagation() // Prevent entering edit mode
+                                    onRemoveTag(i)
+                                }}
+                                className="text-zinc-600 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-all px-1"
+                            >
+                                <X className="w-3 h-3" />
+                            </button>
+                        </div>
+                    )
                 ))}
 
                 {/* Input Chip */}
                 <div className="flex items-center gap-1.5 px-3 py-1.5 bg-transparent text-zinc-400 text-sm rounded-md border border-dashed border-zinc-700 hover:border-zinc-500 transition-colors focus-within:border-purple-500 focus-within:text-white">
                     <Plus className="w-3 h-3" />
                     <input
-                        className="bg-transparent border-none outline-none w-20 text-sm placeholder:text-zinc-700"
+                        className="bg-transparent border-none outline-none w-24 text-sm placeholder:text-zinc-700"
                         placeholder="adicionar..."
                         value={inputValue}
                         onChange={(e) => setInputValue(e.target.value)}
                         onKeyDown={handleInputKeyDown}
-                    // Don't autofocus to avoid stealing nav
+                        onBlur={handleAddBlur}
                     />
                 </div>
             </div>
