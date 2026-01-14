@@ -126,6 +126,10 @@ O sistema é colaborativo, auditável e hierárquico, permitindo que **Admins** 
   - Interface de Leitura de Sinais (Tags).
   - Motor de Ressonância e Clusterização (Hierarchical).
   - Interface de Resultados (Ressonância).
+  - Correção de erros de Hidratação e Rotas (Dashboard 404).
+  - Script de Promoção de Admin via CLI.
+  - Refatoração de Layout: Menu Superior -> Menu Lateral (Sidebar).
+
 
 
 
