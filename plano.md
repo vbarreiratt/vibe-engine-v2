@@ -75,10 +75,10 @@ O sistema é colaborativo, auditável e hierárquico, permitindo que **Admins** 
 
 
 ### Fase 3: Fluxo de Vibe - Parte 1 (Scan & Tags)
-- [ ] Tela de Varredura (Grid Rápido: Vibra/Não Vibra).
-- [ ] Auditoria de Decisões de Varredura.
-- [ ] Integração LLM para Sugestão de Tags (Estado, Matéria, Movimento).
-- [ ] Interface de Revisão de Tags (Human-in-the-loop).
+- [x] Tela de Varredura (Grid Rápido: Vibra/Não Vibra).
+- [x] Auditoria de Decisões de Varredura.
+- [x] Integração LLM para Sugestão de Tags (Estado, Matéria, Movimento).
+- [x] Interface de Revisão de Tags (Human-in-the-loop) e Gestão de Leituras.
 
 
 
@@ -152,6 +152,11 @@ O sistema é colaborativo, auditável e hierárquico, permitindo que **Admins** 
   - **Admin User Management**: Implementação de ações administrativas para deletar usuários e gerar links de reset de senha, com UI de dropdown e confirmação.
   - **User Deletion FK Fix**: Correção de constraints de Foreign Key para permitir exclusão de usuários. Limpeza automática de dependências em ingestions, image_scan, image_signals, audit_log antes de deletar. Migration criada para ON DELETE SET NULL.
   - **Self-Delete Account**: Usuários podem deletar sua própria conta na página de Perfil, com confirmação por digitação de "DELETAR".
+  - **AI Integration (Part 1)**: Implementação de modelo `gemini-2.5-flash-lite` para sugestão de tags. O processamento é feito em batches (Inicial síncrono + Background assíncrono). Integração robusta com timeouts e análise de erros.
+  - **Scan & Run Management**: Implementação do ciclo completo de Varreduras (Scan) e Leituras (Runs). Criação, Listagem e *Exclusão* (com delete cascade e permissões de dono/admin).
+  - **Tag Management**: Implementação de edição de tags (click-to-edit) e adição de novas tags na interface de leitura. Correção de bugs de persistência.
+  - **UX Navigation**: Adição de "Breadcrumbs" para navegação hierárquica (Projeto > Varredura > Leitura) e padronização de modais de confirmação de exclusão.
+  - **Robustness**: Implementação de Debounce em chamadas de API e timeout estendido para "Cold Start" da IA.
 
 
 
