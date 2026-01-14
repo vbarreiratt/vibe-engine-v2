@@ -104,9 +104,9 @@ O sistema é colaborativo, auditável e hierárquico, permitindo que **Admins** 
   - [x] Render do Canvas (React Flow ou HTML5 Canvas customizado? Provavelmente React Flow é mais rápido de implementar interações)
   - [x] Interações: Drag, Criar Núcleo, Dissolver, Outlier, Renomear
   - [x] Visualização de "Seeds" e "Orbitas"
-- [ ] **TASK 5 — Salvamento versionado e listagem**
-  - [ ] Modal de Salvar (Nome + Visibilidade)
-  - [ ] Atualização da Dashboard do Projeto (Listagem de Clusters Runs por Scan)
+- [x] **TASK 5 — Salvamento versionado e listagem**
+  - [x] Modal de Salvar (Nome + Visibilidade)
+  - [x] Atualização da Dashboard do Projeto (Listagem de Clusters Runs por Scan)
 - [ ] **TASK 6 — Exportáveis e Auditoria**
   - [ ] Geração de JSON/MD/CSV na pasta `outputs/`
   - [ ] Integração com `audit_log` para ações de edição

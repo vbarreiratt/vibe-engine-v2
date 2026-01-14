@@ -51,6 +51,8 @@
   - Created `ClusterCanvasPage` skeleton for listing and creating runs.
   - Created `ClusterMural` component for visualizing nodes and edges (using Framer Motion).
   - Added UI components (`button`, `card`) to support the new pages.
+  - Implemented full Editor Mode with Real Data Loader and Save functionality.
+
 
 
 
