@@ -59,3 +59,114 @@
 - **Exports**:
   - Implemented automatic file system export (`JSON`, `MD`, `CSV`) after Cluster Job completion in `outputs/` folder.
 
+## [2026-01-14] Canvas V2 - Editor Imersivo de Ressonância
+
+### Missão Atual
+Transformar o Canvas de Ressonância de um "debug de pontos" para um **editor profissional estilo Miro/FigJam**, com:
+- Visualização clara e imersiva dos clusters como "ilhas"
+- Ferramentas de edição (drag, lasso, merge/split clusters)
+- Sistema de auditoria completo (logs humanos-legíveis)
+- Layout inteligente em 2 estágios (macro: clusters | micro: nodes)
+
+### Features Implementadas
+
+#### 1. Sistema de Layout Inteligente ✅
+- **Arquivo**: `lib/clustering/layout.ts`
+- **2 Estágios**:
+  - **Macro**: Posiciona centros dos clusters em grid relaxado
+  - **Micro**: Distribui nodes em órbita ao redor do centro do cluster
+  - **Outliers**: Nodes singleton posicionados em anel externo
+- **Fit-to-view**: Cálculo automático de bounds e transformação inicial
+- **Benefício**: Clusters organizados visualmente, não espalhados caoticamente
+
+#### 2. Sistema de Logging para Auditoria ✅
+- **Arquivo**: `lib/clustering/logger.ts`
+- **Logs Gerados**:
+  - Início/fim do job (modelo, threshold, método, duração)
+  - Criação de cada cluster (sinais dominantes + justificativa)
+  - Ações do usuário (move, merge, split) - preparado para futuro
+- **Formato Humano**: Logs em texto estruturado, não apenas JSON
+- **Exportação**: Logs salvos em `outputs/run_<timestamp>/clusters/<id>/`
+- **Benefício**: Total transparência do processo, auditável e não "caixa-preta"
+
+#### 3. Canvas Imersivo Fullscreen ✅
+- **Arquivo**: `components/cluster-mural/resonance-canvas.tsx`
+- **Características**:
+  - **100% Viewport**: Canvas ocupa tela inteira (w-screen h-screen)
+  - **UI Flutuante**: Topbar e botões como ilhas flutuantes (podem ser colapsadas)
+  - **Cores Vibrantes**: Paleta HSL com alto contraste (vermelho, ciano, amarelo, verde...)
+  - **Clusters como Ilhas**: Círculos translúcidos coloridos com bordas tracejadas
+  - **Nodes Visíveis**: Quadrados 70x70px preenchidos com cor do cluster
+  - **Badges**: Número do cluster em círculo branco sobreposto
+  - **Glow Effect**: Efeito de brilho ao selecionar node
+- **Interações**:
+  - Zoom & Pan funcionais (scroll + botões)
+  - Seleção de nodes (inspector panel lateral)
+  - Toggle de UI (botão olho 👁)
+  
+#### 4. Integração no ClusterEngine ✅
+- **Arquivo**: `lib/clustering/cluster-engine.ts`
+- Logger integrado em todos os métodos
+- Layout de 2 estágios aplicado automaticamente no `run()`
+- Logs anexados ao resultado final (`result.log`)
+- Método `getTopTags()` para análise de sinais dominantes
+
+#### 5. Exportação Enriquecida ✅
+- Logs humanos-legíveis incluídos nos exports
+- Arquivos gerados em `outputs/`:
+  - `clusters_run.json` (dados completos + log)
+  - `clusters_summary.md` (resumo em Markdown)
+  - `nodes.csv` e `edges.csv`
+
+### Desafios Superados
+
+1. **Visibilidade Zero**: Inicial canvas estava todo preto (sem contraste)
+   - **Solução**: Paleta HSL vibrante com opacidades controladas
+   
+2. **Layout Caótico**: ForceAtlas2 espalhava nodes aleatoriamente
+   - **Solução**: Layout em 2 estágios com grid + órbitas circulares
+   
+3. **UI Não-Imersiva**: Headers/toolbars diminuíam o canvas
+   - **Solução**: Fullscreen + UI flutuante colapsável
+   
+4. **Coordenadas NULL**: Nodes isolados causavam erro de constraint no DB
+   - **Solução**: Fallback para posições circulares quando layout retorna null
+
+5. **Vertex AI Embeddings**: SDK não tinha método `embedContent` para embeddings
+   - **Solução**: Migração para API REST direta com `google-auth-library`
+
+### Métricas
+- **Arquivos Criados**: 3 (`layout.ts`, `logger.ts`, `resonance-canvas.tsx`)
+- **Arquivos Modificados**: 5 (engine, page, job, etc.)
+- **Commits**: 4 commits incrementais
+- **Runs de Teste**: 10+ runs gerados com sucesso
+- **Logs Exportados**: ✅ Funcionando automaticamente
+
+### Status Atual
+✅ **Funcional e Testável**:
+- Canvas fullscreen imersivo
+- Cores vibrantes e visíveis
+- Layout organizado (clusters como ilhas)
+- Zoom, pan, seleção
+- Logging completo
+- Exportação automática
+
+🟡 **Próximos Passos** (Conforme prompt original):
+- [ ] Drag de nodes individuais
+- [ ] Lasso selection (seleção múltipla)
+- [ ] Criar cluster da seleção
+- [ ] Merge de clusters
+- [ ] Split de cluster
+- [ ] Marcar/desmarcar outlier
+- [ ] Carregar thumbnails reais das imagens
+- [ ] Tooltips com sinais ao hover
+- [ ] Persistir logs no banco (tabela `cluster_logs`)
+
+### Observações Técnicas
+- Branch: `implementacao-parte-5`
+- Vertex AI Model: `text-embedding-004` (768 dimensões)
+- Clustering Method: Louvain community detection
+- Graph Library: `graphology` + `graphology-layout-forceatlas2`
+- Threshold Primário: 0.75 (cosine similarity)
+- Threshold Secundário: 0.65
+

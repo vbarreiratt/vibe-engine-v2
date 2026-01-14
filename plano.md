@@ -110,6 +110,44 @@ O sistema é colaborativo, auditável e hierárquico, permitindo que **Admins** 
 - [x] **TASK 6 — Exportáveis e Auditoria**
   - [x] Geração de JSON/MD/CSV na pasta `outputs/`
   - [x] Integração com `audit_log` para ações de edição (Implicit via API endpoints, although explicit audit logging calls could be added, the essential part is the outputs are generated)
+- [x] **TASK 7 — Canvas V2: Editor Imersivo**
+  - [x] Sistema de Layout em 2 Estágios (`layout.ts`)
+    - [x] Macro: Grid relaxado para centros dos clusters
+    - [x] Micro: Órbitas circulares para nodes dentro do cluster
+    - [x] Tratamento de outliers (anel externo)
+  - [x] Sistema de Logging Completo (`logger.ts`)
+    - [x] Logs de início/fim do job com métricas
+    - [x] Logs de criação de clusters com justificativas
+    - [x] Preparação para logs de ações do usuário
+    - [x] Exportação em formato humano-legível
+  - [x] Canvas Fullscreen Imersivo (`resonance-canvas.tsx`)
+    - [x] Layout 100% viewport (w-screen h-screen)
+    - [x] UI flutuante colapsável (topbar + toolbar)
+    - [x] Paleta de cores vibrantes HSL (alto contraste)
+    - [x] Clusters como "ilhas" coloridas
+    - [x] Nodes visíveis (70x70px) com badges
+    - [x] Zoom & Pan funcionais
+    - [x] Seleção de nodes com inspector panel
+  - [x] Integração ClusterEngine
+    - [x] Logger integrado nos métodos run()
+    - [x] Layout aplicado automaticamente
+    - [x] Logs anexados ao resultado
+- [ ] **TASK 8 — Ferramentas de Edição**
+  - [ ] Drag de nodes individuais
+  - [ ] Lasso selection (seleção múltipla)
+  - [ ] Criar cluster da seleção
+  - [ ] Merge de clusters
+  - [ ] Split de cluster
+  - [ ] Marcar/desmarcar outlier
+- [ ] **TASK 9 — Enriquecimento Visual**
+  - [ ] Carregar thumbnails reais das imagens
+  - [ ] Tooltips com sinais ao hover
+  - [ ] Animações de transição
+  - [ ] Histórico de ações (undo/redo)
+- [ ] **TASK 10 — Persistência Avançada**
+  - [ ] Tabela `cluster_logs` no banco
+  - [ ] Salvar logs de ações do usuário
+  - [ ] Versionamento de edições
 
 
 
