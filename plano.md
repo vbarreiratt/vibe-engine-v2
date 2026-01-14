@@ -75,10 +75,11 @@ O sistema é colaborativo, auditável e hierárquico, permitindo que **Admins** 
 
 
 ### Fase 3: Fluxo de Vibe - Parte 1 (Scan & Tags)
-- [ ] Tela de Varredura (Grid Rápido: Vibra/Não Vibra).
-- [ ] Auditoria de Decisões de Varredura.
+- [x] Tela de Varredura (Grid Rápido: Vibra/Não Vibra).
+- [x] Auditoria de Decisões de Varredura.
 - [ ] Integração LLM para Sugestão de Tags (Estado, Matéria, Movimento).
 - [ ] Interface de Revisão de Tags (Human-in-the-loop).
+
 
 ### Fase 4: Fluxo de Vibe - Parte 2 (Ressonância)
 - [ ] Geração de Embeddings (Batch Job).
