@@ -1,9 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { Check, Loader2, Layers, RotateCcw, X, Image as ImageIcon } from 'lucide-react'
+import { Check, Loader2, Layers, RotateCcw } from 'lucide-react'
 import { batchSubmitScan } from './actions'
-import { motion, AnimatePresence } from 'framer-motion'
 
 interface ImageItem {
     id: string
@@ -13,11 +12,9 @@ interface ImageItem {
 export function ScanGrid({ images, projectId }: { images: ImageItem[], projectId: string }) {
     const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
     const [isSubmitting, setIsSubmitting] = useState(false)
-    const [showSelectionMenu, setShowSelectionMenu] = useState(false)
 
-    // To handle optimistic removal after submit involves clearing this list localy
-    // But since we use router.refresh in action, it might handle itself.
-    // However, for smooth UX, we might want to wait.
+    // Filter State
+    const [showOnlySelected, setShowOnlySelected] = useState(false)
 
     const toggleSelection = (id: string) => {
         const next = new Set(selectedIds)
@@ -42,15 +39,16 @@ export function ScanGrid({ images, projectId }: { images: ImageItem[], projectId
 
         try {
             await batchSubmitScan(projectId, decisions)
-            // The page will reload/revalidate, showing empty grid ideally
         } catch (e) {
             alert('Erro ao salvar varredura')
             setIsSubmitting(false)
         }
     }
 
-    // Filter images for the "Selected Menu"
-    const selectedImages = images.filter(img => selectedIds.has(img.id))
+    // Determine what to show in grid
+    const visibleImages = showOnlySelected
+        ? images.filter(img => selectedIds.has(img.id))
+        : images
 
     if (images.length === 0) {
         return (
@@ -75,8 +73,8 @@ export function ScanGrid({ images, projectId }: { images: ImageItem[], projectId
         <div className="relative min-h-[50vh]">
             <div className="flex items-center justify-between text-zinc-500 text-sm mb-6">
                 <div className="flex items-center gap-4">
-                    <span>{images.length} imagens pendentes</span>
-                    {selectedIds.size > 0 && (
+                    <span>{showOnlySelected ? `Visualizando ${visibleImages.length} selecionadas` : `${images.length} imagens totais`}</span>
+                    {selectedIds.size > 0 && !showOnlySelected && (
                         <span className="text-emerald-400 font-medium bg-emerald-500/10 px-2 py-0.5 rounded-full">
                             {selectedIds.size} selecionadas
                         </span>
@@ -88,7 +86,7 @@ export function ScanGrid({ images, projectId }: { images: ImageItem[], projectId
             </div>
 
             <div className={`grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 pb-32 ${isSubmitting ? 'opacity-50 pointer-events-none' : ''}`}>
-                {images.map(img => {
+                {visibleImages.map(img => {
                     const isSelected = selectedIds.has(img.id)
                     return (
                         <div
@@ -121,12 +119,12 @@ export function ScanGrid({ images, projectId }: { images: ImageItem[], projectId
                     <span className="text-white font-medium">{selectedIds.size}</span> vibram
                 </span>
 
-                {/* Toggle Selection Menu */}
+                {/* Toggle View Mode Button */}
                 {selectedIds.size > 0 && (
                     <button
-                        onClick={() => setShowSelectionMenu(!showSelectionMenu)}
-                        className={`p-2 rounded-full transition-colors ${showSelectionMenu ? 'bg-white/10 text-white' : 'hover:bg-white/5 text-zinc-400'}`}
-                        title="Ver selecionadas"
+                        onClick={() => setShowOnlySelected(!showOnlySelected)}
+                        className={`p-2 rounded-full transition-colors ${showOnlySelected ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/20' : 'hover:bg-white/5 text-zinc-400 hover:text-white'}`}
+                        title={showOnlySelected ? "Ver todas" : "Filtrar selecionadas"}
                     >
                         <Layers className="w-5 h-5" />
                     </button>
@@ -143,40 +141,6 @@ export function ScanGrid({ images, projectId }: { images: ImageItem[], projectId
                     Concluir Varredura
                 </button>
             </div>
-
-            {/* Selection Menu Drawer */}
-            <AnimatePresence>
-                {showSelectionMenu && selectedIds.size > 0 && (
-                    <motion.div
-                        initial={{ opacity: 0, y: 20, scale: 0.95 }}
-                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, y: 20, scale: 0.95 }}
-                        className="fixed bottom-24 left-1/2 -translate-x-1/2 bg-zinc-900 border border-zinc-800 rounded-xl shadow-2xl p-4 w-[90vw] max-w-3xl max-h-[300px] overflow-hidden z-30 flex flex-col"
-                    >
-                        <div className="flex items-center justify-between mb-3 pb-3 border-b border-white/5">
-                            <h4 className="text-sm font-medium text-white">Itens Selecionados ({selectedIds.size})</h4>
-                            <button onClick={() => setShowSelectionMenu(false)} className="text-zinc-500 hover:text-white">
-                                <X className="w-4 h-4" />
-                            </button>
-                        </div>
-                        <div className="flex-1 overflow-x-auto overflow-y-hidden pb-2">
-                            <div className="flex gap-3 h-full">
-                                {selectedImages.map(img => (
-                                    <div key={img.id} className="relative aspect-square h-full min-h-[100px] rounded-lg overflow-hidden border border-emerald-500/30 flex-shrink-0 group">
-                                        <img src={img.thumb_url} className="w-full h-full object-cover" />
-                                        <button
-                                            onClick={() => toggleSelection(img.id)}
-                                            className="absolute top-1 right-1 p-1 bg-black/60 text-white/70 hover:text-red-400 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-                                        >
-                                            <X className="w-3 h-3" />
-                                        </button>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
         </div>
     )
 }

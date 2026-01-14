@@ -141,6 +141,7 @@ O sistema é colaborativo, auditável e hierárquico, permitindo que **Admins** 
   - **Project Gallery Filter**: Implementação de filtro na galeria de imagens para alternar entre "Minhas Referências" e "Referências do Projeto" (Públicas).
   - **Scan Configuration**: Implementação de modal de configuração de varredura, permitindo seleção de escopo (Minhas, Público, Todas) antes do início do processo.
   - **Scan UI Redesign**: Reformulação da interface de varredura para seleção múltipla em grade, com feedback visual (outline verde) e submissão em lote (Batch Action).
+  - **Scan Selection Filter**: Implementação de toggle para visualizar apenas as imagens selecionadas diretamente no grid de varredura.
 
 
 
