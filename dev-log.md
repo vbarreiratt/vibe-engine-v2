@@ -33,3 +33,9 @@
 - **Planning**:
   - Detailed task breakdown for Cluster Canvas (Mural UI, Async Job, Persistence).
 
+### Fixes
+- **Database**:
+  - Resolved name collision for `clusters` table by dropping legacy tables in the new migration.
+  - Added `moddatetime` extension enabling to migration to fix trigger error.
+
+

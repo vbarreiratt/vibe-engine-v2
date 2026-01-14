@@ -1,3 +1,10 @@
+-- Enable moddatetime extension
+create extension if not exists "moddatetime";
+
+-- Drop legacy tables if they exist to allow re-creation with new schema
+drop table if exists cluster_images cascade;
+drop table if exists clusters cascade;
+
 -- Create clusters_runs table
 create table clusters_runs (
   id uuid default gen_random_uuid() primary key,
