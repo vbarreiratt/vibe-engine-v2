@@ -37,21 +37,17 @@ export async function generateEmbedding(text: string) {
     try {
         const client = await getVertexClient()
 
-        // Use the text embedding model from Vertex AI 
-        const model = client.getGenerativeModel({
+        // Use textEmbedding method for embedding models
+        const textEmbeddingModel = client.preview.getGenerativeModel({
             model: 'text-embedding-004',
         });
 
-        // Generate embeddings - using correct format for embedding models
-        const request = {
-            content: {
-                role: 'user' as const,
-                parts: [{ text }]
-            }
-        };
+        // Call embedContent with the proper format
+        const result = await textEmbeddingModel.embedContent({
+            content: { role: 'user', parts: [{ text }] }
+        });
 
-        const result = await (model as any).embedContent(request);
-        const embedding = result.embedding?.values;
+        const embedding = result?.embedding?.values;
 
         if (!embedding) {
             throw new Error("No embedding returned")
