@@ -68,13 +68,22 @@ export default async function ProjectPage({ params }: { params: { id: string } }
                         </div>
                     </div>
 
-                    {/* Mode Switcher Placeholder */}
+                    {/* Mode Switcher */}
                     <nav className="space-y-1">
-                        {['Ingestão', 'Varredura', 'Sinais', 'Ressonância'].map((step, i) => (
-                            <div key={step} className={`px-4 py-3 rounded-lg text-sm font-medium flex items-center justify-between ${i === 0 ? 'bg-white/10 text-white' : 'text-zinc-500 hover:text-zinc-300 hover:bg-white/5'}`}>
-                                <span>{i + 1}. {step}</span>
+                        {[
+                            { name: 'Ingestão', path: '' },
+                            { name: 'Varredura', path: '/scan' },
+                            { name: 'Sinais', path: '/tagging' },
+                            { name: 'Ressonância', path: '/resonance' }
+                        ].map((step, i) => (
+                            <a
+                                key={step.name}
+                                href={`/dashboard/project/${projectId}${step.path}`}
+                                className={`px-4 py-3 rounded-lg text-sm font-medium flex items-center justify-between transition-colors ${i === 0 ? 'bg-white/10 text-white' : 'text-zinc-500 hover:text-white hover:bg-white/5'}`}
+                            >
+                                <span>{i + 1}. {step.name}</span>
                                 {i === 0 && <span className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]" />}
-                            </div>
+                            </a>
                         ))}
                     </nav>
                 </div>
