@@ -68,10 +68,11 @@ O sistema é colaborativo, auditável e hierárquico, permitindo que **Admins** 
 
 
 ### Fase 2: Ingestão e Mídia
-- [ ] Configuração DigitalOcean Spaces (S3 Client).
-- [ ] Upload de Imagens (Drag & Drop).
+- [x] Configuração DigitalOcean Spaces (S3 Client).
+- [x] Upload de Imagens (Drag & Drop + S3 Presigned).
 - [ ] Geração de Thumbnails (Server-side/Sharp ou Edge).
-- [ ] Persistência de URLs e metadados no DB.
+- [x] Persistência de URLs e metadados no DB.
+
 
 ### Fase 3: Fluxo de Vibe - Parte 1 (Scan & Tags)
 - [ ] Tela de Varredura (Grid Rápido: Vibra/Não Vibra).
@@ -114,5 +115,8 @@ O sistema é colaborativo, auditável e hierárquico, permitindo que **Admins** 
   - Implementação do Login e Logout.
   - Implementação da Dashboard Admin para gestão de usuários (Promover/Rebaixar Admin).
   - Implementação da Criação de Projetos com alocação de membros.
+  - Configuração do DigitalOcean Spaces (S3).
+  - Implementação do Upload de Imagens com Presigned URLs.
+  - Dashboard do Projeto (Fluxo de Ingestão).
 
 
