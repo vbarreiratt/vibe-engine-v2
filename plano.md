@@ -1,0 +1,104 @@
+# Projeto Vibe Engine (Reboot)
+
+## 1. Visão Geral
+O **Vibe Engine** é um sistema web para reconhecimento, montagem e curadoria de *vibes* visuais. Ele implementa o método definido em `VIBE ENGINE.md`, focando na identificação de atmosferas compartilhadas através de sinais (Estado, Matéria, Movimento) e ressonância automática (clusterização).
+
+O sistema é colaborativo, auditável e hierárquico, permitindo que **Admins** gerenciem projetos e curadores, e **Curadores** operem o fluxo de "scan" e "ressonância" dentro de seus projetos designados.
+
+## 2. Arquitetura Proposta
+
+### Stack Tecnológico
+- **Frontend/App**: Next.js 14+ (App Router), React, TailwindCSS, Lucide Icons.
+- **Backend**: Next.js Server Actions / API Routes.
+- **Database**: Supabase (PostgreSQL) para dados relacionais e vetoriais (pgvector).
+- **Auth**: Supabase Auth (Email/Password).
+- **Storage**: DigitalOcean Spaces (S3 Compatible) para imagens e thumbnails.
+- **AI/ML**: 
+    - LLM (OpenAI/Gemini) para sugestão de tags (Passo 3).
+    - Embeddings (OpenAI/Vertex) para vetorização (Passo 4).
+    - Clusterização: Algoritmo hierárquico ou baseado em densidade (Server-side TS/JS ou Python bridge se necessário).
+
+### Estrutura de Pastas (Monorepo-like no Next.js)
+```
+/
+├── app/                  # Frontend (Next.js App Router)
+│   ├── (auth)/           # Rotas de login/auth
+│   ├── (dashboard)/      # Interface principal
+│   │   ├── admin/        # Área do Admin
+│   │   ├── curator/      # Área do Curador (Projetos)
+│   │   └── project/[id]/ # Fluxo do Vibe Engine
+│   └── api/              # Endpoints (Webhooks, Uploads, Jobs)
+├── components/           # UI Kit e Componentes Reutilizáveis
+├── lib/                  # Core Logic e Utilitários
+│   ├── supabase/         # Clients (Auth, Db)
+│   ├── storage/          # DigitalOcean Spaces Client
+│   ├── ai/               # Clients LLM e Embeddings
+│   └── clustering/       # Lógica de agrupamento
+└── supabase/             # Migrations e Types
+```
+
+## 3. Modelo de Dados (Schema Supabase)
+
+### Tabelas Principais
+- **profiles**: Extensão da tabela `auth.users`. Campos: `role` ('admin', 'curator').
+- **projects**: Projetos de vibe. Campos: `name`, `description`, `status`.
+- **project_members**: Associação N:N Users<->Projects. Campos: `role` (no projeto).
+- **images**: Imagens do projeto. Campos: `original_url`, `thumb_url`, `file_path`, `metadata`.
+- **image_decisions** (Scan): Decisão do curador (Vibra/Não Vibra).
+- **image_signals** (Tags): Sinais da imagem (Estado, Matéria, Movimento).
+- **clusters**: Grupos formados. Campos: `run_id`, `name`, `description`.
+- **cluster_images**: Relacionamento Imagem<->Cluster.
+- **audit_log**: Registro imutável de ações (quem, o quê, quando, diff).
+
+### Segurança (RLS)
+- **Todas as tabelas** com RLS ativo.
+- **Admin**: Acesso total (policy `role = 'admin'`).
+- **Curador**: `SELECT`, `INSERT`, `UPDATE` apenas em projetos onde existe entrada em `project_members`.
+- **Public**: Sem acesso (exceto login).
+
+## 4. Backlog e Etapas
+
+### Fase 1: Fundação e Auth (MVP Início) 
+- [ ] Configuração do Next.js + Tailwind + Design System Base (Dark/Premium).
+- [ ] Configuração do Supabase (Auth + Tables + RLS).
+- [ ] Middleware de Proteção de Rotas (Admin vs Curador).
+- [ ] Gestão de Curadores (Tela Admin).
+- [ ] Criação de Projetos e Atribuição (Tela Admin).
+
+### Fase 2: Ingestão e Mídia
+- [ ] Configuração DigitalOcean Spaces (S3 Client).
+- [ ] Upload de Imagens (Drag & Drop).
+- [ ] Geração de Thumbnails (Server-side/Sharp ou Edge).
+- [ ] Persistência de URLs e metadados no DB.
+
+### Fase 3: Fluxo de Vibe - Parte 1 (Scan & Tags)
+- [ ] Tela de Varredura (Grid Rápido: Vibra/Não Vibra).
+- [ ] Auditoria de Decisões de Varredura.
+- [ ] Integração LLM para Sugestão de Tags (Estado, Matéria, Movimento).
+- [ ] Interface de Revisão de Tags (Human-in-the-loop).
+
+### Fase 4: Fluxo de Vibe - Parte 2 (Ressonância)
+- [ ] Geração de Embeddings (Batch Job).
+- [ ] Motor de Ressonância (Clusterização Lógica).
+- [ ] Interface de Revisão de Clusters (Merge, Split, Rename).
+- [ ] Persistência da "Vibe" final.
+
+### Fase 5: Auditoria e Polimento
+- [ ] Visualização do Log de Auditoria.
+- [ ] Refinamento de UI/UX (Animações, Feedback visual).
+- [ ] Exportação (Markdown/JSON).
+
+## 5. Checklist de Entrega Imediata
+- [ ] Criar app Next.js. (`npx create-next-app`)
+- [ ] Criar migrations SQL iniciais.
+- [ ] Implementar Login e Proteção de Rotas.
+- [ ] Implementar CRUD de Projetos e Membros.
+
+## Status Atual
+- **Status**: DOING (Fundação e Auth)
+- **Entregue**:
+  - App Next.js criado.
+  - Clients Supabase configurados.
+  - Middleware de proteção criado.
+  - Migrations SQL escritas (precisa aplicar).
+
