@@ -59,11 +59,12 @@ O sistema é colaborativo, auditável e hierárquico, permitindo que **Admins** 
 ## 4. Backlog e Etapas
 
 ### Fase 1: Fundação e Auth (MVP Início) 
-- [ ] Configuração do Next.js + Tailwind + Design System Base (Dark/Premium).
-- [ ] Configuração do Supabase (Auth + Tables + RLS).
-- [ ] Middleware de Proteção de Rotas (Admin vs Curador).
-- [ ] Gestão de Curadores (Tela Admin).
+- [x] Configuração do Next.js + Tailwind + Design System Base (Dark/Premium).
+- [x] Configuração do Supabase (Auth + Tables + RLS).
+- [x] Middleware de Proteção de Rotas (Admin vs Curador).
+- [x] Gestão de Curadores (Tela Admin).
 - [ ] Criação de Projetos e Atribuição (Tela Admin).
+
 
 ### Fase 2: Ingestão e Mídia
 - [ ] Configuração DigitalOcean Spaces (S3 Client).
@@ -95,10 +96,20 @@ O sistema é colaborativo, auditável e hierárquico, permitindo que **Admins** 
 - [ ] Implementar CRUD de Projetos e Membros.
 
 ## Status Atual
-- **Status**: DOING (Fundação e Auth)
+- **Status**: DOING (Funcionalidades de Admin e Projetos)
 - **Entregue**:
   - App Next.js criado.
   - Clients Supabase configurados.
   - Middleware de proteção criado.
-  - Migrations SQL escritas (precisa aplicar).
+  - Migrations SQL escritas e aplicadas.
+  - Página de Login e Layout Autenticado.
+  - Dashboard Admin (Listagem de usuários e Promoção de papéis).
+
+## Log de Execução
+- **2024-01-14**:
+  - Inicialização do projeto (Next.js 14, Tailwind, TypeScript).
+  - Setup do Supabase (Auth, Server Actions, Middleware).
+  - Criação do esquema de banco de dados (Migrations iniciais + RLS).
+  - Implementação do Login e Logout.
+  - Implementação da Dashboard Admin para gestão de usuários (Promover/Rebaixar Admin).
 
