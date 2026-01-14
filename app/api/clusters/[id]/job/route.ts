@@ -5,6 +5,63 @@ import { ClusterEngine } from '@/lib/clustering/cluster-engine';
 // Set max duration for Vercel (if Pro)
 export const maxDuration = 60; // 60 seconds
 
+// Helper to write exports
+import fs from 'fs/promises';
+import path from 'path';
+
+async function exportRun(runId: string, result: any, nodesPayload: any[], edgesPayload: any[]) {
+    try {
+        const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+        const baseDir = path.join(process.cwd(), 'outputs', `run_${timestamp}`, 'clusters', runId);
+        await fs.mkdir(baseDir, { recursive: true });
+
+        // 1. JSON (Full)
+        await fs.writeFile(
+            path.join(baseDir, 'clusters_run.json'),
+            JSON.stringify({ result, nodes: nodesPayload, edges: edgesPayload }, null, 2)
+        );
+
+        // 2. MD (Summary)
+        const summary = `
+# Cluster Run Summary
+**Run ID:** ${runId}
+**Date:** ${new Date().toISOString()}
+
+## Clusters (${result.clusters.length})
+${result.clusters.map((c: any) => `
+### ${c.name_suggested}
+- **Motor:** ${c.motor}
+- **Items:** ${c.items.length}
+`).join('\n')}
+
+## Stats
+- **Total Nodes:** ${nodesPayload.length}
+- **Total Edges:** ${edgesPayload.length}
+`;
+        await fs.writeFile(path.join(baseDir, 'clusters_summary.md'), summary.trim());
+
+        // 3. CSV (Edges)
+        const csvEdges = [
+            'source,target,weight,layers',
+            ...edgesPayload.map(e => `${e.source_image_id},${e.target_image_id},${e.weight},"${e.layers.join('|')}"`)
+        ].join('\n');
+        await fs.writeFile(path.join(baseDir, 'edges.csv'), csvEdges);
+
+        // 4. CSV (Nodes)
+        const csvNodes = [
+            'id,x,y,cluster,outlier',
+            ...nodesPayload.map(n => `${n.image_id},${n.x},${n.y},${n.cluster_id},${n.is_outlier}`)
+        ].join('\n');
+        await fs.writeFile(path.join(baseDir, 'nodes.csv'), csvNodes);
+
+        console.log(`Exported run to ${baseDir}`);
+    } catch (e) {
+        console.error("Export failed:", e);
+        // Don't fail the job if export fails
+    }
+}
+
+
 export async function POST(
     request: Request,
     { params }: { params: Promise<{ id: string }> } // Correct for Next 15+
@@ -131,6 +188,10 @@ export async function POST(
             .eq('id', clustersRunId)
             .select()
             .single();
+
+        // 6. Export to Filesystem (Task 6)
+        // Fire and forget export
+        await exportRun(clustersRunId, result, nodesPayload, edgesPayload);
 
         return NextResponse.json({ success: true, run: finalRun, stats: { clusters: result.clusters.length, nodes: nodesPayload.length, edges: edgesPayload.length } });
 

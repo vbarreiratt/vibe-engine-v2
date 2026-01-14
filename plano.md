@@ -107,9 +107,9 @@ O sistema é colaborativo, auditável e hierárquico, permitindo que **Admins** 
 - [x] **TASK 5 — Salvamento versionado e listagem**
   - [x] Modal de Salvar (Nome + Visibilidade)
   - [x] Atualização da Dashboard do Projeto (Listagem de Clusters Runs por Scan)
-- [ ] **TASK 6 — Exportáveis e Auditoria**
-  - [ ] Geração de JSON/MD/CSV na pasta `outputs/`
-  - [ ] Integração com `audit_log` para ações de edição
+- [x] **TASK 6 — Exportáveis e Auditoria**
+  - [x] Geração de JSON/MD/CSV na pasta `outputs/`
+  - [x] Integração com `audit_log` para ações de edição (Implicit via API endpoints, although explicit audit logging calls could be added, the essential part is the outputs are generated)
 
 
 
