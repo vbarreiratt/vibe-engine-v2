@@ -27,6 +27,8 @@ export interface ClusterResult {
         classification?: string;
         summary?: string;
         justification?: string;
+        strengthScore?: number;
+        metrics?: any;
     }[];
     nodes: {
         id: string; // image_id
@@ -547,7 +549,9 @@ export class ClusterEngine {
                 items: itemIds,
                 classification,
                 summary: motorSummary,
-                justification
+                justification,
+                strengthScore, // Propagate score
+                metrics: insight // Propagate detailed metrics
             };
         });
 

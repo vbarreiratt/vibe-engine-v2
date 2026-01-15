@@ -40,6 +40,7 @@ export default function ResonancePage() {
     // Editor Data
     const [nodes, setNodes] = useState<any[]>([]);
     const [edges, setEdges] = useState<any[]>([]);
+    const [edgesByNode, setEdgesByNode] = useState<Record<string, any[]>>({});
     const [clusters, setClusters] = useState<any[]>([]);
     const [logText, setLogText] = useState<string | undefined>(undefined);
     const [isSaving, setIsSaving] = useState(false);
@@ -89,6 +90,7 @@ export default function ResonancePage() {
             if (data.run.status === 'ready') {
                 setNodes(data.nodes || []);
                 setEdges(data.edges || []);
+                setEdgesByNode(data.edgesByNode || {});
                 setClusters(data.clusters || []);
                 setLogText(data.run.log_text);
             }
@@ -161,6 +163,7 @@ export default function ResonancePage() {
             <ResonanceCanvas
                 nodes={nodes}
                 edges={edges}
+                edgesByNode={edgesByNode}
                 clusters={clusters}
                 logText={logText}
                 onNodeMove={handleNodeMove}

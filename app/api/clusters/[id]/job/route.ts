@@ -102,7 +102,11 @@ export async function POST(
                 // @ts-ignore
                 classification: c.classification,
                 // @ts-ignore
-                summary: c.summary
+                summary: c.summary,
+                // @ts-ignore
+                strength_score: c.strengthScore || 0,
+                // @ts-ignore
+                metrics: c.metrics || {}
             };
 
             const { data: dataFull, error: errFull } = await supabase
