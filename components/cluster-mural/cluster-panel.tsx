@@ -1,12 +1,16 @@
-import { X, ArrowRight, Activity, Layers, Zap, Hexagon } from "lucide-react";
+import { X, ArrowRight, Activity, Layers, Zap, Hexagon, Lock, Eye, FlaskConical, Sparkles, MoveRight } from "lucide-react";
 import React from "react";
+import { CanvasMode } from "@/types/cluster-editor";
+import { Button } from "@/components/ui/button";
 
 interface ClusterPanelProps {
     cluster: any;
+    mode?: CanvasMode;
     onClose: () => void;
+    onOpenEditor?: () => void;
 }
 
-export function ClusterPanel({ cluster, onClose }: ClusterPanelProps) {
+export function ClusterPanel({ cluster, mode = 'view', onClose, onOpenEditor }: ClusterPanelProps) {
     if (!cluster) return null;
 
     const { classification, summary, strength_score, metrics, name_suggested } = cluster;
@@ -101,7 +105,7 @@ export function ClusterPanel({ cluster, onClose }: ClusterPanelProps) {
                     </div>
                 </section>
 
-                {/* Block 4: Action */}
+                {/* Block 4: Action / Suggestions */}
                 <section className="bg-purple-500/5 border border-purple-500/20 rounded-xl p-4">
                     <h4 className="flex items-center gap-2 text-xs font-bold text-purple-300 uppercase tracking-wider mb-2">
                         <Zap className="w-3 h-3" />
@@ -131,7 +135,49 @@ export function ClusterPanel({ cluster, onClose }: ClusterPanelProps) {
                         )}
                     </ul>
                 </section>
+            </div>
 
+            {/* Mode-Specific Footer Action */}
+            <div className="p-6 border-t border-white/10 bg-zinc-900/50 backdrop-blur-sm">
+                {mode === 'view' ? (
+                     <div className="flex flex-col gap-2 opacity-50">
+                        <div className="flex items-center gap-2 text-xs text-zinc-400">
+                             <Lock className="w-3 h-3" /> 
+                             Edição Disponível no Playground
+                        </div>
+                        <Button disabled size="sm" variant="secondary" className="w-full text-xs">
+                            <Eye className="w-3 h-3 mr-2" /> Apenas Leitura
+                        </Button>
+                     </div>
+                ) : mode === 'playground' ? (
+                    <div className="flex flex-col gap-2">
+                        <p className="text-[10px] text-zinc-400">
+                            Ajuste os sinais e a curadoria deste cluster no editor.
+                        </p>
+                        <Button 
+                            onClick={onOpenEditor} 
+                            size="sm" 
+                            className="w-full text-xs bg-amber-500 hover:bg-amber-600 text-black border-none"
+                        >
+                            <FlaskConical className="w-3 h-3 mr-2" /> 
+                            Abrir Editor de Cluster
+                        </Button>
+                    </div>
+                ) : (
+                    <div className="flex flex-col gap-2">
+                        <p className="text-[10px] text-purple-300 bg-purple-500/10 p-2 rounded border border-purple-500/20">
+                            Você está no modo de decisão. Defina o papel final deste mundo.
+                        </p>
+                        <Button 
+                            onClick={onOpenEditor} 
+                            size="sm" 
+                            className="w-full text-xs bg-purple-500 hover:bg-purple-600 text-white border-none shadow-[0_0_15px_rgba(168,85,247,0.4)]"
+                        >
+                            <Sparkles className="w-3 h-3 mr-2" /> 
+                            Definir Destino & Papel
+                        </Button>
+                    </div>
+                )}
             </div>
         </div>
     );

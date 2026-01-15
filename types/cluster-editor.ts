@@ -1,5 +1,6 @@
 export type SignalRole = 'structural' | 'support' | 'noise' | 'neutral'; // Neutral = automatic/default
 export type NodeCurationStatus = 'active' | 'weak' | 'pillar' | 'removed';
+export type CanvasMode = 'view' | 'playground' | 'synthesis';
 
 export type EditorSignal = {
     term: string;
@@ -30,10 +31,19 @@ export type ClusterMetrics = {
     dominantLayer: 'state' | 'matter' | 'movement' | 'balanced';
 };
 
+export type SynthesisRole = 'territory' | 'pillar' | 'counterpoint' | 'archive' | null;
+
+export type ClusterSynthesis = {
+    name: string | null;
+    description: string | null;
+    role: SynthesisRole;
+};
+
 export type ClusterEditorData = {
     clusterId: string;
     label: string;
     signals: EditorSignal[];
     nodes: EditorNode[];
     metrics: ClusterMetrics;
+    synthesis: ClusterSynthesis;
 };

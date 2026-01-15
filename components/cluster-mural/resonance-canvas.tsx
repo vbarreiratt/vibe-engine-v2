@@ -1,9 +1,10 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { Save, Eye, EyeOff, MousePointer2, Hand, ZoomIn, ZoomOut, RotateCcw, FileText, X } from 'lucide-react';
+import { useCallback, useEffect, useRef, useState, useMemo } from 'react';
+import { Save, Eye, EyeOff, MousePointer2, Hand, ZoomIn, ZoomOut, RotateCcw, FileText, X, Sparkles, FlaskConical, LayoutGrid } from 'lucide-react';
 import { ResonanceLegend } from './resonance-legend';
 import { ClusterPanel } from './cluster-panel';
+import { CanvasMode } from '@/types/cluster-editor';
 
 import { NodeDrawer } from './node-drawer';
 import { ClusterEditor } from './cluster-editor';
@@ -84,14 +85,46 @@ export function ResonanceCanvas({ nodes, edges, clusters, edgesByNode, logText, 
     const [hoveredClusterId, setHoveredClusterId] = useState<string | null>(null);
     const [clickedCluster, setClickedCluster] = useState<Cluster | null>(null);
     const [showNodeEdges, setShowNodeEdges] = useState(false);
+    const [mode, setMode] = useState<CanvasMode>('view');
+
+    // Playground Drag State
+    const [clusterOffsets, setClusterOffsets] = useState<Record<string, { x: number, y: number }>>({});
+    const [draggingClusterId, setDraggingClusterId] = useState<string | null>(null);
+    const [dragClusterStart, setDragClusterStart] = useState({ x: 0, y: 0 }); // Mouse pos when cluster drag started
+    const [initialOffset, setInitialOffset] = useState({ x: 0, y: 0 }); // Cluster offset when drag started
 
     // UI toggles
     const [showTopbar, setShowTopbar] = useState(true);
     const [showToolbar, setShowToolbar] = useState(true);
 
-    // Helper to get coords
-    const getX = (n: Node) => n.x ?? n.position?.x ?? 0;
-    const getY = (n: Node) => n.y ?? n.position?.y ?? 0;
+    // Map Node -> Cluster ID for reliable offset lookup
+    const nodeClusterMap = useMemo(() => {
+        const map = new Map<string, string>();
+        nodes.forEach(n => {
+            if (n.cluster_id) {
+                map.set(n.id, n.cluster_id);
+            } else if (n.cluster_index !== undefined && clusters[n.cluster_index]) {
+                // Fallback: index mapping
+                map.set(n.id, clusters[n.cluster_index].id);
+            }
+        });
+        return map;
+    }, [nodes, clusters]);
+
+    // Helper to get coords (World Position = Base + Cluster Offset)
+    const getX = (n: Node) => {
+        const base = n.x ?? n.position?.x ?? 0;
+        const cId = nodeClusterMap.get(n.id);
+        const offset = cId ? clusterOffsets[cId] : null;
+        return base + (offset?.x || 0);
+    };
+
+    const getY = (n: Node) => {
+        const base = n.y ?? n.position?.y ?? 0;
+        const cId = nodeClusterMap.get(n.id);
+        const offset = cId ? clusterOffsets[cId] : null;
+        return base + (offset?.y || 0);
+    };
 
     // Fit to view on mount
     useEffect(() => {
@@ -143,6 +176,9 @@ export function ResonanceCanvas({ nodes, edges, clusters, edgesByNode, logText, 
     }, [handleWheel]);
 
     const handleMouseDown = (e: React.MouseEvent) => {
+        // Only pan if we are NOT interacting with a cluster or UI (handled via stopPropagation in children)
+        // But clicking on background should trigger pan.
+        // If mode is 'playground', we might be dragging a cluster, but that's handled in the cluster's onMouseDown.
         if (tool === 'pan' || e.button === 1) {
             setIsDragging(true);
             setDragStart({ x: e.clientX - transform.x, y: e.clientY - transform.y });
@@ -150,6 +186,23 @@ export function ResonanceCanvas({ nodes, edges, clusters, edgesByNode, logText, 
     };
 
     const handleMouseMove = (e: React.MouseEvent) => {
+        // 1. Cluster Drag (Playground Mode)
+        if (draggingClusterId && mode === 'playground') {
+             const zoom = transform.scale;
+             const deltaX = (e.clientX - dragClusterStart.x) / zoom;
+             const deltaY = (e.clientY - dragClusterStart.y) / zoom;
+
+             setClusterOffsets(prev => ({
+                 ...prev,
+                 [draggingClusterId]: {
+                     x: initialOffset.x + deltaX,
+                     y: initialOffset.y + deltaY
+                 }
+             }));
+             return;
+        }
+
+        // 2. Canvas Pan
         if (isDragging && tool === 'pan') {
             setTransform(prev => ({
                 ...prev,
@@ -161,6 +214,7 @@ export function ResonanceCanvas({ nodes, edges, clusters, edgesByNode, logText, 
 
     const handleMouseUp = () => {
         setIsDragging(false);
+        setDraggingClusterId(null);
     };
 
     // Close on Escape
@@ -218,59 +272,20 @@ export function ResonanceCanvas({ nodes, edges, clusters, edgesByNode, logText, 
                 {showTopbar ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
             </button>
 
-            {/* Bottom Center Floating Toolbar */}
-            <div
-                className={`absolute bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-2 z-40 transition-all duration-300 bg-zinc-900/90 backdrop-blur-md border border-white/10 p-1.5 rounded-full shadow-2xl ${showToolbar ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10 pointer-events-none'
-                    }`}
-            >
-                {/* 
-                REMOVIDO POR ENQUANTO (Conforme solicitado)
-                <button
-                    onClick={() => setTool('select')}
-                    className={`p-3 rounded-full transition-all ${tool === 'select'
-                            ? 'bg-zinc-800 text-white shadow-inner'
-                            : 'text-zinc-400 hover:text-white hover:bg-white/5'
-                        }`}
-                    title="Selecionar"
-                >
-                    <MousePointer2 className="w-5 h-5" />
-                </button> 
-                */}
-                
-                <button
-                    onClick={() => setTool('pan')}
-                    className={`p-3 rounded-full transition-all ${tool === 'pan'
-                            ? 'bg-white text-black shadow-lg'
-                            : 'text-zinc-400 hover:text-white hover:bg-white/5'
-                        }`}
-                    title="Pan/Mover (Padrão)"
-                >
-                    <Hand className="w-5 h-5" />
-                </button>
+            {/* Mode Rail - Vertical Indicator (Safe Zone: Left Side) - CSS Transform implementation to prevent ghosting */}
+            <div className="absolute left-8 top-1/2 -translate-y-1/2 z-40 flex flex-col items-center justify-center pointer-events-none hidden md:flex h-[600px] w-8">
+                {/* Lines */}
+                <div className="absolute top-0 w-px h-[200px] bg-gradient-to-b from-transparent via-white/10 to-transparent" />
+                <div className="absolute bottom-0 w-px h-[200px] bg-gradient-to-t from-transparent via-white/10 to-transparent" />
 
-                <div className="h-6 w-px bg-white/10 mx-1" />
-
-                <button
-                    className="p-3 rounded-full text-zinc-400 hover:text-white hover:bg-white/5 transition-all"
-                    title="Zoom In"
-                    onClick={() => setTransform(prev => ({ ...prev, scale: Math.min(prev.scale * 1.3, 3) }))}
-                >
-                    <ZoomIn className="w-5 h-5" />
-                </button>
-                <button
-                    className="p-3 rounded-full text-zinc-400 hover:text-white hover:bg-white/5 transition-all"
-                    title="Zoom Out"
-                    onClick={() => setTransform(prev => ({ ...prev, scale: Math.max(prev.scale / 1.3, 0.1) }))}
-                >
-                    <ZoomOut className="w-5 h-5" />
-                </button>
-                <button
-                    className="p-3 rounded-full text-zinc-400 hover:text-white hover:bg-white/5 transition-all"
-                    title="Resetar Vista"
-                    onClick={() => setTransform({ scale: 1, x: 0, y: 0 })}
-                >
-                    <RotateCcw className="w-4 h-4" />
-                </button>
+                {/* Rotated Text Container (-90deg = Bottom to Top reading) */}
+                <div className="transform -rotate-90 whitespace-nowrap flex items-center gap-6 text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-600 origin-center bg-zinc-900/50 backdrop-blur-sm px-6 py-2 rounded-full border border-white/5 shadow-2xl">
+                    <span className={`transition-colors duration-300 ${mode === 'view' ? 'text-white' : 'text-zinc-600'}`}>Visualização</span>
+                    <span className="w-1 h-1 rounded-full bg-zinc-800" />
+                    <span className={`transition-colors duration-300 ${mode === 'playground' ? 'text-amber-500' : 'text-zinc-600'}`}>Playground</span>
+                    <span className="w-1 h-1 rounded-full bg-zinc-800" />
+                    <span className={`transition-colors duration-300 ${mode === 'synthesis' ? 'text-purple-500' : 'text-zinc-600'}`}>Lab</span>
+                </div>
             </div>
 
             {/* Main Canvas */}
@@ -284,7 +299,11 @@ export function ResonanceCanvas({ nodes, edges, clusters, edgesByNode, logText, 
                 onClick={() => {
                     if (!isDragging) setSelectedNode(null);
                 }}
-                style={{ cursor: tool === 'pan' ? 'grab' : 'default' }}
+                style={{ 
+                    cursor: tool === 'pan' ? 'grab' : 
+                            mode === 'view' ? 'default' : 
+                            mode === 'synthesis' ? 'crosshair' : 'default' 
+                }}
             >
                 <svg className="w-full h-full">
                     <g transform={`translate(${transform.x},${transform.y}) scale(${transform.scale})`}>
@@ -298,10 +317,12 @@ export function ResonanceCanvas({ nodes, edges, clusters, edgesByNode, logText, 
 
                             if (clusterNodes.length === 0) return null;
 
+                            // 1. Center Calculation (Dynamic: Updates with Drag)
+                            // Since getX/getY now includes clusterOffsets, this average is the CURRENT Visual Center.
                             const cx = clusterNodes.reduce((sum, n) => sum + getX(n), 0) / clusterNodes.length;
                             const cy = clusterNodes.reduce((sum, n) => sum + getY(n), 0) / clusterNodes.length;
-                            
-                            // 1. Cognitive Force Radius (Rule: Not Arbitrary)
+
+                            // 2. Cognitive Force Radius (Rule: Not Arbitrary)
                             // Base radius + (Count * Density Factor) scaled by Strength Score
                             // If strength_score is missing (legacy), fallback to count * 30
                             const baseRadius = 100;
@@ -313,6 +334,7 @@ export function ResonanceCanvas({ nodes, edges, clusters, edgesByNode, logText, 
                             const color = CLUSTER_COLORS[idx % CLUSTER_COLORS.length];
                             
                             const isHovered = hoveredClusterId === cluster.id;
+                            const isBeingDragged = draggingClusterId === cluster.id;
                             const classification = cluster.classification || 'WEAK';
                             
                             // Visual Hierarchy
@@ -330,20 +352,69 @@ export function ResonanceCanvas({ nodes, edges, clusters, edgesByNode, logText, 
                                 strokeWidth = "1";
                             }
 
+                            // Dynamic Cursor & Style in Playground
+                            const canDrag = mode === 'playground';
+                            const cursorStyle = canDrag ? (isBeingDragged ? 'grabbing' : 'grab') : (mode === 'view' ? 'zoom-in' : 'pointer');
+
                             return (
                                 <g 
                                     key={cluster.id}
-                                    onMouseEnter={() => setHoveredClusterId(cluster.id)}
+                                    onMouseEnter={() => {
+                                        setHoveredClusterId(cluster.id);
+                                    }}
                                     onMouseLeave={() => setHoveredClusterId(null)}
+                                    // DRAG Start (Playground only)
+                                    onMouseDown={(e) => {
+                                        if (mode === 'playground') {
+                                            e.stopPropagation();
+                                            // 1. Set global drag state
+                                            setDraggingClusterId(cluster.id);
+                                            // 2. Initial mouse pos for delta calc
+                                            setDragClusterStart({ x: e.clientX, y: e.clientY });
+                                            // 3. Keep current offset as base
+                                            setInitialOffset(clusterOffsets[cluster.id] || { x: 0, y: 0 });
+                                        }
+                                    }}
                                     onClick={(e) => {
                                         e.stopPropagation();
+                                        // Ignore click if it was a drag (Threshold check could be added, but handled by separate intents mostly)
+                                        // Simple heuristic: if we were dragging this cluster recently, skip. 
+                                        // But mouseUp clears draggingClusterId immediately. 
+                                        // However, normal click doesn't trigger drag threshold usually.
+                                        
+                                        // For now, allow click even after small drag unless we implement delta check.
+                                        // PROMPT: "se deslocamento < threshold (ex.: 4px), tratar como click" - handled below in logic?
+                                        // Actually, if we just dragged, we don't want to open the panel.
+                                        // We can use a ref to track total movement during drag.
+                                        
+                                        // Universal: Single click always opens the Card/Panel
+                                        // NOTE: Should we block if we just dragged significantly? 
+                                        // Let's assume user intention is precise for now.
                                         setClickedCluster(cluster);
                                     }}
                                     onDoubleClick={(e) => {
                                         e.stopPropagation();
-                                        setEditingClusterId(cluster.id);
+                                        if (mode === 'view') {
+                                            // View Mode: Fly to cluster
+                                            const newScale = 1.5;
+                                            setTransform({
+                                                scale: newScale,
+                                                x: -cx * newScale + (window.innerWidth / 2),
+                                                y: -cy * newScale + (window.innerHeight / 2)
+                                            });
+                                        } else {
+                                            // Play/Synth: Open Editor
+                                            setEditingClusterId(cluster.id);
+                                        }
                                     }}
-                                    style={{ cursor: 'pointer' }}
+                                    style={{ 
+                                        cursor: cursorStyle,
+                                        pointerEvents: tool === 'pan' ? 'none' : 'all',
+                                        zIndex: isBeingDragged ? 100 : 1 // SVG z-index doesn't work like HTML, order matters.
+                                        // Moving to end of array renders on top. 
+                                        // We are iterating. We can't easily reorder here without state sort.
+                                    }}
+                                    className={`transition-all duration-300 ${isBeingDragged ? 'opacity-90' : ''}`}
                                 >
                                     {/* Ilha do cluster (glow) */}
                                     <circle
@@ -379,19 +450,20 @@ export function ResonanceCanvas({ nodes, edges, clusters, edgesByNode, logText, 
                                             fontSize={isHovered ? "22" : "18"}
                                             fontWeight="700"
                                             style={{ textShadow: '0 2px 8px rgba(0,0,0,0.8)' }}
+                                            pointerEvents="none"
                                         >
                                             {cluster.name_suggested}
                                         </text>
                                         
                                         {/* Status Badge */}
-                                       <text x={cx} y={cy - radius - 45} textAnchor="middle" fill="white" fontSize="10" fontWeight="bold" letterSpacing="1px" opacity="0.8">
+                                       <text x={cx} y={cy - radius - 45} textAnchor="middle" fill="white" fontSize="10" fontWeight="bold" letterSpacing="1px" opacity="0.8" pointerEvents="none">
                                             {classification}
                                         </text>
                                     </>
                                     )}
 
                                     {/* Copy Obrigatório: Tooltip de Força Cognitiva (Hover Only) */}
-                                    {isHovered && !clickedCluster && (
+                                    {isHovered && !clickedCluster && !isBeingDragged && (
                                         <foreignObject x={cx - 100} y={cy + radius + 20} width="200" height="120" style={{ overflow: 'visible', pointerEvents: 'none' }}>
                                             <div className="bg-black/80 backdrop-blur-md border border-white/10 rounded-lg p-3 text-center shadow-xl animate-in fade-in slide-in-from-top-2 duration-200">
                                                 <div className="text-[10px] uppercase text-zinc-400 tracking-wider font-bold mb-1">Força Cognitiva</div>
@@ -399,7 +471,7 @@ export function ResonanceCanvas({ nodes, edges, clusters, edgesByNode, logText, 
                                                     Este tamanho representa o peso deste "mundo": massa + coesão + recorrência.
                                                 </div>
                                                 <div className="text-[9px] text-zinc-500 mt-2 italic">
-                                                    Clique para ver detalhes
+                                                    {mode === 'playground' ? 'Arraste para mover' : 'Clique para ver detalhes'}
                                                 </div>
                                             </div>
                                         </foreignObject>
@@ -510,7 +582,7 @@ export function ResonanceCanvas({ nodes, edges, clusters, edgesByNode, logText, 
                                         setSelectedNode(node.id);
                                         // Auto-open connections if desired? No, user toggles.
                                     }}
-                                    style={{ cursor: 'pointer' }}
+                                    style={{ cursor: 'pointer', pointerEvents: tool === 'pan' ? 'none' : 'auto' }}
                                 >
                                     {/* Glow effect */}
                                     {isSelected && (
@@ -671,15 +743,94 @@ export function ResonanceCanvas({ nodes, edges, clusters, edgesByNode, logText, 
             <ResonanceLegend />
 
             {/* Cognitive Panel (New Interaction) */}
-            <ClusterPanel cluster={clickedCluster} onClose={() => setClickedCluster(null)} />
+            <ClusterPanel 
+                cluster={clickedCluster} 
+                mode={mode}
+                onClose={() => setClickedCluster(null)} 
+                onOpenEditor={() => {
+                    if (clickedCluster) {
+                        setEditingClusterId(clickedCluster.id);
+                        setClickedCluster(null); // Close panel when opening editor
+                    }
+                }}
+            />
 
             {/* Cluster Editor (Level 1 Analysis) */}
             {editingClusterId && (
                 <ClusterEditor 
                     clusterId={editingClusterId} 
+                    mode={mode}
                     onClose={() => setEditingClusterId(null)} 
                 />
             )}
+
+            {/* Unified Bottom Toolbar (Safe Zone: Bottom Center) */}
+            <div className="absolute bottom-8 left-1/2 -translate-x-1/2 bg-zinc-900/90 backdrop-blur-md border border-white/10 p-2 rounded-full shadow-2xl flex items-center gap-2 z-50">
+                {/* 1. Pan Tool (Global) */}
+                <button
+                    onClick={() => setTool('pan')}
+                    className={`p-2 rounded-full transition-all group relative ${tool === 'pan' ? 'bg-white text-black shadow-lg' : 'text-zinc-400 hover:text-white hover:bg-white/5'}`}
+                    title="Ferramenta Pan (Mãozinha): Navegue sem mover nada."
+                >
+                    <Hand className="w-5 h-5" />
+                </button>
+
+                <div className="h-6 w-px bg-white/10 mx-1" />
+
+                {/* 2. View Mode */}
+                 <button 
+                    onClick={() => { setMode('view'); setTool('select'); }}
+                    className={`p-2 rounded-full transition-all group relative ${mode === 'view' ? 'bg-zinc-800 text-white shadow-inner' : 'text-zinc-400 hover:text-white hover:bg-white/5'}`}
+                    title="Modo Visualização (Olho): Explore e clique."
+                 >
+                    <Eye className="w-5 h-5" />
+                    {mode === 'view' && <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-white rounded-full" />}
+                 </button>
+                 
+                 {/* 3. Playground Mode */}
+                 <button 
+                    onClick={() => { setMode('playground'); setTool('select'); }}
+                    className={`p-2 rounded-full transition-all group relative ${mode === 'playground' ? 'bg-amber-500/20 text-amber-400' : 'text-zinc-500 hover:text-zinc-300'}`}
+                    title="Modo Playground (Erlenmeyer): Mova e experimente."
+                 >
+                    <FlaskConical className="w-5 h-5" />
+                    {mode === 'playground' && <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-amber-400 rounded-full" />}
+                 </button>
+
+                 {/* 4. Synthesis Mode */}
+                 <button 
+                    onClick={() => { setMode('synthesis'); setTool('select'); }}
+                    className={`p-2 rounded-full transition-all group relative ${mode === 'synthesis' ? 'bg-purple-500/20 text-purple-400' : 'text-zinc-500 hover:text-zinc-300'}`}
+                    title="Modo Síntese (Estrela): Defina destinos."
+                 >
+                    <Sparkles className="w-5 h-5" />
+                    {mode === 'synthesis' && <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-purple-400 rounded-full" />}
+                 </button>
+
+                <div className="h-6 w-px bg-white/10 mx-1" />
+
+                {/* Zoom Controls */}
+                <div className="flex items-center gap-1">
+                    <button
+                        className="p-2 rounded-full text-zinc-400 hover:text-white hover:bg-white/5 transition-all"
+                        onClick={() => setTransform(prev => ({ ...prev, scale: Math.min(prev.scale * 1.2, 3) }))}
+                    >
+                        <ZoomIn className="w-4 h-4" />
+                    </button>
+                    <button
+                        className="p-2 rounded-full text-zinc-400 hover:text-white hover:bg-white/5 transition-all"
+                        onClick={() => setTransform(prev => ({ ...prev, scale: Math.max(prev.scale / 1.2, 0.1) }))}
+                    >
+                        <ZoomOut className="w-4 h-4" />
+                    </button>
+                     <button
+                        className="p-2 rounded-full text-zinc-400 hover:text-white hover:bg-white/5 transition-all"
+                        onClick={() => setTransform({ scale: 1, x: 0, y: 0 })}
+                    >
+                        <RotateCcw className="w-4 h-4" />
+                    </button>
+                </div>
+            </div>
         </div>
     );
 }

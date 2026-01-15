@@ -130,7 +130,7 @@ export async function getClusterEditorData(clusterId: string): Promise<ClusterEd
     const dominantLayer = (Object.keys(layerCounts) as Array<keyof typeof layerCounts>).reduce((a, b) => layerCounts[a] > layerCounts[b] ? a : b);
 
     const metrics: ClusterMetrics = {
-        classification,
+        classification: cluster.classification || classification, // Prefer DB value (Motor Truth)
         avgRecurrence,
         density,
         stability: avgRecurrence * (totalNodes > 3 ? 1 : 0.5),
@@ -143,8 +143,27 @@ export async function getClusterEditorData(clusterId: string): Promise<ClusterEd
         label: cluster.name_suggested || 'Cluster',
         signals,
         nodes,
-        metrics
+        metrics,
+        synthesis: {
+            name: cluster.name_final,
+            description: cluster.description_final,
+            role: cluster.synthesis_status
+        }
     };
+}
+
+export async function updateClusterSynthesis(clusterId: string, data: { name?: string, description?: string, role?: string }) {
+    const supabase = await createClient();
+    
+    // Build update object
+    const update: any = {};
+    if (data.name !== undefined) update.name_final = data.name;
+    if (data.description !== undefined) update.description_final = data.description;
+    if (data.role !== undefined) update.synthesis_status = data.role;
+
+    if (Object.keys(update).length === 0) return;
+
+    await supabase.from('clusters').update(update).eq('id', clusterId);
 }
 
 /**

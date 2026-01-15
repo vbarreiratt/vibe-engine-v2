@@ -1,20 +1,51 @@
 'use client';
 
 import { useState, useEffect, useMemo, useRef } from 'react';
-import { X, Activity, Layers, Play, AlertTriangle, ShieldCheck, Zap, Lock, Unlock, Crown, Trash2, RotateCcw, Save, MoreHorizontal, Check, Flame, Plus, CloudFog, Ban, Undo2, Eye, Info } from 'lucide-react';
+import { X, Activity, Layers, Play, AlertTriangle, ShieldCheck, Zap, Lock, Unlock, Crown, Trash2, RotateCcw, Save, MoreHorizontal, Check, Flame, Plus, CloudFog, Ban, Undo2, Eye, Info, Map as MapIcon, Archive, Split, Sparkles, FlaskConical } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { ClusterEditorData, EditorSignal, EditorNode, SignalRole, NodeCurationStatus } from '@/types/cluster-editor';
-import { getClusterEditorData, logClusterEditorAction, setSignalRole, setNodeCuration } from '@/app/actions/cluster-editor';
+import { ClusterEditorData, EditorSignal, EditorNode, SignalRole, NodeCurationStatus, SynthesisRole, CanvasMode } from '@/types/cluster-editor';
+import { getClusterEditorData, logClusterEditorAction, setSignalRole, setNodeCuration, updateClusterSynthesis } from '@/app/actions/cluster-editor';
 
 interface ClusterEditorProps {
     clusterId: string;
     onClose: () => void;
+    mode: CanvasMode;
 }
 
-export function ClusterEditor({ clusterId, onClose }: ClusterEditorProps) {
+export function ClusterEditor({ clusterId, onClose, mode }: ClusterEditorProps) {
     const [data, setData] = useState<ClusterEditorData | null>(null);
     const [loading, setLoading] = useState(true);
+    
+    // Synthesis State
+    const [synthesisName, setSynthesisName] = useState('');
+    const [synthesisDesc, setSynthesisDesc] = useState('');
+    const [synthesisRole, setSynthesisRole] = useState<SynthesisRole>(null);
+    const [isSavingSynthesis, setIsSavingSynthesis] = useState(false);
+
+    // Context for optimistic role updates
+    const handleSynthesisUpdate = (updates: { name?: string, description?: string, role?: SynthesisRole }) => {
+        if (!data) return;
+        
+        // Optimistic State Update
+        if (updates.name !== undefined) setSynthesisName(updates.name);
+        if (updates.description !== undefined) setSynthesisDesc(updates.description);
+        if (updates.role !== undefined) setSynthesisRole(updates.role);
+
+        // Async Save
+        setIsSavingSynthesis(true);
+        updateClusterSynthesis(data.clusterId, {
+            name: updates.name ?? synthesisName, // use passed or current (be careful with closures, using ref or just assuming immediate call)
+            description: updates.description ?? synthesisDesc,
+            role: (updates.role !== undefined ? updates.role : synthesisRole) || undefined
+        }).then(() => {
+            setFeedback({ message: "Síntese salva", type: 'success' });
+        }).catch(() => {
+            setFeedback({ message: "Erro ao salvar", type: 'warning' });
+        }).finally(() => {
+            setIsSavingSynthesis(false);
+        });
+    };
     
     // Local Simulation State
     const [disabledSignals, setDisabledSignals] = useState<Set<string>>(new Set());
@@ -42,7 +73,14 @@ export function ClusterEditor({ clusterId, onClose }: ClusterEditorProps) {
         async function load() {
             try {
                 const result = await getClusterEditorData(clusterId);
-                if (mounted) setData(result);
+                if (mounted) {
+                    setData(result);
+                    if (result?.synthesis) {
+                         setSynthesisName(result.synthesis.name || '');
+                         setSynthesisDesc(result.synthesis.description || '');
+                         setSynthesisRole(result.synthesis.role || null);
+                    }
+                }
             } catch (e) {
                 console.error(e);
             } finally {
@@ -337,10 +375,12 @@ export function ClusterEditor({ clusterId, onClose }: ClusterEditorProps) {
                                 >
                                     {/* 1. Checkbox: Activate/Deactivate */}
                                     <button 
+                                        disabled={mode === 'view'}
                                         onClick={(e) => { e.stopPropagation(); toggleSignalActive(signal.term); }}
-                                        title="Desativar temporariamente este sinal para testar sua influência."
+                                        title={mode === 'view' ? "Modo Visualização (somente leitura)" : "Desativar temporariamente este sinal para testar sua influência."}
                                         className={cn(
                                             "check-area w-5 h-5 rounded border flex items-center justify-center transition-colors z-20 shrink-0",
+                                            mode === 'view' && "opacity-50 cursor-not-allowed pointer-events-none", // Strict Read-Only
                                             isDisabled 
                                                 ? "border-zinc-700 bg-transparent text-transparent" 
                                                 : "border-lime-500/50 bg-lime-500/10 text-lime-400 hover:bg-lime-500/20"
@@ -393,22 +433,24 @@ export function ClusterEditor({ clusterId, onClose }: ClusterEditorProps) {
                                        )}
                                     </div>
 
-                                    {/* 4. Menu Trigger */}
-                                    <button 
-                                        onClick={(e) => { 
-                                            e.stopPropagation(); 
-                                            if (activeMenuSignal === signal.term) {
-                                                setActiveMenuSignal(null);
-                                            } else {
-                                                const rect = e.currentTarget.getBoundingClientRect();
-                                                setMenuPosition({ x: rect.right + 8, y: rect.top });
-                                                setActiveMenuSignal(signal.term);
-                                            }
-                                        }}
-                                        className={cn("p-1 rounded hover:bg-white/10 text-zinc-500 hover:text-white transition-colors z-20", isMenuOpen && "bg-white/10 text-white")}
-                                    >
-                                        <MoreHorizontal className="w-4 h-4" />
-                                    </button>
+                                    {/* 4. Menu Trigger (Interactive Modes Only) */}
+                                    {mode !== 'view' && (
+                                        <button 
+                                            onClick={(e) => { 
+                                                e.stopPropagation(); 
+                                                if (activeMenuSignal === signal.term) {
+                                                    setActiveMenuSignal(null);
+                                                } else {
+                                                    const rect = e.currentTarget.getBoundingClientRect();
+                                                    setMenuPosition({ x: rect.right + 8, y: rect.top });
+                                                    setActiveMenuSignal(signal.term);
+                                                }
+                                            }}
+                                            className={cn("p-1 rounded hover:bg-white/10 text-zinc-500 hover:text-white transition-colors z-20", isMenuOpen && "bg-white/10 text-white")}
+                                        >
+                                            <MoreHorizontal className="w-4 h-4" />
+                                        </button>
+                                    )}
 
                                     {/* Background Role Hint */}
                                     {role === 'structural' && !isDisabled && (
@@ -419,17 +461,32 @@ export function ClusterEditor({ clusterId, onClose }: ClusterEditorProps) {
                         })}
                     </div>
                     
-                    {/* CURATION MODE FOOTER */}
+                    {/* MODE FOOTER */}
                     <div className="p-4 border-t border-white/10 bg-zinc-900/30 backdrop-blur-sm mt-auto">
-                         <div className="flex items-center gap-2 mb-1.5 text-lime-400 text-[10px] font-bold uppercase tracking-widest">
-                            <Save className="w-3 h-3" />
-                            Modo de Curadoria Ativo
-                        </div>
+                        {mode === 'view' ? (
+                             <div className="flex items-center gap-2 mb-1.5 text-zinc-500 text-[10px] font-bold uppercase tracking-widest">
+                                <Eye className="w-3 h-3" />
+                                Visualização
+                            </div>
+                        ) : mode === 'playground' ? (
+                             <div className="flex items-center gap-2 mb-1.5 text-amber-400 text-[10px] font-bold uppercase tracking-widest">
+                                <FlaskConical className="w-3 h-3" />
+                                Playground Ativo
+                            </div>
+                        ) : (
+                             <div className="flex items-center gap-2 mb-1.5 text-purple-400 text-[10px] font-bold uppercase tracking-widest">
+                                <Sparkles className="w-3 h-3" />
+                                Modo Síntese
+                            </div>
+                        )}
+                       
                         <p className="text-[10px] text-zinc-500 mb-3 leading-relaxed">
-                            Você está interpretando o cluster. Suas decisões não alteram o motor, apenas a leitura.
+                            {mode === 'view' && "Todas as ferramentas de edição estão desabilitadas."}
+                            {mode === 'playground' && "Suas edições de sinal alteram a leitura, mas não o motor original."}
+                            {mode === 'synthesis' && "Conclua sua análise definindo o papel deste cluster no sistema."}
                         </p>
                         <Button onClick={onClose} size="sm" className="w-full text-xs h-8 bg-zinc-800 hover:bg-zinc-700 border border-white/5 text-white">
-                            Encerrar e Salvar
+                            {mode === 'view' ? "Fechar Visualização" : "Encerrar e Salvar"}
                         </Button>
                     </div>
                 </aside>
@@ -502,38 +559,40 @@ export function ClusterEditor({ clusterId, onClose }: ClusterEditorProps) {
                                         )}
                                     </div>
 
-                                    {/* Curation Overlays (Level 2) - Visible on Group Hover */}
-                                    <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity z-20">
-                                         <div className="relative group/btn">
-                                             <button 
-                                                onClick={(e) => { e.stopPropagation(); handleNodeCuration(node.nodeId, node.curationStatus === 'pillar' ? 'active' : 'pillar'); }}
-                                                className={cn("p-1.5 rounded backdrop-blur-md transition-colors", node.curationStatus === 'pillar' ? "bg-amber-500 text-black shadow-[0_0_10px_rgba(245,158,11,0.5)]" : "bg-black/50 text-white hover:bg-amber-500 hover:text-black")}
-                                             >
-                                                <Crown className="w-3 h-3" />
-                                             </button>
-                                             {/* PILLAR TOOLTIP */}
-                                             <div className="absolute right-0 top-full mt-2 w-48 bg-zinc-900/95 border border-amber-500/20 p-3 rounded shadow-2xl backdrop-blur-xl pointer-events-none opacity-0 group-hover/btn:opacity-100 transition-opacity z-50">
-                                                <h5 className="text-amber-400 font-bold text-[10px] mb-1 uppercase tracking-wider flex items-center gap-1">
-                                                    <Crown className="w-3 h-3" /> Definir como Pilar
-                                                </h5>
-                                                <p className="text-zinc-300 text-[10px] leading-relaxed mb-1.5">
-                                                    Esta referência é um exemplo canônico da vibe.
-                                                </p>
-                                                <ul className="text-[9px] text-zinc-500 space-y-0.5 list-disc list-inside">
-                                                    <li>Ajuda humanos a entenderem o cluster</li>
-                                                    <li>Estabiliza sinais motores</li>
-                                                </ul>
-                                             </div>
-                                         </div>
+                                    {/* Curation Overlays (Level 2) - Visible on Group Hover (Interactive Modes Only) */}
+                                    {mode !== 'view' && (
+                                        <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity z-20">
+                                            <div className="relative group/btn">
+                                                <button 
+                                                    onClick={(e) => { e.stopPropagation(); handleNodeCuration(node.nodeId, node.curationStatus === 'pillar' ? 'active' : 'pillar'); }}
+                                                    className={cn("p-1.5 rounded backdrop-blur-md transition-colors", node.curationStatus === 'pillar' ? "bg-amber-500 text-black shadow-[0_0_10px_rgba(245,158,11,0.5)]" : "bg-black/50 text-white hover:bg-amber-500 hover:text-black")}
+                                                >
+                                                    <Crown className="w-3 h-3" />
+                                                </button>
+                                                {/* PILLAR TOOLTIP */}
+                                                <div className="absolute right-0 top-full mt-2 w-48 bg-zinc-900/95 border border-amber-500/20 p-3 rounded shadow-2xl backdrop-blur-xl pointer-events-none opacity-0 group-hover/btn:opacity-100 transition-opacity z-50">
+                                                    <h5 className="text-amber-400 font-bold text-[10px] mb-1 uppercase tracking-wider flex items-center gap-1">
+                                                        <Crown className="w-3 h-3" /> Definir como Pilar
+                                                    </h5>
+                                                    <p className="text-zinc-300 text-[10px] leading-relaxed mb-1.5">
+                                                        Esta referência é um exemplo canônico da vibe.
+                                                    </p>
+                                                    <ul className="text-[9px] text-zinc-500 space-y-0.5 list-disc list-inside">
+                                                        <li>Ajuda humanos a entenderem o cluster</li>
+                                                        <li>Estabiliza sinais motores</li>
+                                                    </ul>
+                                                </div>
+                                            </div>
 
-                                         <button 
-                                            onClick={(e) => { e.stopPropagation(); handleNodeCuration(node.nodeId, node.curationStatus === 'removed' ? 'active' : 'removed'); }}
-                                            className={cn("p-1.5 rounded backdrop-blur-md transition-colors", node.curationStatus === 'removed' ? "bg-red-500 text-white" : "bg-black/50 text-white hover:bg-red-500")}
-                                             title="Remover do Cluster (Ruído)"
-                                         >
-                                            {node.curationStatus === 'removed' ? <RotateCcw className="w-3 h-3" /> : <Trash2 className="w-3 h-3" />}
-                                         </button>
-                                    </div>
+                                            <button 
+                                                onClick={(e) => { e.stopPropagation(); handleNodeCuration(node.nodeId, node.curationStatus === 'removed' ? 'active' : 'removed'); }}
+                                                className={cn("p-1.5 rounded backdrop-blur-md transition-colors", node.curationStatus === 'removed' ? "bg-red-500 text-white" : "bg-black/50 text-white hover:bg-red-500")}
+                                                title="Remover do Cluster (Ruído)"
+                                            >
+                                                {node.curationStatus === 'removed' ? <RotateCcw className="w-3 h-3" /> : <Trash2 className="w-3 h-3" />}
+                                            </button>
+                                        </div>
+                                    )}
 
                                     {/* Info Overlay */}
                                     <div className="absolute inset-x-0 bottom-0 p-2 bg-gradient-to-t from-black/80 to-transparent">
@@ -677,16 +736,104 @@ export function ClusterEditor({ clusterId, onClose }: ClusterEditorProps) {
                          </div>
                     </div>
 
-                     {/* Insights Box */}
-                     <div className="mt-auto p-4 rounded bg-zinc-900/50 border border-white/5">
-                        <div className="flex items-center gap-2 text-xs text-lime-400 font-bold mb-2">
-                            <Save className="w-3 h-3" />
-                            Modo de Curadoria
+                    {/* Synthesis & Decision Panel (ONLY IN SYNTHESIS MODE) */}
+                    {mode === 'synthesis' && (
+                        <div className="mt-6 pt-6 border-t border-white/10 flex flex-col gap-4 animate-in fade-in slide-in-from-right-4">
+                            <div className="bg-purple-500/10 border border-purple-500/20 p-3 rounded mb-2">
+                                <h4 className="text-xs font-bold text-purple-400 uppercase tracking-widest flex items-center gap-2 mb-1">
+                                    <Sparkles className="w-4 h-4" /> Modo Síntese
+                                </h4>
+                                <p className="text-[10px] text-zinc-400 leading-snug">
+                                    Defina o destino deste mundo. As alterações aqui não afetam o motor.
+                                </p>
+                            </div>
+
+                            {/* 1. Name */}
+                            <div className="space-y-1">
+                                <label className="text-[10px] text-zinc-500 font-medium">Nome da Vibe (Consciente)</label>
+                                <input 
+                                    type="text" 
+                                    value={synthesisName}
+                                    onChange={(e) => setSynthesisName(e.target.value)}
+                                    onBlur={() => handleSynthesisUpdate({ name: synthesisName })}
+                                    placeholder="Ex: Urgência Elétrica..."
+                                    className="w-full bg-black/20 border border-white/10 rounded px-2 py-1.5 text-xs text-purple-100 placeholder:text-zinc-700 focus:outline-none focus:border-purple-500/50 transition-colors"
+                                />
+                            </div>
+
+                            {/* 2. Role Decision */}
+                            <div className="space-y-1">
+                                <label className="text-[10px] text-zinc-500 font-medium">Papel no Sistema</label>
+                                <div className="grid grid-cols-2 gap-2">
+                                    {[
+                                        { value: 'territory', label: 'Território', icon: MapIcon, color: 'text-purple-400', border: 'border-purple-500/30' },
+                                        { value: 'pillar', label: 'Pilar', icon: Crown, color: 'text-amber-400', border: 'border-amber-500/30' },
+                                        { value: 'counterpoint', label: 'Contraponto', icon: Zap, color: 'text-pink-400', border: 'border-pink-500/30' },
+                                        { value: 'archive', label: 'Arquivo', icon: Archive, color: 'text-zinc-400', border: 'border-zinc-500/30' },
+                                    ].map(option => (
+                                        <button
+                                            key={option.value}
+                                            onClick={() => handleSynthesisUpdate({ role: option.value as any })}
+                                            className={cn(
+                                                "flex items-center gap-2 px-2 py-2 rounded border text-[10px] transition-all text-left",
+                                                synthesisRole === option.value 
+                                                    ? `bg-white/5 ${option.border} ${option.color}` 
+                                                    : "bg-transparent border-white/5 text-zinc-500 hover:bg-white/5 hover:text-zinc-300"
+                                            )}
+                                        >
+                                            <option.icon className="w-3 h-3 shrink-0" />
+                                            {option.label}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* 3. Description */}
+                             <div className="space-y-1">
+                                <label className="text-[10px] text-zinc-500 font-medium">Manifesto / Descrição</label>
+                                <textarea 
+                                    value={synthesisDesc}
+                                    onChange={(e) => setSynthesisDesc(e.target.value)}
+                                    onBlur={() => handleSynthesisUpdate({ description: synthesisDesc })}
+                                    placeholder="Para onde vai este mundo?"
+                                    className="w-full bg-black/20 border border-white/10 rounded px-2 py-2 text-xs text-zinc-300 placeholder:text-zinc-700 min-h-[60px] focus:outline-none focus:border-purple-500/50 transition-colors resize-none leading-relaxed scrollbar-hide"
+                                />
+                            </div>
+
+                            {/* Save Feedback */}
+                            {isSavingSynthesis && (
+                                 <div className="text-[10px] text-zinc-500 flex items-center gap-1 animate-pulse justify-end">
+                                     <Save className="w-3 h-3" /> Salvando síntese...
+                                 </div>
+                            )}
                         </div>
-                        <p className="text-[11px] text-zinc-400 leading-relaxed italic">
-                            Suas alterações de Papel (Motor/Apoio) e Curadoria (Pilar/Lixo) são salvas automaticamente e influenciarão o próximo ciclo de regeneração.
-                        </p>
-                     </div>
+                    )}
+
+                     {/* Insights Box (Legacy / Playground Mode) */}
+                     {mode === 'playground' && (
+                        <div className="mt-auto p-4 rounded bg-amber-500/5 border border-amber-500/10">
+                            <div className="flex items-center gap-2 text-xs text-amber-400 font-bold mb-2">
+                                <FlaskConical className="w-3 h-3" />
+                                Modo Playground
+                            </div>
+                            <p className="text-[11px] text-zinc-400 leading-relaxed italic">
+                                Você está interpretando o cluster. Suas decisões não alteram o motor, apenas a leitura.
+                            </p>
+                        </div>
+                     )}
+
+                     {/* Visualization Mode Info */}
+                      {mode === 'view' && (
+                        <div className="mt-auto p-4 rounded bg-white/5 border border-white/10">
+                            <div className="flex items-center gap-2 text-xs text-zinc-400 font-bold mb-2">
+                                <Eye className="w-3 h-3" />
+                                Modo Visualização
+                            </div>
+                            <p className="text-[11px] text-zinc-500 leading-relaxed italic">
+                                Explore os mundos detectados. Entre no Playground para editar a leitura.
+                            </p>
+                        </div>
+                     )}
 
                 </aside>
             </div>

@@ -237,3 +237,20 @@ Transformar o Canvas de Ressonância de um "debug de pontos" para um **editor pr
   - Improved Signal Dropdown with color-coded Method definitions (Motor/Support/Noise).
 - **Bug Fixes**:
   - Fixed `overflow-hidden` clipping issue on Image Grid tooltips by refactoring DOM structure.
+
+## [2026-01-15] Evolution: Synthesis Layer (Thinking System)
+
+### Concept
+- Moved from "Reading/Classification" to "Synthesis/Decision".
+- Implemented the decision layer where the user determines the *fate* of a cluster (Territory, Pillar, etc.), separately from its structural health.
+
+### Features
+- **Cluster Synthesis Panel**:
+  - New sidebar section in `ClusterEditor`.
+  - **Conscious Naming**: `name_final` and `description_final` inputs.
+  - **Role Decision**: `synthesis_status` (Territory, Pillar, Counterpoint, Archive).
+- **Architecture**:
+  - `cluster_relations` table for future Resonance Map.
+  - Updates to `ClusterEditorData` to include synthesis state.
+  - Optimistic UI updates for Synthesis fields.
+
