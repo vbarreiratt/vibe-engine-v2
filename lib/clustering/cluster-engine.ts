@@ -24,6 +24,9 @@ export interface ClusterResult {
         name_suggested: string; // "State + Matter"
         motor: 'state' | 'matter' | 'movement';
         items: string[]; // image_ids
+        classification?: string;
+        summary?: string;
+        justification?: string;
     }[];
     nodes: {
         id: string; // image_id
@@ -534,11 +537,17 @@ export class ClusterEngine {
             this.logger.logClusterInsight(insight);
             clusterMetricsForAudit.push(insight);
 
+            // Construct Semantic Motor Summary
+            const motorSummary = `State: ${dominantSignals.state[0] || '?'} · Matter: ${dominantSignals.matter[0] || '?'} · Movement: ${dominantSignals.movement[0] || '?'}`;
+
             return {
                 id: cId,
                 name_suggested: `${topState || 'Vibe'} ${topMatter || 'Material'}`,
                 motor: 'state' as const,
-                items: itemIds
+                items: itemIds,
+                classification,
+                summary: motorSummary,
+                justification
             };
         });
 

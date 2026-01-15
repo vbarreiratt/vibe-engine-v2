@@ -89,18 +89,49 @@ export async function POST(
         const clusterIdMap: Record<string, string> = {}; // engineId -> dbUuid
 
         for (const c of result.clusters) {
-            const { data: insertedCluster, error: cErr } = await supabase
-                .from('clusters')
-                .insert({
-                    clusters_run_id: clustersRunId,
-                    name_suggested: c.name_suggested,
-                    motor: c.motor,
-                    description_suggested: `Cluster driven by ${c.motor} with ${c.items.length} items.`
-                })
-                .select('id')
-                .single();
+            // Attempt to insert with Semantic Fields (Migration 20260115)
+            // If DB schema is outdated, this will fail. We fallback to legacy insert.
+            let insertedCluster;
+            
+            // Payload with new fields
+            const payloadFull = {
+                clusters_run_id: clustersRunId,
+                name_suggested: c.name_suggested,
+                motor: c.motor,
+                description_suggested: c.justification || `Cluster driven by ${c.motor}.`,
+                // @ts-ignore
+                classification: c.classification,
+                // @ts-ignore
+                summary: c.summary
+            };
 
-            if (cErr) throw cErr;
+            const { data: dataFull, error: errFull } = await supabase
+                .from('clusters')
+                .insert(payloadFull)
+                .select('id')
+                .maybeSingle();
+
+            if (!errFull && dataFull) {
+                insertedCluster = dataFull;
+            } else {
+                // Fallback: Legacy Schema (if column missing)
+                console.warn(`[ClusterJob] Semantic Insert Failed (${errFull?.code}). Falling back to legacy schema. Apply migration 20260115000009_add_semantic_fields_to_clusters.sql`);
+                
+                const { data: dataLegacy, error: errLegacy } = await supabase
+                    .from('clusters')
+                    .insert({
+                        clusters_run_id: clustersRunId,
+                        name_suggested: c.name_suggested,
+                        motor: c.motor,
+                        description_suggested: `Cluster driven by ${c.motor} with ${c.items.length} items.`
+                    })
+                    .select('id')
+                    .single();
+                
+                if (errLegacy) throw errLegacy;
+                insertedCluster = dataLegacy;
+            }
+
             clusterIdMap[c.id] = insertedCluster.id;
         }
 

@@ -8,9 +8,11 @@ interface Node {
     id: string;
     x: number;
     y: number;
-    cluster_index: number;
+    cluster_id?: string;
+    cluster_index?: number;
     is_outlier: boolean;
     image_url?: string;
+    images?: { thumb_url: string }; 
 }
 
 interface Edge {
@@ -25,6 +27,9 @@ interface Cluster {
     name_suggested: string;
     motor: string;
     items: string[];
+    classification?: string;
+    summary?: string;
+    description_suggested?: string;
 }
 
 interface ResonanceCanvasProps {
@@ -58,6 +63,7 @@ export function ResonanceCanvas({ nodes, edges, clusters, logText, onNodeMove, o
     const [isDragging, setIsDragging] = useState(false);
     const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
     const [showLog, setShowLog] = useState(false);
+    const [hoveredClusterId, setHoveredClusterId] = useState<string | null>(null);
 
     // UI toggles
     const [showTopbar, setShowTopbar] = useState(true);
@@ -248,7 +254,12 @@ export function ResonanceCanvas({ nodes, edges, clusters, logText, onNodeMove, o
                     <g transform={`translate(${transform.x},${transform.y}) scale(${transform.scale})`}>
                         {/* Render cluster islands */}
                         {clusters.map((cluster, idx) => {
-                            const clusterNodes = nodes.filter(n => n.cluster_index === parseInt(cluster.id));
+                             // Robust cluster matching (ID or Index)
+                            const clusterNodes = nodes.filter(n => 
+                                (n.cluster_id && n.cluster_id === cluster.id) || 
+                                (!n.cluster_id && n.cluster_index !== undefined && String(n.cluster_index) === cluster.id)
+                            );
+
                             if (clusterNodes.length === 0) return null;
 
                             const cx = clusterNodes.reduce((sum, n) => sum + n.x, 0) / clusterNodes.length;
@@ -256,52 +267,102 @@ export function ResonanceCanvas({ nodes, edges, clusters, logText, onNodeMove, o
                             const radius = Math.max(100, clusterNodes.length * 30);
 
                             const color = CLUSTER_COLORS[idx % CLUSTER_COLORS.length];
+                            
+                            const isHovered = hoveredClusterId === cluster.id;
+                            const classification = cluster.classification || 'WEAK';
+                            
+                            // Visual Hierarchy
+                            let opacity = 0.15;
+                            let strokeDash = "5,5";
+                            let strokeWidth = "2";
+                            
+                            if (classification === 'STRONG') {
+                                opacity = 0.25;
+                                strokeDash = "none";
+                                strokeWidth = "4";
+                            } else if (classification === 'NOISE') {
+                                opacity = 0.05;
+                                strokeDash = "2,2";
+                                strokeWidth = "1";
+                            }
 
                             return (
-                                <g key={cluster.id}>
+                                <g 
+                                    key={cluster.id}
+                                    onMouseEnter={() => setHoveredClusterId(cluster.id)}
+                                    onMouseLeave={() => setHoveredClusterId(null)}
+                                    style={{ cursor: 'pointer' }}
+                                >
                                     {/* Ilha do cluster (glow) */}
                                     <circle
                                         cx={cx}
                                         cy={cy}
-                                        r={radius + 20}
+                                        r={radius + (isHovered ? 30 : 20)}
                                         fill={color}
-                                        fillOpacity="0.05"
+                                        fillOpacity={isHovered ? opacity * 1.5 : opacity}
                                         stroke="none"
+                                        className="transition-all duration-300"
                                     />
                                     <circle
                                         cx={cx}
                                         cy={cy}
-                                        r={radius}
-                                        fill={color}
-                                        fillOpacity="0.15"
+                                        r={radius + (isHovered ? 10 : 0)}
+                                        fill="none"
                                         stroke={color}
-                                        strokeWidth="3"
-                                        strokeOpacity="0.6"
-                                        strokeDasharray="5,5"
+                                        strokeWidth={strokeWidth}
+                                        fillOpacity="0"
+                                        strokeOpacity={classification === 'NOISE' ? 0.3 : 0.6}
+                                        strokeDasharray={strokeDash}
+                                        className="transition-all duration-300"
                                     />
-                                    {/* Label do cluster */}
-                                    <text
-                                        x={cx}
-                                        y={cy - radius - 20}
-                                        textAnchor="middle"
-                                        fill={color}
-                                        fontSize="18"
-                                        fontWeight="700"
-                                        style={{ textShadow: '0 2px 8px rgba(0,0,0,0.8)' }}
-                                    >
-                                        {cluster.name_suggested}
-                                    </text>
-                                    <text
-                                        x={cx}
-                                        y={cy - radius - 2}
-                                        textAnchor="middle"
-                                        fill="white"
-                                        fontSize="12"
-                                        fontWeight="500"
-                                        fillOpacity="0.7"
-                                    >
-                                        {clusterNodes.length} nodes
-                                    </text>
+                                    
+                                    {/* Label - Semantic */}
+                                    {(classification !== 'NOISE' || isHovered) && (
+                                    <>
+                                        <text
+                                            x={cx}
+                                            y={cy - radius - 20}
+                                            textAnchor="middle"
+                                            fill={color}
+                                            fontSize={isHovered ? "22" : "18"}
+                                            fontWeight="700"
+                                            style={{ textShadow: '0 2px 8px rgba(0,0,0,0.8)' }}
+                                        >
+                                            {cluster.name_suggested}
+                                        </text>
+                                        
+                                        {/* Status Badge */}
+                                       <text x={cx} y={cy - radius - 45} textAnchor="middle" fill="white" fontSize="10" fontWeight="bold" letterSpacing="1px" opacity="0.8">
+                                            {classification}
+                                        </text>
+                                    </>
+                                    )}
+
+                                    {/* Semantic Popover (ForeignObject) */}
+                                    {isHovered && (
+                                        <foreignObject x={cx - 140} y={cy - radius - 220} width="280" height="200" style={{ overflow: 'visible', pointerEvents: 'none' }}>
+                                            <div className="bg-zinc-950/90 border border-white/10 rounded-xl p-4 shadow-2xl backdrop-blur-md text-white text-left scale-100 origin-bottom transition-all">
+                                                <h4 className="font-bold text-lg mb-1" style={{color}}>{cluster.name_suggested}</h4>
+                                                
+                                                <div className="text-[10px] uppercase tracking-wider font-mono text-zinc-400 mb-2 border-b border-white/5 pb-2 leading-snug">
+                                                    {cluster.summary || 'Análise pendente'}
+                                                </div>
+                                                
+                                                <p className="text-xs text-zinc-300 mb-3 leading-relaxed">
+                                                    {cluster.description_suggested || 'Sem justificativa.'}
+                                                </p>
+                                                
+                                                {/* Call to Action */}
+                                                <div className={`text-[10px] px-2 py-1.5 rounded bg-white/5 border border-white/5`}>
+                                                    <span className="text-purple-400 font-bold">➢ Ação: </span>
+                                                    {classification === 'STRONG' && "Nomear, tensionar e consolidar."}
+                                                    {classification === 'PROTO' && "Decidir: expandir ou fundir?"}
+                                                    {classification === 'NOISE' && "Descartar ou manter referência."}
+                                                    {classification === 'WEAK' && "Aguardar mais sinais."}
+                                                </div>
+                                            </div>
+                                        </foreignObject>
+                                    )}
                                 </g>
                             );
                         })}
@@ -327,7 +388,13 @@ export function ResonanceCanvas({ nodes, edges, clusters, logText, onNodeMove, o
 
                         {/* Render nodes */}
                         {nodes.map((node) => {
-                            const color = CLUSTER_COLORS[node.cluster_index % CLUSTER_COLORS.length];
+                            let cIndex = node.cluster_index || 0;
+                            if (node.cluster_id) {
+                                const idx = clusters.findIndex(c => c.id === node.cluster_id);
+                                if (idx !== -1) cIndex = idx;
+                            }
+                            const color = CLUSTER_COLORS[cIndex % CLUSTER_COLORS.length];
+                            
                             const isSelected = selectedNode === node.id;
 
                             return (
