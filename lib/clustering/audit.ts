@@ -20,56 +20,60 @@ export interface AuditResult {
 
 export class ClusterAuditor {
     
-    // Hash Helpers
+    // Hash Helpers - Full SHA256 for audit
     static hashString(content: string): string {
-        return crypto.createHash('sha256').update(content).digest('hex').substring(0, 16);
+        return crypto.createHash('sha256').update(content).digest('hex');
     }
 
     static hashObject(obj: any): string {
+        // Ensure deterministic stringify by sorting keys? Not strictly necessary if we just hash the content written to disk
+        // But for object hashing, JSON.stringify is unstable. Better to rely on file hashes.
         return this.hashString(JSON.stringify(obj));
     }
 
     // Sanity Checks
-    static runSanityChecks(result: ClusterResult, metrics: any): AuditResult {
+    static runSanityChecks(result: ClusterResult, metrics: any, fileHashes: any): AuditResult {
         const checks: AuditConstraint[] = [];
 
-        // 1. Language Normalization Check
-        const FORBIDDEN_TOKENS = ['intense', 'pulsating', 'glow', 'ink', 'motion', 'blur']; // Se vazou EN
+        // 1. Language Normalization Check (CRITICAL now)
+        const FORBIDDEN_TOKENS = ['intense', 'pulsating', 'glow', 'ink', 'motion', 'blur', 'digital light', 'fading', 'neon glow'];
         let forbiddenFound = 0;
+        let forbiddenDetails = '';
         
-        // Check cluster names/tags
-        result.clusters.forEach(c => {
-           // We check the suggested name or derived tags if available in metrics
-           // For now checking name as proxy
-           if (FORBIDDEN_TOKENS.some(t => c.name_suggested.toLowerCase().includes(t))) {
+        // Check cluster names and justifications
+        metrics.forEach((m: any) => {
+           const textCheck = (m.justification + ' ' + JSON.stringify(m.dominantSignals)).toLowerCase();
+           const violations = FORBIDDEN_TOKENS.filter(t => textCheck.includes(t));
+           if (violations.length > 0) {
                forbiddenFound++;
+               forbiddenDetails += `[Cluster ${m.clusterId}: ${violations.join(', ')}] `;
            }
         });
         
         checks.push({
-            checkName: 'Language Normalization',
+            checkName: 'Language Normalization Cleanliness',
             passed: forbiddenFound === 0,
-            details: forbiddenFound > 0 ? `Found ${forbiddenFound} clusters with forbidden English tokens.` : 'No forbidden tokens found.',
-            severity: 'WARNING' // Warning because maybe user WANTS english, but system prefers PT
+            details: forbiddenFound > 0 ? `Found ${forbiddenFound} violations: ${forbiddenDetails}` : 'No forbidden tokens found.',
+            severity: 'CRITICAL' 
         });
 
         // 2. NOISE Rule Check
         let invalidNoise = 0;
-        // Access metrics for classification confirmation
-        // Assuming metrics passed has classification info per cluster
         const noiseClusters = metrics.filter((m: any) => m.classification === 'NOISE');
         noiseClusters.forEach((nc: any) => {
             if (nc.nodeCount > 1) {
-                // Noise should generally be single items or completely disconnected
-                // If it has >1 elements, it better have VERY low strength
-                if (nc.strengthScore > 0.2) invalidNoise++;
+                // NOISE with >1 node MUST NOT have high internal connection
+                // If it has density > 0.3 it shouldn't be noise usually, unless disconnected from everything else?
+                // But per prompt rules: Gate 3 Failure -> PROTO or WEAK, not NOISE usually unless truly 0 edges.
+                // However, NOISE rule is: N=1 OR N>1 but zero significant internal edges.
+                if (nc.density.avg > 0.1) invalidNoise++;
             }
         });
 
         checks.push({
             checkName: 'NOISE Classification Rules',
             passed: invalidNoise === 0,
-            details: `${invalidNoise} clusters marked NOISE but have significant size/strength.`,
+            details: `${invalidNoise} clusters marked NOISE but have internal density > 0.1.`,
             severity: 'CRITICAL'
         });
 
@@ -81,33 +85,32 @@ export class ClusterAuditor {
         checks.push({
             checkName: 'Metrics Variance (No Dummies)',
             passed: !lowVariance,
-            details: lowVariance ? 'All clusters have identical strengthScore. Likely dummy data.' : `Unique scores: ${uniqueScores}/${scores.length}`,
+            details: lowVariance ? 'All clusters have identical strengthScore.' : `Unique scores: ${uniqueScores}/${scores.length}`,
             severity: 'CRITICAL'
         });
 
-        // 4. Graph Integrity
-        const edgeCount = result.edges.length;
+        // 4. Chain of Evidence Integrity
+        const hasInputs = !!fileHashes.inputs;
+        const hasEdges = !!fileHashes.edges;
+        const hasMetrics = !!fileHashes.metrics;
+        
         checks.push({
-            checkName: 'Graph Connectivity',
-            passed: edgeCount > 0 || result.nodes.length < 2,
-            details: `Graph has ${edgeCount} edges for ${result.nodes.length} nodes.`,
-            severity: 'WARNING'
+            checkName: 'Chain of Evidence Integrity',
+            passed: hasInputs && hasEdges && hasMetrics,
+            details: `Hashes present: Inputs=${hasInputs}, Edges=${hasEdges}, Metrics=${hasMetrics}`,
+            severity: 'CRITICAL'
         });
 
         // Determine Final Status
         const criticalFail = checks.some(c => c.severity === 'CRITICAL' && !c.passed);
-        const warningFail = checks.some(c => c.severity === 'WARNING' && !c.passed);
+        // We removed WARNING severity for Language, so mostly strictly PASS/FAIL now.
         
-        const status = criticalFail ? 'FAILED_AUDIT' : (warningFail ? 'WARNING' : 'PASS');
+        const status = criticalFail ? 'FAILED_AUDIT' : 'PASS';
 
         return {
             status,
             checks,
-            hashes: {
-                inputs: 'calculated-in-runtime', // Filled by caller
-                edges: 'calculated-in-runtime',
-                metrics: 'calculated-in-runtime'
-            }
+            hashes: fileHashes
         };
     }
 }

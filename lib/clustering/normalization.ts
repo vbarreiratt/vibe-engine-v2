@@ -50,6 +50,13 @@ const DICTIONARY: Record<string, string> = {
     'shiny': 'brilhante',
     'matte': 'fosco',
     
+    // Novas correções (Leak Patch)
+    'fade': 'desvanecer',
+    'fading': 'desvanecer',
+    'digital light': 'luz digital',
+    'neon glow': 'luz neon',
+    'glowing lines': 'linhas brilhantes',
+    
     // Movimento/Estado
     'movement': 'movimento',
     'motion': 'movimento',
@@ -108,6 +115,10 @@ export function normalizeSignal(term: string): NormalizationResult {
     }
 
     // 2. Heurísticas Simples
+    
+    // Leak Patch: Scan for multi-word leakage first
+    if (processing.includes('neon glow')) return { original, normalized: 'luz neon', method: 'heuristic' };
+    if (processing.includes('digital light')) return { original, normalized: 'luz digital', method: 'heuristic' };
     
     // Plural (EN/PT) simples -> Singular
     if (processing.endsWith('s') && !processing.endsWith('ss')) {

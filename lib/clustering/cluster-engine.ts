@@ -220,6 +220,9 @@ export class ClusterEngine {
                     graph.addEdge(idA, idB, {
                         weight,
                         layers,
+                        // Extensive audit data
+                        simState, simMatter, simMove,
+                        sharedState, sharedMatter, sharedMove
                     });
                 }
 
@@ -271,14 +274,57 @@ export class ClusterEngine {
         // Save signals_normalized.json
         await fs.writeFile(path.join(evidenceDir, 'signals_normalized.json'), JSON.stringify(normalizedData, null, 2));
 
-        // 2. Build Graph
+        // 2. Build Graph (and kNN Fallback)
         const graph = this.buildGraph();
+
+        // Safe Fallback: Check for disconnected nodes and attempt 1-NN or 2-NN if some overlap exists
+        this.images.forEach(img => {
+            const degree = graph.degree(img.id);
+            if (degree === 0) {
+                 // Try to find ANY neighbor with at least minimal overlap (1 shared or threshold > 0.6) representing a weak link
+                 // This reduces fragmentation into NOISE for valid but weak items
+                 let bestMatch = null;
+                 let maxScore = -1;
+                 
+                 this.images.forEach(other => {
+                      if (img.id === other.id) return;
+                      // Recalculate basic sim (inefficient but safe fallback method)
+                      const empA = this.embeddings[img.id];
+                      const empB = this.embeddings[other.id];
+                      if (!empA || !empB) return;
+                      
+                      const s = cosineSimilarity(empA.state, empB.state);
+                      const m = cosineSimilarity(empA.matter, empB.matter);
+                      const v = cosineSimilarity(empA.movement, empB.movement);
+                      const avg = (s + m + v) / 3;
+                      
+                      if (avg > maxScore) {
+                          maxScore = avg;
+                          bestMatch = other.id;
+                      }
+                 });
+
+                 if (bestMatch && maxScore > 0.65) {
+                     graph.addEdge(img.id, bestMatch, {
+                         weight: maxScore,
+                         layers: ['knn_rescue'],
+                         simState: 0, simMatter: 0, simMove: 0,
+                         sharedState: [], sharedMatter: [], sharedMove: [],
+                         isRescue: true
+                     });
+                 }
+            }
+        });
         
-        // Save graph_edges.csv
-        const edgesCsv = ['source,target,weight,layers'];
+        // Save graph_edges.csv with Expanded Components
+        const edgesCsv = ['source,target,weight,layers,sim_state,sim_matter,sim_move,overlap_state,overlap_matter,overlap_move,is_rescue'];
         graph.edges().forEach(e => {
             const attr = graph.getEdgeAttributes(e);
-            edgesCsv.push(`${graph.source(e)},${graph.target(e)},${attr.weight.toFixed(4)},"${attr.layers.join('|')}"`);
+            const ovS = attr.sharedState ? attr.sharedState.length : 0;
+            const ovM = attr.sharedMatter ? attr.sharedMatter.length : 0;
+            const ovV = attr.sharedMove ? attr.sharedMove.length : 0;
+            
+            edgesCsv.push(`${graph.source(e)},${graph.target(e)},${attr.weight.toFixed(4)},"${attr.layers.join('|')}",${attr.simState?.toFixed(2)||0},${attr.simMatter?.toFixed(2)||0},${attr.simMove?.toFixed(2)||0},${ovS},${ovM},${ovV},${attr.isRescue||false}`);
         });
         await fs.writeFile(path.join(evidenceDir, 'graph_edges.csv'), edgesCsv.join('\n'));
 
@@ -374,7 +420,7 @@ export class ClusterEngine {
             const maxWeight = weights.length > 0 ? Math.max(...weights) : 0;
             const density = { avg: avgWeight, min: minWeight, max: maxWeight };
 
-            // 2. Recurrence
+            // 2. Recurrence (Signal Overlap)
             const countSignal = (list: typeof normalizedData, layer: 'state' | 'matter' | 'movement', signal: string) => {
                 if (!signal) return 0;
                 return list.filter(img => {
@@ -387,6 +433,11 @@ export class ClusterEngine {
             const recState = dominantSignals.state[0] ? countSignal(clusterItems, 'state', dominantSignals.state[0]) / itemIds.length : 0;
             const recMatter = dominantSignals.matter[0] ? countSignal(clusterItems, 'matter', dominantSignals.matter[0]) / itemIds.length : 0;
             const recMove = dominantSignals.movement[0] ? countSignal(clusterItems, 'movement', dominantSignals.movement[0]) / itemIds.length : 0;
+            
+            // New: Multi-Layer Recurrence Logic (Method requirement)
+            const recValues = [recState, recMatter, recMove].sort((a,b) => b-a);
+            const recurrenceMulti = (recValues[0] + recValues[1]) / 2; // Avg of top 2
+            
             const recurrence = { state: recState, matter: recMatter, movement: recMove };
             
             // 3. Stability (Leave-One-Out Simulation)
@@ -426,44 +477,45 @@ export class ClusterEngine {
             if (itemIds.length < 3) sizePenalty = 0.3;
             if (itemIds.length === 1) sizePenalty = 0.9;
 
-            const strengthScore = Math.max(0, Math.min(1, rawStrength - sizePenalty));
+            // 4. Base Score (Method: Weight Recurrence higher)
+            const strengthScore = (recurrenceMulti * 0.7) + (density.avg * 0.3);
 
-            // 5. Classification Rules (Audit Strict)
+            // 5. Classification Rules (Strict Gates from Method)
             let classification: 'STRONG' | 'WEAK' | 'PROTO' | 'NOISE' = 'WEAK';
             
-            if (itemIds.length === 1) {
+            const maxEdgeWeight = strongestEdges[0]?.weight || 0;
+
+            // Gate 1: Noise (Too small or too disconnected)
+            if (itemIds.length < 2 || maxEdgeWeight < 0.35) {
                 classification = 'NOISE';
-            } else if (itemIds.length === 0) { 
-                 classification = 'NOISE';
-            } else {
-                 // Check thresholds from prompt
-                 // STRONG: N >= 4, rec >= 0.6 in 2 layers, density check
-                 const strongRecurrence = [recState, recMatter, recMove].filter(r => r >= 0.6).length >= 2;
-                 
-                 if (itemIds.length >= 4 && strongRecurrence && density.avg > 0.6) {
-                     classification = 'STRONG';
-                 } else if (strengthScore > 0.35 && (itemIds.length >= 2)) {
-                     classification = 'PROTO';
-                 } else {
-                     classification = 'WEAK';
-                 }
+            }
+            // Gate 2 & 3 & 4 (Check Quality)
+            else {
+                const passesRecurrenceGate = recurrenceMulti >= 0.6;
+                
+                if (passesRecurrenceGate) {
+                    if (itemIds.length >= 4 && density.avg > 0.6) {
+                        classification = 'STRONG';
+                    } else {
+                        // High recurrence but small or sparse
+                        classification = 'PROTO';
+                    }
+                } else {
+                    // Fails recurrence gate (signals diffuse)
+                    classification = 'WEAK';
+                }
             }
             
-            // Override: If NOISE has high strength, something is wrong, force clamp or flag
-            if (classification === 'NOISE' && strengthScore > 0.1) {
-                // This shouldn't happen with the formula, but just in case
-            }
-
             // Generate justification
             let justification = `Cluster ${classification} (${(strengthScore*100).toFixed(0)}%). `;
             if (classification === 'STRONG') {
-                justification += `Vibe consolidada. Recorrência alta em múltiplos canais.`;
+                justification += `Vibe forte. Recorrência multi-camada (${(recurrenceMulti*100).toFixed(0)}%) e densidade alta.`;
             } else if (classification === 'PROTO') {
-                justification += `Mundo emergente. Forte conexão mas tamanho reduzido.`;
+                justification += `Núcleo em formação. Sinais fortes, mas quantidade/densidade abaixo do limiar.`;
             } else if (classification === 'NOISE') {
-                justification += `Isolado ou conexão fraca irrelevante.`;
+                justification += `Descartado. Tamanho insuficiente ou arestas fracas.`;
             } else {
-                justification += `Instável ou difuso.`;
+                justification += `Vibe fraca. Sinais dispersos (Recorrência < 60%). Requer curadoria.`;
             }
 
             const insight = {
@@ -491,7 +543,7 @@ export class ClusterEngine {
         });
 
         // Near-Cluster Check (Bucket logic)
-        const nearClusters = [];
+        const nearClusters: { signals: string, nodes: string[], reason: string }[] = [];
         // Map all pairs (state+matter)
         const buckets: Record<string, string[]> = {};
         normalizedData.forEach(node => {
@@ -577,8 +629,24 @@ export class ClusterEngine {
         // Apply 2-stage layout
         result = applyTwoStageLayout(result);
 
+        // Create Real Hashes for Audit (SHA256)
+        const hashes = {
+            inputs: ClusterAuditor.hashString(inputsCsv.join('\n')),
+            edges: ClusterAuditor.hashString(edgesCsv.join('\n')),
+            metrics: ClusterAuditor.hashString(JSON.stringify(clusterMetricsForAudit, null, 2))
+        };
+        // Also write detailed map to disk for human verification
+        const detailedHashes = {
+            ...hashes,
+            'inputs_canonical.csv': hashes.inputs,
+            'graph_edges.csv': hashes.edges,
+            'cluster_metrics.json': hashes.metrics,
+            'signals_normalized.json': ClusterAuditor.hashString(JSON.stringify(normalizedData, null, 2))
+        };
+        await fs.writeFile(path.join(evidenceDir, 'hashes.json'), JSON.stringify(detailedHashes, null, 2));
+
         // Audit
-        const audit = ClusterAuditor.runSanityChecks(result, clusterMetricsForAudit);
+        const audit = ClusterAuditor.runSanityChecks(result, clusterMetricsForAudit, hashes);
         await fs.writeFile(path.join(evidenceDir, 'sanity_checks.json'), JSON.stringify(audit, null, 2));
         
         result.audit = audit;

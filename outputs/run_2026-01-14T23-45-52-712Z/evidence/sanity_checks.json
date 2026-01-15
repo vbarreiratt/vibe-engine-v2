@@ -1,0 +1,34 @@
+{
+  "status": "WARNING",
+  "checks": [
+    {
+      "checkName": "Language Normalization",
+      "passed": false,
+      "details": "Found 1 clusters with forbidden English tokens.",
+      "severity": "WARNING"
+    },
+    {
+      "checkName": "NOISE Classification Rules",
+      "passed": true,
+      "details": "0 clusters marked NOISE but have significant size/strength.",
+      "severity": "CRITICAL"
+    },
+    {
+      "checkName": "Metrics Variance (No Dummies)",
+      "passed": true,
+      "details": "Unique scores: 9/22",
+      "severity": "CRITICAL"
+    },
+    {
+      "checkName": "Graph Connectivity",
+      "passed": true,
+      "details": "Graph has 41 edges for 50 nodes.",
+      "severity": "WARNING"
+    }
+  ],
+  "hashes": {
+    "inputs": "calculated-in-runtime",
+    "edges": "calculated-in-runtime",
+    "metrics": "calculated-in-runtime"
+  }
+}

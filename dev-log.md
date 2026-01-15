@@ -192,3 +192,20 @@ Transformar o Canvas de Ressonância de um "debug de pontos" para um **editor pr
 - 1. Normalização (`normalize.ts`) criada com dicionário EN->PT.
 - 2. Logger refatorado para apontar evidências.
 - 3. ClusterEngine sendo atualizado para cálculo real de métricas.
+
+## [2026-01-14] Strict Audit & Gates Implementation (Current)
+
+### Objectives
+- Implement "GATES" for cluster classification to align with Method (Strict Resonance).
+- Fix `strengthScore` with multi-layer weighting and caps.
+- Implement Real Hashes (SHA256) for audit artifacts.
+- Expand `graph_edges.csv` to explain weight composition.
+- Fix Graph Fragmentation with kNN Fallback (controlled).
+- Enforce PT-BR normalization as CRITICAL pass.
+
+### Plan
+1.  **Refactor Auditor**: Implement real file hashing and Critical Checks.
+2.  **Update Normalization**: Add leaked terms and fail-hard mode.
+3.  **Update Graph Builder**: Add kNN fallback and expanded edge logging.
+4.  **Refactor Metrics**: Implement Gates for Classification and capped Strength Score.
+5.  **Run & Verify**: Test the job.
