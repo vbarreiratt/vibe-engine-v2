@@ -1,0 +1,422 @@
+{
+  "result": {
+    "clusters": [
+      {
+        "id": "0",
+        "name_suggested": "direto tinta plana",
+        "motor": "state",
+        "items": [
+          "29c4cb5d-1832-45e3-8434-5d619b3c2c72",
+          "b8ace381-cb66-4aa2-b93b-51f1386e7c5f",
+          "0c7401e0-31ff-414b-a1a5-37788125a8d4",
+          "1a4e4133-08d3-4676-948c-d018846cde04"
+        ]
+      },
+      {
+        "id": "1",
+        "name_suggested": "agressivo tinta grossa",
+        "motor": "state",
+        "items": [
+          "df9dcc5e-e809-4ffe-933a-8d6772a72800"
+        ]
+      },
+      {
+        "id": "2",
+        "name_suggested": "desconectado pixels",
+        "motor": "state",
+        "items": [
+          "de05fcf5-afb4-423c-82c2-c9ebb81673ae"
+        ]
+      },
+      {
+        "id": "3",
+        "name_suggested": "alegre desenho animado",
+        "motor": "state",
+        "items": [
+          "559edd31-01ed-47f0-a5f2-a20b4c07cdde"
+        ]
+      },
+      {
+        "id": "4",
+        "name_suggested": "jovial espuma",
+        "motor": "state",
+        "items": [
+          "96203f8c-e3e8-4966-9c3d-f7ac9168f992"
+        ]
+      },
+      {
+        "id": "5",
+        "name_suggested": "monocromático concreto",
+        "motor": "state",
+        "items": [
+          "9ce55986-f267-422b-977e-e7ce4bc8940c"
+        ]
+      },
+      {
+        "id": "6",
+        "name_suggested": "organizado papel",
+        "motor": "state",
+        "items": [
+          "7c711d2f-59bc-499d-b6c6-45aa143c3286"
+        ]
+      },
+      {
+        "id": "7",
+        "name_suggested": "elegante papel",
+        "motor": "state",
+        "items": [
+          "b08f13cb-1eb4-4013-a30c-6c0674d06059"
+        ]
+      },
+      {
+        "id": "8",
+        "name_suggested": "técnico sintético",
+        "motor": "state",
+        "items": [
+          "79b5f99f-2922-4179-9a64-c512d231ab52",
+          "6ea7bbf4-8193-436d-a1c0-d53cf1d911b0"
+        ]
+      },
+      {
+        "id": "9",
+        "name_suggested": "dinâmico neon",
+        "motor": "state",
+        "items": [
+          "9190c85a-759f-4d8f-9ca9-a081948219f4",
+          "64ffb29c-8557-4301-b115-cf1ee7e83737"
+        ]
+      }
+    ],
+    "nodes": [
+      {
+        "id": "29c4cb5d-1832-45e3-8434-5d619b3c2c72",
+        "x": 42.48996853318472,
+        "y": -22.166576259652835,
+        "cluster_index": 0,
+        "is_outlier": false
+      },
+      {
+        "id": "df9dcc5e-e809-4ffe-933a-8d6772a72800",
+        "x": 800,
+        "y": 0,
+        "cluster_index": 1,
+        "is_outlier": true
+      },
+      {
+        "id": "b8ace381-cb66-4aa2-b93b-51f1386e7c5f",
+        "x": -12.213763509298474,
+        "y": 43.46641911312104,
+        "cluster_index": 0,
+        "is_outlier": false
+      },
+      {
+        "id": "0c7401e0-31ff-414b-a1a5-37788125a8d4",
+        "x": -73.42668484479795,
+        "y": -22.44615229592413,
+        "cluster_index": 0,
+        "is_outlier": false
+      },
+      {
+        "id": "1a4e4133-08d3-4676-948c-d018846cde04",
+        "x": -11.158437669834806,
+        "y": -86.28052944850438,
+        "cluster_index": 0,
+        "is_outlier": false
+      },
+      {
+        "id": "de05fcf5-afb4-423c-82c2-c9ebb81673ae",
+        "x": 498.79184148698687,
+        "y": 625.4651859744239,
+        "cluster_index": 2,
+        "is_outlier": true
+      },
+      {
+        "id": "559edd31-01ed-47f0-a5f2-a20b4c07cdde",
+        "x": -178.01674716505147,
+        "y": 779.9423297454589,
+        "cluster_index": 3,
+        "is_outlier": true
+      },
+      {
+        "id": "96203f8c-e3e8-4966-9c3d-f7ac9168f992",
+        "x": -720.7750943219353,
+        "y": 347.10699129404657,
+        "cluster_index": 4,
+        "is_outlier": true
+      },
+      {
+        "id": "9ce55986-f267-422b-977e-e7ce4bc8940c",
+        "x": -720.7750943219353,
+        "y": -347.1069912940464,
+        "cluster_index": 5,
+        "is_outlier": true
+      },
+      {
+        "id": "7c711d2f-59bc-499d-b6c6-45aa143c3286",
+        "x": -178.01674716505167,
+        "y": -779.9423297454589,
+        "cluster_index": 6,
+        "is_outlier": true
+      },
+      {
+        "id": "b08f13cb-1eb4-4013-a30c-6c0674d06059",
+        "x": 498.7918414869867,
+        "y": -625.4651859744239,
+        "cluster_index": 7,
+        "is_outlier": true
+      },
+      {
+        "id": "79b5f99f-2922-4179-9a64-c512d231ab52",
+        "x": 415.17909307484524,
+        "y": 14.28734201035775,
+        "cluster_index": 8,
+        "is_outlier": false
+      },
+      {
+        "id": "6ea7bbf4-8193-436d-a1c0-d53cf1d911b0",
+        "x": 297.4171709973319,
+        "y": 11.545158015410438,
+        "cluster_index": 8,
+        "is_outlier": false
+      },
+      {
+        "id": "9190c85a-759f-4d8f-9ca9-a081948219f4",
+        "x": 30.27687140434793,
+        "y": 369.0931418922317,
+        "cluster_index": 9,
+        "is_outlier": false
+      },
+      {
+        "id": "64ffb29c-8557-4301-b115-cf1ee7e83737",
+        "x": -90.2484630867645,
+        "y": 369.856316262645,
+        "cluster_index": 9,
+        "is_outlier": false
+      }
+    ],
+    "edges": [
+      {
+        "source": "29c4cb5d-1832-45e3-8434-5d619b3c2c72",
+        "target": "0c7401e0-31ff-414b-a1a5-37788125a8d4",
+        "weight": 0.7591216433154372,
+        "layers": [
+          "state",
+          "movement"
+        ]
+      },
+      {
+        "source": "b8ace381-cb66-4aa2-b93b-51f1386e7c5f",
+        "target": "0c7401e0-31ff-414b-a1a5-37788125a8d4",
+        "weight": 0.7122833477190043,
+        "layers": [
+          "state",
+          "matter"
+        ]
+      },
+      {
+        "source": "0c7401e0-31ff-414b-a1a5-37788125a8d4",
+        "target": "1a4e4133-08d3-4676-948c-d018846cde04",
+        "weight": 0.7469859021143214,
+        "layers": [
+          "state",
+          "matter",
+          "movement"
+        ]
+      },
+      {
+        "source": "79b5f99f-2922-4179-9a64-c512d231ab52",
+        "target": "6ea7bbf4-8193-436d-a1c0-d53cf1d911b0",
+        "weight": 0.7235639718829479,
+        "layers": [
+          "matter",
+          "movement"
+        ]
+      },
+      {
+        "source": "9190c85a-759f-4d8f-9ca9-a081948219f4",
+        "target": "64ffb29c-8557-4301-b115-cf1ee7e83737",
+        "weight": 0.7652052661434303,
+        "layers": [
+          "state",
+          "matter"
+        ]
+      }
+    ],
+    "log": "[CLUSTER_JOB_START]\nNodes recebidos: 15\nModelo de embedding: text-embedding-004\nDimensão: 768\nMétrica: cosine similarity\nThreshold de ressonância: 0.75\nMétodo de agrupamento: louvain community detection\n\n[CLUSTER_AUTO]\ncluster_id: C0\nnodes: 4\nsinais dominantes:\n  • Estado: direto, audacioso, impactante\n  • Matéria: tinta plana, aço escovado, veludo negro\n  • Movimento: projetar, saltar, firmar\nJustificativa:\nCluster formado por estado direto, audacioso, impactante, matéria tinta plana, aço escovado, veludo negro, movimento projetar, saltar, firmar.\n\n[CLUSTER_AUTO]\ncluster_id: C1\nnodes: 1\nsinais dominantes:\n  • Estado: agressivo, eletrizante, provocador\n  • Matéria: tinta grossa, vinil, choque\n  • Movimento: gritar, esmagar, desafiar\nJustificativa:\nCluster formado por estado agressivo, eletrizante, provocador, matéria tinta grossa, vinil, choque, movimento gritar, esmagar, desafiar.\n\n[CLUSTER_AUTO]\ncluster_id: C2\nnodes: 1\nsinais dominantes:\n  • Estado: desconectado, digital, enigmático\n  • Matéria: pixels, luz fria, digital\n  • Movimento: pairar, piscar, flutuar\nJustificativa:\nCluster formado por estado desconectado, digital, enigmático, matéria pixels, luz fria, digital, movimento pairar, piscar, flutuar.\n\n[CLUSTER_AUTO]\ncluster_id: C3\nnodes: 1\nsinais dominantes:\n  • Estado: alegre, enérgico, acolhedor\n  • Matéria: desenho animado, café da manhã, luz do dia\n  • Movimento: correndo, servindo, brilhando\nJustificativa:\nCluster formado por estado alegre, enérgico, acolhedor, matéria desenho animado, café da manhã, luz do dia, movimento correndo, servindo, brilhando.\n\n[CLUSTER_AUTO]\ncluster_id: C4\nnodes: 1\nsinais dominantes:\n  • Estado: jovial, amigável, acolhedor\n  • Matéria: espuma, algodão macio, borracha maleável\n  • Movimento: saltitar, abraçar, ondular\nJustificativa:\nCluster formado por estado jovial, amigável, acolhedor, matéria espuma, algodão macio, borracha maleável, movimento saltitar, abraçar, ondular.\n\n[CLUSTER_AUTO]\ncluster_id: C5\nnodes: 1\nsinais dominantes:\n  • Estado: monocromático, sólido, minimalista\n  • Matéria: concreto, metal escovado, papel texturizado\n  • Movimento: emergir, assentar, contornar\nJustificativa:\nCluster formado por estado monocromático, sólido, minimalista, matéria concreto, metal escovado, papel texturizado, movimento emergir, assentar, contornar.\n\n[CLUSTER_AUTO]\ncluster_id: C6\nnodes: 1\nsinais dominantes:\n  • Estado: organizado, minimalista, distinto\n  • Matéria: papel, tinta, contato\n  • Movimento: alinhar, apresentar, imprimir\nJustificativa:\nCluster formado por estado organizado, minimalista, distinto, matéria papel, tinta, contato, movimento alinhar, apresentar, imprimir.\n\n[CLUSTER_AUTO]\ncluster_id: C7\nnodes: 1\nsinais dominantes:\n  • Estado: elegante, festivo, claro\n  • Matéria: papel, tinta, brilho suave\n  • Movimento: deslizar, sobrepor, flutuar\nJustificativa:\nCluster formado por estado elegante, festivo, claro, matéria papel, tinta, brilho suave, movimento deslizar, sobrepor, flutuar.\n\n[CLUSTER_AUTO]\ncluster_id: C8\nnodes: 2\nsinais dominantes:\n  • Estado: técnico, enigmático, retro\n  • Matéria: sintético, pixel, dados\n  • Movimento: processar, transmitir, decodificar\nJustificativa:\nCluster formado por estado técnico, enigmático, retro, matéria sintético, pixel, dados, movimento processar, transmitir, decodificar.\n\n[CLUSTER_AUTO]\ncluster_id: C9\nnodes: 2\nsinais dominantes:\n  • Estado: dinâmico, eletrizante, desconcertante\n  • Matéria: neon, plástico, digital\n  • Movimento: pulsar, vibrar, emergir\nJustificativa:\nCluster formado por estado dinâmico, eletrizante, desconcertante, matéria neon, plástico, digital, movimento pulsar, vibrar, emergir.\n\n[CLUSTER_JOB_END]\nClusters gerados: 10\nOutliers: 7\nDuração: 0.01s\n\n"
+  },
+  "nodes": [
+    {
+      "clusters_run_id": "ef2b6632-ca0d-40eb-b38e-ecee3e4b30ba",
+      "image_id": "29c4cb5d-1832-45e3-8434-5d619b3c2c72",
+      "cluster_id": "34d357f6-1a57-45c6-a100-c8344620732d",
+      "x": 42.48996853318472,
+      "y": -22.166576259652835,
+      "is_outlier": false
+    },
+    {
+      "clusters_run_id": "ef2b6632-ca0d-40eb-b38e-ecee3e4b30ba",
+      "image_id": "df9dcc5e-e809-4ffe-933a-8d6772a72800",
+      "cluster_id": "1e36d4ae-6bfa-413c-974f-d5f757c44b63",
+      "x": 800,
+      "y": 0,
+      "is_outlier": true
+    },
+    {
+      "clusters_run_id": "ef2b6632-ca0d-40eb-b38e-ecee3e4b30ba",
+      "image_id": "b8ace381-cb66-4aa2-b93b-51f1386e7c5f",
+      "cluster_id": "34d357f6-1a57-45c6-a100-c8344620732d",
+      "x": -12.213763509298474,
+      "y": 43.46641911312104,
+      "is_outlier": false
+    },
+    {
+      "clusters_run_id": "ef2b6632-ca0d-40eb-b38e-ecee3e4b30ba",
+      "image_id": "0c7401e0-31ff-414b-a1a5-37788125a8d4",
+      "cluster_id": "34d357f6-1a57-45c6-a100-c8344620732d",
+      "x": -73.42668484479795,
+      "y": -22.44615229592413,
+      "is_outlier": false
+    },
+    {
+      "clusters_run_id": "ef2b6632-ca0d-40eb-b38e-ecee3e4b30ba",
+      "image_id": "1a4e4133-08d3-4676-948c-d018846cde04",
+      "cluster_id": "34d357f6-1a57-45c6-a100-c8344620732d",
+      "x": -11.158437669834806,
+      "y": -86.28052944850438,
+      "is_outlier": false
+    },
+    {
+      "clusters_run_id": "ef2b6632-ca0d-40eb-b38e-ecee3e4b30ba",
+      "image_id": "de05fcf5-afb4-423c-82c2-c9ebb81673ae",
+      "cluster_id": "9bddeb02-1d72-4f02-aa59-43f4da52526b",
+      "x": 498.79184148698687,
+      "y": 625.4651859744239,
+      "is_outlier": true
+    },
+    {
+      "clusters_run_id": "ef2b6632-ca0d-40eb-b38e-ecee3e4b30ba",
+      "image_id": "559edd31-01ed-47f0-a5f2-a20b4c07cdde",
+      "cluster_id": "b63f6852-08ae-49ee-ba4c-7e26b87f0eb9",
+      "x": -178.01674716505147,
+      "y": 779.9423297454589,
+      "is_outlier": true
+    },
+    {
+      "clusters_run_id": "ef2b6632-ca0d-40eb-b38e-ecee3e4b30ba",
+      "image_id": "96203f8c-e3e8-4966-9c3d-f7ac9168f992",
+      "cluster_id": "8742a793-3dfc-4577-8a71-065ccb671751",
+      "x": -720.7750943219353,
+      "y": 347.10699129404657,
+      "is_outlier": true
+    },
+    {
+      "clusters_run_id": "ef2b6632-ca0d-40eb-b38e-ecee3e4b30ba",
+      "image_id": "9ce55986-f267-422b-977e-e7ce4bc8940c",
+      "cluster_id": "d79019fa-be77-4b41-9996-ab43ea239189",
+      "x": -720.7750943219353,
+      "y": -347.1069912940464,
+      "is_outlier": true
+    },
+    {
+      "clusters_run_id": "ef2b6632-ca0d-40eb-b38e-ecee3e4b30ba",
+      "image_id": "7c711d2f-59bc-499d-b6c6-45aa143c3286",
+      "cluster_id": "8664500f-341c-463e-8df1-bc525a61b9f0",
+      "x": -178.01674716505167,
+      "y": -779.9423297454589,
+      "is_outlier": true
+    },
+    {
+      "clusters_run_id": "ef2b6632-ca0d-40eb-b38e-ecee3e4b30ba",
+      "image_id": "b08f13cb-1eb4-4013-a30c-6c0674d06059",
+      "cluster_id": "1e26e43c-e933-4357-b0ad-c6e355d0b0a5",
+      "x": 498.7918414869867,
+      "y": -625.4651859744239,
+      "is_outlier": true
+    },
+    {
+      "clusters_run_id": "ef2b6632-ca0d-40eb-b38e-ecee3e4b30ba",
+      "image_id": "79b5f99f-2922-4179-9a64-c512d231ab52",
+      "cluster_id": "90c9e804-746b-4d51-9e1f-7e9d01447879",
+      "x": 415.17909307484524,
+      "y": 14.28734201035775,
+      "is_outlier": false
+    },
+    {
+      "clusters_run_id": "ef2b6632-ca0d-40eb-b38e-ecee3e4b30ba",
+      "image_id": "6ea7bbf4-8193-436d-a1c0-d53cf1d911b0",
+      "cluster_id": "90c9e804-746b-4d51-9e1f-7e9d01447879",
+      "x": 297.4171709973319,
+      "y": 11.545158015410438,
+      "is_outlier": false
+    },
+    {
+      "clusters_run_id": "ef2b6632-ca0d-40eb-b38e-ecee3e4b30ba",
+      "image_id": "9190c85a-759f-4d8f-9ca9-a081948219f4",
+      "cluster_id": "08468af9-c92b-47d4-bdc5-bb503fc923d6",
+      "x": 30.27687140434793,
+      "y": 369.0931418922317,
+      "is_outlier": false
+    },
+    {
+      "clusters_run_id": "ef2b6632-ca0d-40eb-b38e-ecee3e4b30ba",
+      "image_id": "64ffb29c-8557-4301-b115-cf1ee7e83737",
+      "cluster_id": "08468af9-c92b-47d4-bdc5-bb503fc923d6",
+      "x": -90.2484630867645,
+      "y": 369.856316262645,
+      "is_outlier": false
+    }
+  ],
+  "edges": [
+    {
+      "clusters_run_id": "ef2b6632-ca0d-40eb-b38e-ecee3e4b30ba",
+      "source_image_id": "29c4cb5d-1832-45e3-8434-5d619b3c2c72",
+      "target_image_id": "0c7401e0-31ff-414b-a1a5-37788125a8d4",
+      "weight": 0.7591216433154372,
+      "layers": [
+        "state",
+        "movement"
+      ]
+    },
+    {
+      "clusters_run_id": "ef2b6632-ca0d-40eb-b38e-ecee3e4b30ba",
+      "source_image_id": "b8ace381-cb66-4aa2-b93b-51f1386e7c5f",
+      "target_image_id": "0c7401e0-31ff-414b-a1a5-37788125a8d4",
+      "weight": 0.7122833477190043,
+      "layers": [
+        "state",
+        "matter"
+      ]
+    },
+    {
+      "clusters_run_id": "ef2b6632-ca0d-40eb-b38e-ecee3e4b30ba",
+      "source_image_id": "0c7401e0-31ff-414b-a1a5-37788125a8d4",
+      "target_image_id": "1a4e4133-08d3-4676-948c-d018846cde04",
+      "weight": 0.7469859021143214,
+      "layers": [
+        "state",
+        "matter",
+        "movement"
+      ]
+    },
+    {
+      "clusters_run_id": "ef2b6632-ca0d-40eb-b38e-ecee3e4b30ba",
+      "source_image_id": "79b5f99f-2922-4179-9a64-c512d231ab52",
+      "target_image_id": "6ea7bbf4-8193-436d-a1c0-d53cf1d911b0",
+      "weight": 0.7235639718829479,
+      "layers": [
+        "matter",
+        "movement"
+      ]
+    },
+    {
+      "clusters_run_id": "ef2b6632-ca0d-40eb-b38e-ecee3e4b30ba",
+      "source_image_id": "9190c85a-759f-4d8f-9ca9-a081948219f4",
+      "target_image_id": "64ffb29c-8557-4301-b115-cf1ee7e83737",
+      "weight": 0.7652052661434303,
+      "layers": [
+        "state",
+        "matter"
+      ]
+    }
+  ]
+}

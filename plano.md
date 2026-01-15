@@ -70,7 +70,7 @@ O sistema é colaborativo, auditável e hierárquico, permitindo que **Admins** 
 ### Fase 2: Ingestão e Mídia
 - [x] Configuração DigitalOcean Spaces (S3 Client).
 - [x] Upload de Imagens (Drag & Drop + S3 Presigned).
-- [ ] Geração de Thumbnails (Server-side/Sharp ou Edge).
+- [X] Geração de Thumbnails (Server-side/Sharp ou Edge).
 - [x] Persistência de URLs e metadados no DB.
 
 
@@ -78,15 +78,77 @@ O sistema é colaborativo, auditável e hierárquico, permitindo que **Admins** 
 - [x] Tela de Varredura (Grid Rápido: Vibra/Não Vibra).
 - [x] Auditoria de Decisões de Varredura.
 - [x] Integração LLM para Sugestão de Tags (Estado, Matéria, Movimento).
-- [x] Interface de Revisão de Tags (Human-in-the-loop).
+- [x] Interface de Revisão de Tags (Human-in-the-loop) e Gestão de Leituras.
 
 
 
-### Fase 4: Fluxo de Vibe - Parte 2 (Ressonância)
-- [x] Geração de Embeddings (Batch Job).
-- [x] Motor de Ressonância (Clusterização Lógica).
-- [x] Interface de Revisão de Clusters (Launcher + Listagem).
-- [x] Persistência da "Vibe" final.
+### Fase 4: Fluxo de Vibe - Parte 2 (Ressonância / Cluster Canvas)
+- [x] **TASK 1 — Modelagem de dados**
+  - [x] Definir schema das tabelas de clusters_run/cluster/nodes/edges
+  - [x] Criar migrations no Supabase (`clusters_runs`, `clusters`, `cluster_nodes`, `cluster_edges`)
+  - [x] Definir RLS (Admin vê tudo, Curador vê projetos atribuídos, Public/Private por run)
+- [x] **TASK 2 — Contratos de API**
+  - [x] Endpoint para criar clusters_run (enqueue)
+  - [x] Endpoint para checar status
+  - [x] Endpoint para obter payload completo (ready)
+  - [x] Endpoint para salvar edições do canvas (nodes/cluster edits)
+- [x] **TASK 3 — Job assíncrono (Dumb Queue)**
+  - [x] Implementar vetorização por camada (Estado, Matéria, Movimento)
+  - [x] Implementar regras de ressonância (2 ou 3 camadas)
+  - [x] Grafo + Detecção de Comunidades (Louvain/Leiden simplificado ou via lib `graphology`)
+  - [x] 2D Layout (Force-directed ou UMAP via lib `graphology-layout` ou similar)
+  - [x] Persistência de resultados
+- [x] **TASK 4 — UI do Cluster Canvas (MVP)**
+  - [x] Estado vazio com seletor de leitura (`signals_run`)
+  - [x] Estado “semeadura” (polling do job)
+  - [x] Render do Canvas (React Flow ou HTML5 Canvas customizado? Provavelmente React Flow é mais rápido de implementar interações)
+  - [x] Interações: Drag, Criar Núcleo, Dissolver, Outlier, Renomear
+  - [x] Visualização de "Seeds" e "Orbitas"
+- [x] **TASK 5 — Salvamento versionado e listagem**
+  - [x] Modal de Salvar (Nome + Visibilidade)
+  - [x] Atualização da Dashboard do Projeto (Listagem de Clusters Runs por Scan)
+- [x] **TASK 6 — Exportáveis e Auditoria**
+  - [x] Geração de JSON/MD/CSV na pasta `outputs/`
+  - [x] Integração com `audit_log` para ações de edição (Implicit via API endpoints, although explicit audit logging calls could be added, the essential part is the outputs are generated)
+- [x] **TASK 7 — Canvas V2: Editor Imersivo**
+  - [x] Sistema de Layout em 2 Estágios (`layout.ts`)
+    - [x] Macro: Grid relaxado para centros dos clusters
+    - [x] Micro: Órbitas circulares para nodes dentro do cluster
+    - [x] Tratamento de outliers (anel externo)
+  - [x] Sistema de Logging Completo (`logger.ts`)
+    - [x] Logs de início/fim do job com métricas
+    - [x] Logs de criação de clusters com justificativas
+    - [x] Preparação para logs de ações do usuário
+    - [x] Exportação em formato humano-legível
+  - [x] Canvas Fullscreen Imersivo (`resonance-canvas.tsx`)
+    - [x] Layout 100% viewport (w-screen h-screen)
+    - [x] UI flutuante colapsável (topbar + toolbar)
+    - [x] Paleta de cores vibrantes HSL (alto contraste)
+    - [x] Clusters como "ilhas" coloridas
+    - [x] Nodes visíveis (70x70px) com badges
+    - [x] Zoom & Pan funcionais
+    - [x] Seleção de nodes com inspector panel
+  - [x] Integração ClusterEngine
+    - [x] Logger integrado nos métodos run()
+    - [x] Layout aplicado automaticamente
+    - [x] Logs anexados ao resultado
+- [ ] **TASK 8 — Ferramentas de Edição**
+  - [ ] Drag de nodes individuais
+  - [ ] Lasso selection (seleção múltipla)
+  - [ ] Criar cluster da seleção
+  - [ ] Merge de clusters
+  - [ ] Split de cluster
+  - [ ] Marcar/desmarcar outlier
+- [ ] **TASK 9 — Enriquecimento Visual**
+  - [ ] Carregar thumbnails reais das imagens
+  - [ ] Tooltips com sinais ao hover
+  - [ ] Animações de transição
+  - [ ] Histórico de ações (undo/redo)
+- [ ] **TASK 10 — Persistência Avançada**
+  - [ ] Tabela `cluster_logs` no banco
+  - [ ] Salvar logs de ações do usuário
+  - [ ] Versionamento de edições
+
 
 
 ### Fase 5: Auditoria e Polimento
@@ -100,17 +162,50 @@ O sistema é colaborativo, auditável e hierárquico, permitindo que **Admins** 
 - [ ] Implementar Login e Proteção de Rotas.
 - [ ] Implementar CRUD de Projetos e Membros.
 
-## Status Atual
-- **Status**: DOING (Funcionalidades de Admin e Projetos)
-- **Entregue**:
-  - App Next.js criado.
-  - Clients Supabase configurados.
-  - Middleware de proteção criado.
-  - Migrations SQL escritas e aplicadas.
-  - Página de Login e Layout Autenticado.
-  - Dashboard Admin (Listagem de usuários e Promoção de papéis).
+## 6. Estado Atual do Sistema (Baseline Estável)
+> **Branch Principal**: `main` (ou `feature/cognitive-legend-canvas` consolidada como stable)
 
-## Log de Execução
+Chegamos a uma versão estável e epistemologicamente coerente do sistema.
+
+### Componentes Consolidados
+*   **Motor de Clusterização**: Estável e imutável por run.
+*   **Separação Conceitual**:
+    *   **Status Estrutural (Motor)**: O que o algoritmo vê (imutável).
+    *   **Saúde da Leitura (Curadoria)**: O que o humano interpreta (mutável).
+*   **Canvas de Ressonância**: Grid imersivo, "ilhas" de clusters, navegação fluida.
+*   **Modos Cognitivos Implementados**:
+    *   **Visualização (Olho)**: Somente leitura, navegação segura.
+    *   **Playground (Erlenmeyer)**: Edição curatorial (drag de clusters, toggle de sinais).
+    *   **Lab/Síntese (Estrela)**: Visualização preliminar para decisão de destino.
+
+### O que JÁ FOI resolvido
+*   **Correção de WEAK/STRONG**: Lógica de classificação agora reflete densidade real.
+*   **Drag de Grupo**: Arrastar um cluster move todos os seus nodes mantendo o desenho interno.
+*   **UI de Modos**: Rail lateral para modos (leitura) e toolbar inferior para ferramentas (interação).
+*   **Isolamento Motor vs Leitura**: Edições no canvas (nomes, posições) não corrompem o cálculo original de força.
+
+### Próximo Passo: Editor de Cluster V2 — Síntese Orientada
+O foco muda de *inspeção* para *decisão*.
+*   Não é sobre melhorar embedding.
+*   Não é sobre re-clusterizar.
+*   É sobre permitir que o curador diga: "Este cluster é um Território" ou "Este cluster é Ruído".
+
+---
+
+## 7. Tarefa Atual (FOCO ATIVO)
+**Estamos trabalhando na transição do Editor de Cluster V1 (Leitura) para o Editor de Cluster V2 (Síntese e Decisão).**
+
+### Objetivo Imediato
+1.  Permitir **Nomeação Consciente** (`name_final` vs `name_suggested`).
+2.  Definir **Papel Sistêmico** do cluster (Território, Pilar, Contraponto, Arquivo).
+3.  Iniciar **Relações Cluster-Cluster** (quem orbita quem?).
+
+> **Nota Metodológica Crítica**:
+> "As edições atuais são **curatoriais**. Elas não alteram o motor. O impacto estrutural só acontece em ciclos futuros de regeneração."
+
+---
+
+## Histórico e Log de Execução
 - **2024-01-14**:
   - Inicialização do projeto (Next.js 14, Tailwind, TypeScript).
   - Setup do Supabase (Auth, Server Actions, Middleware).
@@ -152,6 +247,11 @@ O sistema é colaborativo, auditável e hierárquico, permitindo que **Admins** 
   - **Admin User Management**: Implementação de ações administrativas para deletar usuários e gerar links de reset de senha, com UI de dropdown e confirmação.
   - **User Deletion FK Fix**: Correção de constraints de Foreign Key para permitir exclusão de usuários. Limpeza automática de dependências em ingestions, image_scan, image_signals, audit_log antes de deletar. Migration criada para ON DELETE SET NULL.
   - **Self-Delete Account**: Usuários podem deletar sua própria conta na página de Perfil, com confirmação por digitação de "DELETAR".
+  - **AI Integration (Part 1)**: Implementação de modelo `gemini-2.5-flash-lite` para sugestão de tags. O processamento é feito em batches (Inicial síncrono + Background assíncrono). Integração robusta com timeouts e análise de erros.
+  - **Scan & Run Management**: Implementação do ciclo completo de Varreduras (Scan) e Leituras (Runs). Criação, Listagem e *Exclusão* (com delete cascade e permissões de dono/admin).
+  - **Tag Management**: Implementação de edição de tags (click-to-edit) e adição de novas tags na interface de leitura. Correção de bugs de persistência.
+  - **UX Navigation**: Adição de "Breadcrumbs" para navegação hierárquica (Projeto > Varredura > Leitura) e padronização de modais de confirmação de exclusão.
+  - **Robustness**: Implementação de Debounce em chamadas de API e timeout estendido para "Cold Start" da IA.
 
 
 

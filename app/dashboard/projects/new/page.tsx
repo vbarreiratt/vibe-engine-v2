@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { createProject } from '../actions'
 import { redirect } from 'next/navigation'
 import { FolderPlus, Users } from 'lucide-react'
+import { DashboardShell } from '@/components/dashboard-shell'
 
 export default async function NewProjectPage() {
     const supabase = await createClient()
@@ -32,7 +33,8 @@ export default async function NewProjectPage() {
         .order('email')
 
     return (
-        <div className="max-w-2xl mx-auto space-y-8 py-8">
+        <DashboardShell>
+            <div className="max-w-2xl mx-auto space-y-8 py-8">
             <div>
                 <h1 className="text-3xl font-light text-white tracking-wide flex items-center gap-3">
                     <FolderPlus className="w-8 h-8 text-zinc-400" />
@@ -102,6 +104,7 @@ export default async function NewProjectPage() {
                     </button>
                 </div>
             </form>
-        </div>
+            </div>
+        </DashboardShell>
     )
 }

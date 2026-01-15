@@ -1,31 +1,41 @@
 'use client'
 
-import { useState } from 'react'
-import { Settings, X, Save, UserPlus, Trash2, Loader2, Users } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { Settings, X, Save, UserPlus, Trash2, Loader2, Users, CheckCircle, AlertCircle } from 'lucide-react'
 import { updateProjectSettings, addProjectMember, removeProjectMember } from './actions'
 
 export function ProjectSettingsDialog({ project, members }: { project: any, members: any[] }) {
     const [isOpen, setIsOpen] = useState(false)
     const [activeTab, setActiveTab] = useState<'general' | 'members'>('general')
     const [isLoading, setIsLoading] = useState(false)
+    const [statusMessage, setStatusMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null)
+    const [memberToRemove, setMemberToRemove] = useState<string | null>(null)
 
     // Form States
     const [name, setName] = useState(project.name)
     const [description, setDescription] = useState(project.description || '')
     const [newMemberEmail, setNewMemberEmail] = useState('')
 
+    // Auto-clear status message
+    useEffect(() => {
+        if (statusMessage) {
+            const timer = setTimeout(() => setStatusMessage(null), 3000)
+            return () => clearTimeout(timer)
+        }
+    }, [statusMessage])
+
     const handleUpdate = async () => {
         setIsLoading(true)
+        setStatusMessage(null)
         const formData = new FormData()
         formData.append('name', name)
         formData.append('description', description)
 
         try {
             await updateProjectSettings(project.id, formData)
-            alert('Projeto atualizado!')
-            setIsOpen(false)
+            setStatusMessage({ type: 'success', text: 'Projeto atualizado!' })
         } catch (e: any) {
-            alert(e.message)
+            setStatusMessage({ type: 'error', text: e.message })
         } finally {
             setIsLoading(false)
         }
@@ -34,20 +44,29 @@ export function ProjectSettingsDialog({ project, members }: { project: any, memb
     const handleAddMember = async () => {
         if (!newMemberEmail) return
         setIsLoading(true)
+        setStatusMessage(null)
         const res = await addProjectMember(project.id, newMemberEmail)
         setIsLoading(false)
         if (res?.error) {
-            alert(res.error)
+            setStatusMessage({ type: 'error', text: res.error })
         } else {
             setNewMemberEmail('')
+            setStatusMessage({ type: 'success', text: 'Membro adicionado!' })
         }
     }
 
     const handleRemoveMember = async (userId: string) => {
-        if (!confirm('Remover membro?')) return
         setIsLoading(true)
-        await removeProjectMember(project.id, userId)
-        setIsLoading(false)
+        setStatusMessage(null)
+        try {
+            await removeProjectMember(project.id, userId)
+            setMemberToRemove(null)
+            setStatusMessage({ type: 'success', text: 'Membro removido!' })
+        } catch (e: any) {
+            setStatusMessage({ type: 'error', text: 'Erro ao remover membro' })
+        } finally {
+            setIsLoading(false)
+        }
     }
 
     if (!isOpen) {
@@ -94,7 +113,16 @@ export function ProjectSettingsDialog({ project, members }: { project: any, memb
                 </div>
 
                 {/* Content */}
-                <div className="p-6 overflow-y-auto flex-1">
+                <div className="p-6 overflow-y-auto flex-1 relative">
+                    {/* Status Message Overlay */}
+                    {statusMessage && (
+                        <div className={`absolute top-4 left-1/2 -translate-x-1/2 z-10 flex items-center gap-2 px-4 py-2 rounded-full shadow-lg border animate-in slide-in-from-top-4 ${statusMessage.type === 'success' ? 'bg-emerald-500/20 border-emerald-500/50 text-emerald-400' : 'bg-red-500/20 border-red-500/50 text-red-400'
+                            }`}>
+                            {statusMessage.type === 'success' ? <CheckCircle className="w-4 h-4" /> : <AlertCircle className="w-4 h-4" />}
+                            <span className="text-xs font-medium">{statusMessage.text}</span>
+                        </div>
+                    )}
+
                     {activeTab === 'general' && (
                         <div className="space-y-4">
                             <div className="space-y-1">
@@ -142,7 +170,7 @@ export function ProjectSettingsDialog({ project, members }: { project: any, memb
                                     disabled={isLoading || !newMemberEmail}
                                     className="text-purple-400 hover:text-purple-300 disabled:opacity-50"
                                 >
-                                    <UserPlus className="w-5 h-5" />
+                                    {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <UserPlus className="w-5 h-5" />}
                                 </button>
                             </div>
 
@@ -159,13 +187,33 @@ export function ProjectSettingsDialog({ project, members }: { project: any, memb
                                                 <p className="text-xs text-zinc-500 uppercase">{m.role}</p>
                                             </div>
                                         </div>
-                                        <button
-                                            onClick={() => handleRemoveMember(m.user_id)}
-                                            className="text-zinc-600 hover:text-red-500 p-2 transition-colors"
-                                            title="Remover"
-                                        >
-                                            <Trash2 className="w-4 h-4" />
-                                        </button>
+
+                                        {memberToRemove === m.user_id ? (
+                                            <div className="flex gap-2 animate-in slide-in-from-right-2">
+                                                <button
+                                                    onClick={() => handleRemoveMember(m.user_id)}
+                                                    disabled={isLoading}
+                                                    className="px-2 py-1 bg-red-500 text-white text-[10px] rounded hover:bg-red-400"
+                                                >
+                                                    {isLoading ? '...' : 'Remover'}
+                                                </button>
+                                                <button
+                                                    onClick={() => setMemberToRemove(null)}
+                                                    disabled={isLoading}
+                                                    className="px-2 py-1 bg-zinc-700 text-zinc-300 text-[10px] rounded hover:bg-zinc-600"
+                                                >
+                                                    Não
+                                                </button>
+                                            </div>
+                                        ) : (
+                                            <button
+                                                onClick={() => setMemberToRemove(m.user_id)}
+                                                className="text-zinc-600 hover:text-red-500 p-2 transition-colors"
+                                                title="Remover"
+                                            >
+                                                <Trash2 className="w-4 h-4" />
+                                            </button>
+                                        )}
                                     </div>
                                 ))}
                             </div>

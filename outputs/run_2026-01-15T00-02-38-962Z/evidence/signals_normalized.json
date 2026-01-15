@@ -1,0 +1,2702 @@
+[
+  {
+    "id": "29c4cb5d-1832-45e3-8434-5d619b3c2c72",
+    "state": [
+      {
+        "original": "impactante",
+        "normalized": "impactante",
+        "method": "identity"
+      },
+      {
+        "original": "preciso",
+        "normalized": "preciso",
+        "method": "identity"
+      },
+      {
+        "original": "moderno",
+        "normalized": "moderno",
+        "method": "identity"
+      }
+    ],
+    "matter": [
+      {
+        "original": "espaço",
+        "normalized": "espaço",
+        "method": "identity"
+      },
+      {
+        "original": "vetor",
+        "normalized": "vetor",
+        "method": "identity"
+      },
+      {
+        "original": "silhueta",
+        "normalized": "silhueta",
+        "method": "identity"
+      }
+    ],
+    "movement": [
+      {
+        "original": "expansão",
+        "normalized": "expansão",
+        "method": "identity"
+      },
+      {
+        "original": "centralização",
+        "normalized": "centralização",
+        "method": "identity"
+      },
+      {
+        "original": "definição",
+        "normalized": "definição",
+        "method": "identity"
+      }
+    ]
+  },
+  {
+    "id": "df9dcc5e-e809-4ffe-933a-8d6772a72800",
+    "state": [
+      {
+        "original": "provocante",
+        "normalized": "provocante",
+        "method": "identity"
+      },
+      {
+        "original": "intenso",
+        "normalized": "intenso",
+        "method": "identity"
+      },
+      {
+        "original": "agressivo",
+        "normalized": "agressivo",
+        "method": "identity"
+      }
+    ],
+    "matter": [
+      {
+        "original": "vinil",
+        "normalized": "vinil",
+        "method": "identity"
+      },
+      {
+        "original": "tinta fresca",
+        "normalized": "tinta fresca",
+        "method": "identity"
+      },
+      {
+        "original": "ruído digital",
+        "normalized": "ruído digital",
+        "method": "identity"
+      }
+    ],
+    "movement": [
+      {
+        "original": "sorrir",
+        "normalized": "sorrir",
+        "method": "identity"
+      },
+      {
+        "original": "fixar",
+        "normalized": "fixar",
+        "method": "identity"
+      },
+      {
+        "original": "apontar",
+        "normalized": "apontar",
+        "method": "identity"
+      }
+    ]
+  },
+  {
+    "id": "b8ace381-cb66-4aa2-b93b-51f1386e7c5f",
+    "state": [
+      {
+        "original": "ousado",
+        "normalized": "ousado",
+        "method": "identity"
+      },
+      {
+        "original": "moderno",
+        "normalized": "moderno",
+        "method": "identity"
+      },
+      {
+        "original": "declarativo",
+        "normalized": "declarativo",
+        "method": "identity"
+      }
+    ],
+    "matter": [
+      {
+        "original": "acrílico",
+        "normalized": "acrílico",
+        "method": "identity"
+      },
+      {
+        "original": "metal escovado",
+        "normalized": "metal escovado",
+        "method": "identity"
+      },
+      {
+        "original": "papel grosso",
+        "normalized": "papel grosso",
+        "method": "identity"
+      }
+    ],
+    "movement": [
+      {
+        "original": "ancorar",
+        "normalized": "ancorar",
+        "method": "identity"
+      },
+      {
+        "original": "definir",
+        "normalized": "definir",
+        "method": "identity"
+      },
+      {
+        "original": "moldar",
+        "normalized": "moldar",
+        "method": "identity"
+      }
+    ]
+  },
+  {
+    "id": "0c7401e0-31ff-414b-a1a5-37788125a8d4",
+    "state": [
+      {
+        "original": "ousado",
+        "normalized": "ousado",
+        "method": "identity"
+      },
+      {
+        "original": "energético",
+        "normalized": "energético",
+        "method": "identity"
+      },
+      {
+        "original": "impactante",
+        "normalized": "impactante",
+        "method": "identity"
+      }
+    ],
+    "matter": [
+      {
+        "original": "plástico liso",
+        "normalized": "plástico liso",
+        "method": "identity"
+      },
+      {
+        "original": "vinil brilhante",
+        "normalized": "vinil brilhante",
+        "method": "identity"
+      },
+      {
+        "original": "cores sólidas",
+        "normalized": "cores sólidas",
+        "method": "identity"
+      }
+    ],
+    "movement": [
+      {
+        "original": "saltar",
+        "normalized": "saltar",
+        "method": "identity"
+      },
+      {
+        "original": "chamar",
+        "normalized": "chamar",
+        "method": "identity"
+      },
+      {
+        "original": "declarar",
+        "normalized": "declarar",
+        "method": "identity"
+      }
+    ]
+  },
+  {
+    "id": "1a4e4133-08d3-4676-948c-d018846cde04",
+    "state": [
+      {
+        "original": "vibrante",
+        "normalized": "vibrante",
+        "method": "identity"
+      },
+      {
+        "original": "chamativo",
+        "normalized": "chamativo",
+        "method": "identity"
+      },
+      {
+        "original": "energético",
+        "normalized": "energético",
+        "method": "identity"
+      }
+    ],
+    "matter": [
+      {
+        "original": "plástico",
+        "normalized": "plástico",
+        "method": "identity"
+      },
+      {
+        "original": "vinil",
+        "normalized": "vinil",
+        "method": "identity"
+      },
+      {
+        "original": "elétrico",
+        "normalized": "elétrico",
+        "method": "identity"
+      }
+    ],
+    "movement": [
+      {
+        "original": "saltar",
+        "normalized": "saltar",
+        "method": "identity"
+      },
+      {
+        "original": "deslizar",
+        "normalized": "deslizar",
+        "method": "identity"
+      },
+      {
+        "original": "pulsar",
+        "normalized": "pulsar",
+        "method": "identity"
+      }
+    ]
+  },
+  {
+    "id": "de05fcf5-afb4-423c-82c2-c9ebb81673ae",
+    "state": [
+      {
+        "original": "digital",
+        "normalized": "digital",
+        "method": "identity"
+      },
+      {
+        "original": "glitchy",
+        "normalized": "glitchy",
+        "method": "identity"
+      },
+      {
+        "original": "formal",
+        "normalized": "formal",
+        "method": "identity"
+      }
+    ],
+    "matter": [
+      {
+        "original": "pixels",
+        "normalized": "pixels",
+        "method": "identity"
+      },
+      {
+        "original": "neon",
+        "normalized": "neon",
+        "method": "dictionary"
+      },
+      {
+        "original": "data",
+        "normalized": "data",
+        "method": "identity"
+      }
+    ],
+    "movement": [
+      {
+        "original": "pulsar",
+        "normalized": "pulsar",
+        "method": "identity"
+      },
+      {
+        "original": "fragmentar",
+        "normalized": "fragmentar",
+        "method": "identity"
+      },
+      {
+        "original": "oscilar",
+        "normalized": "oscilar",
+        "method": "identity"
+      }
+    ]
+  },
+  {
+    "id": "559edd31-01ed-47f0-a5f2-a20b4c07cdde",
+    "state": [
+      {
+        "original": "alegre",
+        "normalized": "alegre",
+        "method": "identity"
+      },
+      {
+        "original": "acolhedor",
+        "normalized": "acolhedor",
+        "method": "identity"
+      },
+      {
+        "original": "simples",
+        "normalized": "simples",
+        "method": "identity"
+      }
+    ],
+    "matter": [
+      {
+        "original": "açúcar",
+        "normalized": "açúcar",
+        "method": "identity"
+      },
+      {
+        "original": "algodão",
+        "normalized": "algodão",
+        "method": "identity"
+      },
+      {
+        "original": "calor",
+        "normalized": "calor",
+        "method": "identity"
+      }
+    ],
+    "movement": [
+      {
+        "original": "correr",
+        "normalized": "correr",
+        "method": "identity"
+      },
+      {
+        "original": "acender",
+        "normalized": "acender",
+        "method": "identity"
+      },
+      {
+        "original": "oferecer",
+        "normalized": "oferecer",
+        "method": "identity"
+      }
+    ]
+  },
+  {
+    "id": "96203f8c-e3e8-4966-9c3d-f7ac9168f992",
+    "state": [
+      {
+        "original": "lúdico",
+        "normalized": "lúdico",
+        "method": "identity"
+      },
+      {
+        "original": "acolhedor",
+        "normalized": "acolhedor",
+        "method": "identity"
+      },
+      {
+        "original": "gentil",
+        "normalized": "gentil",
+        "method": "identity"
+      }
+    ],
+    "matter": [
+      {
+        "original": "feltro macio",
+        "normalized": "feltro macio",
+        "method": "identity"
+      },
+      {
+        "original": "borracha",
+        "normalized": "borracha",
+        "method": "identity"
+      },
+      {
+        "original": "massa de modelar",
+        "normalized": "massa de modelar",
+        "method": "identity"
+      }
+    ],
+    "movement": [
+      {
+        "original": "saltitar",
+        "normalized": "saltitar",
+        "method": "identity"
+      },
+      {
+        "original": "flutuar",
+        "normalized": "flutuar",
+        "method": "identity"
+      },
+      {
+        "original": "acolher",
+        "normalized": "acolher",
+        "method": "identity"
+      }
+    ]
+  },
+  {
+    "id": "24285c4c-372c-4857-8c1c-658ba0a4b647",
+    "state": [
+      {
+        "original": "fragmentado",
+        "normalized": "fragmentado",
+        "method": "identity"
+      },
+      {
+        "original": "dinâmico",
+        "normalized": "dinâmico",
+        "method": "identity"
+      },
+      {
+        "original": "experimental",
+        "normalized": "experimental",
+        "method": "identity"
+      }
+    ],
+    "matter": [
+      {
+        "original": "ruído digital",
+        "normalized": "ruído digital",
+        "method": "identity"
+      },
+      {
+        "original": "grão de halftones",
+        "normalized": "grão de halftones",
+        "method": "identity"
+      },
+      {
+        "original": "vetor elétrico",
+        "normalized": "vetor elétrico",
+        "method": "identity"
+      }
+    ],
+    "movement": [
+      {
+        "original": "explodir",
+        "normalized": "explodir",
+        "method": "identity"
+      },
+      {
+        "original": "pulsar",
+        "normalized": "pulsar",
+        "method": "identity"
+      },
+      {
+        "original": "deslizar",
+        "normalized": "deslizar",
+        "method": "identity"
+      }
+    ]
+  },
+  {
+    "id": "0ebe866b-c55b-4e71-bcde-e5fcd7284fb9",
+    "state": [
+      {
+        "original": "caótico",
+        "normalized": "caótico",
+        "method": "identity"
+      },
+      {
+        "original": "surreal",
+        "normalized": "surreal",
+        "method": "dictionary"
+      },
+      {
+        "original": "energético",
+        "normalized": "energético",
+        "method": "identity"
+      }
+    ],
+    "matter": [
+      {
+        "original": "poeira digital",
+        "normalized": "poeira digital",
+        "method": "identity"
+      },
+      {
+        "original": "luz neon",
+        "normalized": "luz neon",
+        "method": "identity"
+      },
+      {
+        "original": "papel granulado",
+        "normalized": "papel granulado",
+        "method": "identity"
+      }
+    ],
+    "movement": [
+      {
+        "original": "pulsar",
+        "normalized": "pulsar",
+        "method": "identity"
+      },
+      {
+        "original": "desfocar",
+        "normalized": "desfocar",
+        "method": "identity"
+      },
+      {
+        "original": "sobrepor",
+        "normalized": "sobrepor",
+        "method": "identity"
+      }
+    ]
+  },
+  {
+    "id": "61bf0b1b-bca2-4604-9036-c3006b1a9a4a",
+    "state": [
+      {
+        "original": "formal",
+        "normalized": "formal",
+        "method": "identity"
+      },
+      {
+        "original": "cerebral",
+        "normalized": "cerebral",
+        "method": "identity"
+      },
+      {
+        "original": "objetivo",
+        "normalized": "objetivo",
+        "method": "identity"
+      }
+    ],
+    "matter": [
+      {
+        "original": "papel",
+        "normalized": "papel",
+        "method": "identity"
+      },
+      {
+        "original": "tinta",
+        "normalized": "tinta",
+        "method": "identity"
+      },
+      {
+        "original": "rigidez",
+        "normalized": "rigidez",
+        "method": "identity"
+      }
+    ],
+    "movement": [
+      {
+        "original": "ancorar",
+        "normalized": "ancorar",
+        "method": "identity"
+      },
+      {
+        "original": "registrar",
+        "normalized": "registrar",
+        "method": "identity"
+      },
+      {
+        "original": "declarar",
+        "normalized": "declarar",
+        "method": "identity"
+      }
+    ]
+  },
+  {
+    "id": "eb61265a-fc7c-4f4f-89b7-ce94f8a7b8e5",
+    "state": [
+      {
+        "original": "noite urbana",
+        "normalized": "noite urbana",
+        "method": "identity"
+      },
+      {
+        "original": "caótica",
+        "normalized": "caótica",
+        "method": "identity"
+      },
+      {
+        "original": "vibrante",
+        "normalized": "vibrante",
+        "method": "identity"
+      }
+    ],
+    "matter": [
+      {
+        "original": "metal",
+        "normalized": "metal",
+        "method": "dictionary"
+      },
+      {
+        "original": "chuva",
+        "normalized": "chuva",
+        "method": "identity"
+      },
+      {
+        "original": "luz neon",
+        "normalized": "luz neon",
+        "method": "identity"
+      }
+    ],
+    "movement": [
+      {
+        "original": "iluminar",
+        "normalized": "iluminar",
+        "method": "identity"
+      },
+      {
+        "original": "desfocar",
+        "normalized": "desfocar",
+        "method": "identity"
+      },
+      {
+        "original": "sobrepor",
+        "normalized": "sobrepor",
+        "method": "identity"
+      }
+    ]
+  },
+  {
+    "id": "a462e427-6593-4b04-8909-07003b8a76e9",
+    "state": [
+      {
+        "original": "digital",
+        "normalized": "digital",
+        "method": "identity"
+      },
+      {
+        "original": "energetic",
+        "normalized": "energetic",
+        "method": "identity"
+      },
+      {
+        "original": "informational",
+        "normalized": "informational",
+        "method": "identity"
+      }
+    ],
+    "matter": [
+      {
+        "original": "neon glow",
+        "normalized": "luz neon",
+        "method": "dictionary"
+      },
+      {
+        "original": "digital grid",
+        "normalized": "digital grid",
+        "method": "identity"
+      },
+      {
+        "original": "bold typography",
+        "normalized": "bold typography",
+        "method": "identity"
+      }
+    ],
+    "movement": [
+      {
+        "original": "pulsating",
+        "normalized": "pulsante",
+        "method": "dictionary"
+      },
+      {
+        "original": "scrolling",
+        "normalized": "scrolling",
+        "method": "identity"
+      },
+      {
+        "original": "aligning",
+        "normalized": "aligning",
+        "method": "identity"
+      }
+    ]
+  },
+  {
+    "id": "68830f51-7115-4dde-ac53-f6d8be34de1b",
+    "state": [
+      {
+        "original": "intense",
+        "normalized": "intenso",
+        "method": "dictionary"
+      },
+      {
+        "original": "abstract",
+        "normalized": "abstrato",
+        "method": "dictionary"
+      },
+      {
+        "original": "minimalist",
+        "normalized": "minimalist",
+        "method": "identity"
+      }
+    ],
+    "matter": [
+      {
+        "original": "digital light",
+        "normalized": "luz digital",
+        "method": "dictionary"
+      },
+      {
+        "original": "static energy",
+        "normalized": "static energy",
+        "method": "identity"
+      },
+      {
+        "original": "processed air",
+        "normalized": "processed air",
+        "method": "identity"
+      }
+    ],
+    "movement": [
+      {
+        "original": "fading",
+        "normalized": "desvanecer",
+        "method": "dictionary"
+      },
+      {
+        "original": "shimmering",
+        "normalized": "shimmering",
+        "method": "identity"
+      },
+      {
+        "original": "pulsing",
+        "normalized": "pulsing",
+        "method": "identity"
+      }
+    ]
+  },
+  {
+    "id": "7d372b41-9eec-48d5-97fd-28c556d7475a",
+    "state": [
+      {
+        "original": "analítico",
+        "normalized": "analítico",
+        "method": "identity"
+      },
+      {
+        "original": "digital",
+        "normalized": "digital",
+        "method": "identity"
+      },
+      {
+        "original": "texturizado",
+        "normalized": "texturizado",
+        "method": "identity"
+      }
+    ],
+    "matter": [
+      {
+        "original": "pixel",
+        "normalized": "pixel",
+        "method": "identity"
+      },
+      {
+        "original": "caracteres",
+        "normalized": "caracteres",
+        "method": "identity"
+      },
+      {
+        "original": "dados",
+        "normalized": "dados",
+        "method": "identity"
+      }
+    ],
+    "movement": [
+      {
+        "original": "processando",
+        "normalized": "processando",
+        "method": "identity"
+      },
+      {
+        "original": "renderizando",
+        "normalized": "renderizando",
+        "method": "identity"
+      },
+      {
+        "original": "desenhando",
+        "normalized": "desenhando",
+        "method": "identity"
+      }
+    ]
+  },
+  {
+    "id": "39b12e1b-50ba-4376-bb72-05d53d815686",
+    "state": [
+      {
+        "original": "iridescente",
+        "normalized": "iridescente",
+        "method": "identity"
+      },
+      {
+        "original": "digital",
+        "normalized": "digital",
+        "method": "identity"
+      },
+      {
+        "original": "estudioso",
+        "normalized": "estudioso",
+        "method": "identity"
+      }
+    ],
+    "matter": [
+      {
+        "original": "plástico",
+        "normalized": "plástico",
+        "method": "identity"
+      },
+      {
+        "original": "luz difusa",
+        "normalized": "luz difusa",
+        "method": "identity"
+      },
+      {
+        "original": "papel virtual",
+        "normalized": "papel virtual",
+        "method": "identity"
+      }
+    ],
+    "movement": [
+      {
+        "original": "difundindo",
+        "normalized": "difundindo",
+        "method": "identity"
+      },
+      {
+        "original": "desdobrando",
+        "normalized": "desdobrando",
+        "method": "identity"
+      },
+      {
+        "original": "circulando",
+        "normalized": "circulando",
+        "method": "identity"
+      }
+    ]
+  },
+  {
+    "id": "c4a20d0b-3ee6-417d-962f-ac80bfaed2ef",
+    "state": [
+      {
+        "original": "eletrizante",
+        "normalized": "eletrizante",
+        "method": "identity"
+      },
+      {
+        "original": "festivo",
+        "normalized": "festivo",
+        "method": "identity"
+      },
+      {
+        "original": "urgente",
+        "normalized": "urgente",
+        "method": "identity"
+      }
+    ],
+    "matter": [
+      {
+        "original": "energia",
+        "normalized": "energia",
+        "method": "identity"
+      },
+      {
+        "original": "luz neon",
+        "normalized": "luz neon",
+        "method": "identity"
+      },
+      {
+        "original": "pulso digital",
+        "normalized": "pulso digital",
+        "method": "identity"
+      }
+    ],
+    "movement": [
+      {
+        "original": "pulsar",
+        "normalized": "pulsar",
+        "method": "identity"
+      },
+      {
+        "original": "irradiar",
+        "normalized": "irradiar",
+        "method": "identity"
+      },
+      {
+        "original": "girar",
+        "normalized": "girar",
+        "method": "identity"
+      }
+    ]
+  },
+  {
+    "id": "5ed94bf1-6de4-4233-9aee-9fbe1482502c",
+    "state": [
+      {
+        "original": "dinâmico",
+        "normalized": "dinâmico",
+        "method": "identity"
+      },
+      {
+        "original": "assertivo",
+        "normalized": "assertivo",
+        "method": "identity"
+      },
+      {
+        "original": "energético",
+        "normalized": "energético",
+        "method": "identity"
+      }
+    ],
+    "matter": [
+      {
+        "original": "tinta vívida",
+        "normalized": "tinta vívida",
+        "method": "identity"
+      },
+      {
+        "original": "ouro escuro",
+        "normalized": "ouro escuro",
+        "method": "identity"
+      },
+      {
+        "original": "pixelado",
+        "normalized": "pixelado",
+        "method": "identity"
+      }
+    ],
+    "movement": [
+      {
+        "original": "avançar",
+        "normalized": "avançar",
+        "method": "identity"
+      },
+      {
+        "original": "galopar",
+        "normalized": "galopar",
+        "method": "identity"
+      },
+      {
+        "original": "saltar",
+        "normalized": "saltar",
+        "method": "identity"
+      }
+    ]
+  },
+  {
+    "id": "6db3da82-b45f-40f0-a543-3f1937a9b77d",
+    "state": [
+      {
+        "original": "introspectivo",
+        "normalized": "introspectivo",
+        "method": "identity"
+      },
+      {
+        "original": "sensual",
+        "normalized": "sensual",
+        "method": "identity"
+      },
+      {
+        "original": "melancólico",
+        "normalized": "melancólico",
+        "method": "identity"
+      }
+    ],
+    "matter": [
+      {
+        "original": "veludo",
+        "normalized": "veludo",
+        "method": "identity"
+      },
+      {
+        "original": "pétala",
+        "normalized": "pétala",
+        "method": "identity"
+      },
+      {
+        "original": "sombra",
+        "normalized": "sombra",
+        "method": "identity"
+      }
+    ],
+    "movement": [
+      {
+        "original": "sussurrar",
+        "normalized": "sussurrar",
+        "method": "identity"
+      },
+      {
+        "original": "desabrochar",
+        "normalized": "desabrochar",
+        "method": "identity"
+      },
+      {
+        "original": "contemplar",
+        "normalized": "contemplar",
+        "method": "identity"
+      }
+    ]
+  },
+  {
+    "id": "b94dea90-0a9d-4b59-9fbc-535749306fd2",
+    "state": [
+      {
+        "original": "desorientador",
+        "normalized": "desorientador",
+        "method": "identity"
+      },
+      {
+        "original": "digitalmente fragmentado",
+        "normalized": "digitalmente fragmentado",
+        "method": "identity"
+      },
+      {
+        "original": "nostálgico confuso",
+        "normalized": "nostálgico confuso",
+        "method": "identity"
+      }
+    ],
+    "matter": [
+      {
+        "original": "glitch",
+        "normalized": "glitch",
+        "method": "identity"
+      },
+      {
+        "original": "pixels",
+        "normalized": "pixels",
+        "method": "identity"
+      },
+      {
+        "original": "pelo digital",
+        "normalized": "pelo digital",
+        "method": "identity"
+      }
+    ],
+    "movement": [
+      {
+        "original": "corrompendo",
+        "normalized": "corrompendo",
+        "method": "identity"
+      },
+      {
+        "original": "fragmentando",
+        "normalized": "fragmentando",
+        "method": "identity"
+      },
+      {
+        "original": "pixelizando",
+        "normalized": "pixelizando",
+        "method": "identity"
+      }
+    ]
+  },
+  {
+    "id": "0c5c54c4-92bf-4d2b-8e84-833bcc4c4de4",
+    "state": [
+      {
+        "original": "melancólico",
+        "normalized": "melancólico",
+        "method": "identity"
+      },
+      {
+        "original": "reflexivo",
+        "normalized": "reflexivo",
+        "method": "identity"
+      },
+      {
+        "original": "misterioso",
+        "normalized": "misterioso",
+        "method": "identity"
+      }
+    ],
+    "matter": [
+      {
+        "original": "neblina",
+        "normalized": "neblina",
+        "method": "identity"
+      },
+      {
+        "original": "fumaça",
+        "normalized": "fumaça",
+        "method": "identity"
+      },
+      {
+        "original": "vinil",
+        "normalized": "vinil",
+        "method": "identity"
+      }
+    ],
+    "movement": [
+      {
+        "original": "sussurrar",
+        "normalized": "sussurrar",
+        "method": "identity"
+      },
+      {
+        "original": "diluir",
+        "normalized": "diluir",
+        "method": "identity"
+      },
+      {
+        "original": "ondular",
+        "normalized": "ondular",
+        "method": "identity"
+      }
+    ]
+  },
+  {
+    "id": "c374c250-2e51-4b59-906d-3bd36e009aa8",
+    "state": [
+      {
+        "original": "lúdico",
+        "normalized": "lúdico",
+        "method": "identity"
+      },
+      {
+        "original": "brilhante",
+        "normalized": "brilhante",
+        "method": "identity"
+      },
+      {
+        "original": "descolado",
+        "normalized": "descolado",
+        "method": "identity"
+      }
+    ],
+    "matter": [
+      {
+        "original": "holográfico",
+        "normalized": "holográfico",
+        "method": "identity"
+      },
+      {
+        "original": "prateado",
+        "normalized": "prateado",
+        "method": "identity"
+      },
+      {
+        "original": "iridescente",
+        "normalized": "iridescente",
+        "method": "identity"
+      }
+    ],
+    "movement": [
+      {
+        "original": "cintilar",
+        "normalized": "cintilar",
+        "method": "identity"
+      },
+      {
+        "original": "ondular",
+        "normalized": "ondular",
+        "method": "identity"
+      },
+      {
+        "original": "brilhar",
+        "normalized": "brilhar",
+        "method": "identity"
+      }
+    ]
+  },
+  {
+    "id": "009e1ba9-0676-4a07-99df-cbb5564f3c57",
+    "state": [
+      {
+        "original": "caótico",
+        "normalized": "caótico",
+        "method": "identity"
+      },
+      {
+        "original": "vertiginoso",
+        "normalized": "vertiginoso",
+        "method": "identity"
+      },
+      {
+        "original": "fragmentado",
+        "normalized": "fragmentado",
+        "method": "identity"
+      }
+    ],
+    "matter": [
+      {
+        "original": "vidro quebrado",
+        "normalized": "vidro quebrado",
+        "method": "identity"
+      },
+      {
+        "original": "energia vibrante",
+        "normalized": "energia vibrante",
+        "method": "identity"
+      },
+      {
+        "original": "metais frios",
+        "normalized": "metais frios",
+        "method": "identity"
+      }
+    ],
+    "movement": [
+      {
+        "original": "girando",
+        "normalized": "girando",
+        "method": "identity"
+      },
+      {
+        "original": "pulsando",
+        "normalized": "pulsando",
+        "method": "identity"
+      },
+      {
+        "original": "rasgando",
+        "normalized": "rasgando",
+        "method": "identity"
+      }
+    ]
+  },
+  {
+    "id": "c3cd49f1-d0e2-478b-ab04-8e079f1b513b",
+    "state": [
+      {
+        "original": "nostálgico",
+        "normalized": "nostálgico",
+        "method": "identity"
+      },
+      {
+        "original": "energético",
+        "normalized": "energético",
+        "method": "identity"
+      },
+      {
+        "original": "urbano",
+        "normalized": "urbano",
+        "method": "identity"
+      }
+    ],
+    "matter": [
+      {
+        "original": "vinil brilhante",
+        "normalized": "vinil brilhante",
+        "method": "identity"
+      },
+      {
+        "original": "luz de neon",
+        "normalized": "luz de neon",
+        "method": "identity"
+      },
+      {
+        "original": "energia sonora",
+        "normalized": "energia sonora",
+        "method": "identity"
+      }
+    ],
+    "movement": [
+      {
+        "original": "pulsa",
+        "normalized": "pulsa",
+        "method": "identity"
+      },
+      {
+        "original": "brilha",
+        "normalized": "brilha",
+        "method": "identity"
+      },
+      {
+        "original": "vibra",
+        "normalized": "vibra",
+        "method": "identity"
+      }
+    ]
+  },
+  {
+    "id": "5401cb7c-08da-446a-b4c1-40989be206ca",
+    "state": [
+      {
+        "original": "intrigante",
+        "normalized": "intrigante",
+        "method": "identity"
+      },
+      {
+        "original": "distrativo",
+        "normalized": "distrativo",
+        "method": "identity"
+      },
+      {
+        "original": "artístico",
+        "normalized": "artístico",
+        "method": "identity"
+      }
+    ],
+    "matter": [
+      {
+        "original": "papel",
+        "normalized": "papel",
+        "method": "identity"
+      },
+      {
+        "original": "tinta",
+        "normalized": "tinta",
+        "method": "identity"
+      },
+      {
+        "original": "fio",
+        "normalized": "fio",
+        "method": "identity"
+      }
+    ],
+    "movement": [
+      {
+        "original": "sobrepor",
+        "normalized": "sobrepor",
+        "method": "identity"
+      },
+      {
+        "original": "empilhar",
+        "normalized": "empilhar",
+        "method": "identity"
+      },
+      {
+        "original": "desdobrar",
+        "normalized": "desdobrar",
+        "method": "identity"
+      }
+    ]
+  },
+  {
+    "id": "90c72c62-9fdd-4ca2-bc89-b327b78c5fc0",
+    "state": [
+      {
+        "original": "intenso",
+        "normalized": "intenso",
+        "method": "identity"
+      },
+      {
+        "original": "enigmático",
+        "normalized": "enigmático",
+        "method": "identity"
+      },
+      {
+        "original": "urbano",
+        "normalized": "urbano",
+        "method": "identity"
+      }
+    ],
+    "matter": [
+      {
+        "original": "tinta vibrante",
+        "normalized": "tinta vibrante",
+        "method": "identity"
+      },
+      {
+        "original": "papel texturizado",
+        "normalized": "papel texturizado",
+        "method": "identity"
+      },
+      {
+        "original": "informação gráfica",
+        "normalized": "informação gráfica",
+        "method": "identity"
+      }
+    ],
+    "movement": [
+      {
+        "original": "sobrepor",
+        "normalized": "sobrepor",
+        "method": "identity"
+      },
+      {
+        "original": "fragmentar",
+        "normalized": "fragmentar",
+        "method": "identity"
+      },
+      {
+        "original": "comunicar",
+        "normalized": "comunicar",
+        "method": "identity"
+      }
+    ]
+  },
+  {
+    "id": "a78037ec-26b1-4540-a7c6-afe34f390975",
+    "state": [
+      {
+        "original": "descolado",
+        "normalized": "descolado",
+        "method": "identity"
+      },
+      {
+        "original": "informativo",
+        "normalized": "informativo",
+        "method": "identity"
+      },
+      {
+        "original": "descontraído",
+        "normalized": "descontraído",
+        "method": "identity"
+      }
+    ],
+    "matter": [
+      {
+        "original": "tinta",
+        "normalized": "tinta",
+        "method": "identity"
+      },
+      {
+        "original": "papel",
+        "normalized": "papel",
+        "method": "identity"
+      },
+      {
+        "original": "energia",
+        "normalized": "energia",
+        "method": "identity"
+      }
+    ],
+    "movement": [
+      {
+        "original": "anunciar",
+        "normalized": "anunciar",
+        "method": "identity"
+      },
+      {
+        "original": "desdobrar",
+        "normalized": "desdobrar",
+        "method": "identity"
+      },
+      {
+        "original": "informar",
+        "normalized": "informar",
+        "method": "identity"
+      }
+    ]
+  },
+  {
+    "id": "5e238faf-b677-483a-8b3a-e1c4fcf6479f",
+    "state": [
+      {
+        "original": "intenso",
+        "normalized": "intenso",
+        "method": "identity"
+      },
+      {
+        "original": "confrontador",
+        "normalized": "confrontador",
+        "method": "identity"
+      },
+      {
+        "original": "declarativo",
+        "normalized": "declarativo",
+        "method": "identity"
+      }
+    ],
+    "matter": [
+      {
+        "original": "tinta",
+        "normalized": "tinta",
+        "method": "identity"
+      },
+      {
+        "original": "papel",
+        "normalized": "papel",
+        "method": "identity"
+      },
+      {
+        "original": "impacto",
+        "normalized": "impacto",
+        "method": "identity"
+      }
+    ],
+    "movement": [
+      {
+        "original": "chocar",
+        "normalized": "chocar",
+        "method": "identity"
+      },
+      {
+        "original": "impor",
+        "normalized": "impor",
+        "method": "identity"
+      },
+      {
+        "original": "revelar",
+        "normalized": "revelar",
+        "method": "identity"
+      }
+    ]
+  },
+  {
+    "id": "27891bd3-a828-45a4-bf5a-6b7a8105565c",
+    "state": [
+      {
+        "original": "estático",
+        "normalized": "estático",
+        "method": "identity"
+      },
+      {
+        "original": "técnico",
+        "normalized": "técnico",
+        "method": "identity"
+      },
+      {
+        "original": "informativo",
+        "normalized": "informativo",
+        "method": "identity"
+      }
+    ],
+    "matter": [
+      {
+        "original": "pixels",
+        "normalized": "pixels",
+        "method": "identity"
+      },
+      {
+        "original": "dados",
+        "normalized": "dados",
+        "method": "identity"
+      },
+      {
+        "original": "sinais",
+        "normalized": "sinais",
+        "method": "identity"
+      }
+    ],
+    "movement": [
+      {
+        "original": "exibir",
+        "normalized": "exibir",
+        "method": "identity"
+      },
+      {
+        "original": "registrar",
+        "normalized": "registrar",
+        "method": "identity"
+      },
+      {
+        "original": "processar",
+        "normalized": "processar",
+        "method": "identity"
+      }
+    ]
+  },
+  {
+    "id": "291bb266-687f-4ca1-a7da-e45c010d7790",
+    "state": [
+      {
+        "original": "intense",
+        "normalized": "intenso",
+        "method": "dictionary"
+      },
+      {
+        "original": "vibrant",
+        "normalized": "vibrante",
+        "method": "dictionary"
+      },
+      {
+        "original": "chaotic",
+        "normalized": "caótico",
+        "method": "dictionary"
+      }
+    ],
+    "matter": [
+      {
+        "original": "ink",
+        "normalized": "tinta",
+        "method": "dictionary"
+      },
+      {
+        "original": "paper",
+        "normalized": "papel",
+        "method": "dictionary"
+      },
+      {
+        "original": "ink stain",
+        "normalized": "ink stain",
+        "method": "identity"
+      }
+    ],
+    "movement": [
+      {
+        "original": "staring",
+        "normalized": "staring",
+        "method": "identity"
+      },
+      {
+        "original": "pulsing",
+        "normalized": "pulsing",
+        "method": "identity"
+      },
+      {
+        "original": "layering",
+        "normalized": "layering",
+        "method": "identity"
+      }
+    ]
+  },
+  {
+    "id": "f5082190-f6b3-468f-bda3-6ba9e8c519ea",
+    "state": [
+      {
+        "original": "fragmentado",
+        "normalized": "fragmentado",
+        "method": "identity"
+      },
+      {
+        "original": "glitch",
+        "normalized": "glitch",
+        "method": "identity"
+      },
+      {
+        "original": "nostálgico",
+        "normalized": "nostálgico",
+        "method": "identity"
+      }
+    ],
+    "matter": [
+      {
+        "original": "pixels",
+        "normalized": "pixels",
+        "method": "identity"
+      },
+      {
+        "original": "glitch",
+        "normalized": "glitch",
+        "method": "identity"
+      },
+      {
+        "original": "óleo",
+        "normalized": "óleo",
+        "method": "identity"
+      }
+    ],
+    "movement": [
+      {
+        "original": "falhando",
+        "normalized": "falhando",
+        "method": "identity"
+      },
+      {
+        "original": "corrompendo",
+        "normalized": "corrompendo",
+        "method": "identity"
+      },
+      {
+        "original": "sobrepondo",
+        "normalized": "sobrepondo",
+        "method": "identity"
+      }
+    ]
+  },
+  {
+    "id": "7b8541cc-1220-4842-92e7-d8bf682b7741",
+    "state": [
+      {
+        "original": "nostálgico",
+        "normalized": "nostálgico",
+        "method": "identity"
+      },
+      {
+        "original": "informativo",
+        "normalized": "informativo",
+        "method": "identity"
+      },
+      {
+        "original": "retro",
+        "normalized": "retro",
+        "method": "identity"
+      }
+    ],
+    "matter": [
+      {
+        "original": "plástico",
+        "normalized": "plástico",
+        "method": "identity"
+      },
+      {
+        "original": "vidro",
+        "normalized": "vidro",
+        "method": "identity"
+      },
+      {
+        "original": "luz",
+        "normalized": "luz",
+        "method": "identity"
+      }
+    ],
+    "movement": [
+      {
+        "original": "exibir",
+        "normalized": "exibir",
+        "method": "identity"
+      },
+      {
+        "original": "carregar",
+        "normalized": "carregar",
+        "method": "identity"
+      },
+      {
+        "original": "processar",
+        "normalized": "processar",
+        "method": "identity"
+      }
+    ]
+  },
+  {
+    "id": "77d039a0-1709-4794-9cde-07991ce82833",
+    "state": [
+      {
+        "original": "caótico",
+        "normalized": "caótico",
+        "method": "identity"
+      },
+      {
+        "original": "efervescente",
+        "normalized": "efervescente",
+        "method": "identity"
+      },
+      {
+        "original": "fragmentado",
+        "normalized": "fragmentado",
+        "method": "identity"
+      }
+    ],
+    "matter": [
+      {
+        "original": "papel rasgado",
+        "normalized": "papel rasgado",
+        "method": "identity"
+      },
+      {
+        "original": "tinta spray",
+        "normalized": "tinta spray",
+        "method": "identity"
+      },
+      {
+        "original": "colagem digital",
+        "normalized": "colagem digital",
+        "method": "identity"
+      }
+    ],
+    "movement": [
+      {
+        "original": "sobrepor",
+        "normalized": "sobrepor",
+        "method": "identity"
+      },
+      {
+        "original": "cortar",
+        "normalized": "cortar",
+        "method": "identity"
+      },
+      {
+        "original": "reorganizar",
+        "normalized": "reorganizar",
+        "method": "identity"
+      }
+    ]
+  },
+  {
+    "id": "9836cde7-2b04-410a-bbe8-5ddba64d38b7",
+    "state": [
+      {
+        "original": "preciso",
+        "normalized": "preciso",
+        "method": "identity"
+      },
+      {
+        "original": "ordenado",
+        "normalized": "ordenado",
+        "method": "identity"
+      },
+      {
+        "original": "sintético",
+        "normalized": "sintético",
+        "method": "identity"
+      }
+    ],
+    "matter": [
+      {
+        "original": "plástico",
+        "normalized": "plástico",
+        "method": "identity"
+      },
+      {
+        "original": "digital",
+        "normalized": "digital",
+        "method": "identity"
+      },
+      {
+        "original": "sintético",
+        "normalized": "sintético",
+        "method": "identity"
+      }
+    ],
+    "movement": [
+      {
+        "original": "deslizar",
+        "normalized": "deslizar",
+        "method": "identity"
+      },
+      {
+        "original": "ancorar",
+        "normalized": "ancorar",
+        "method": "identity"
+      },
+      {
+        "original": "escanear",
+        "normalized": "escanear",
+        "method": "identity"
+      }
+    ]
+  },
+  {
+    "id": "71ce5603-a6ce-4357-9eeb-26d9b70a8e24",
+    "state": [
+      {
+        "original": "impactante",
+        "normalized": "impactante",
+        "method": "identity"
+      },
+      {
+        "original": "desafiador",
+        "normalized": "desafiador",
+        "method": "identity"
+      },
+      {
+        "original": "abstrato",
+        "normalized": "abstrato",
+        "method": "identity"
+      }
+    ],
+    "matter": [
+      {
+        "original": "tinta densa",
+        "normalized": "tinta densa",
+        "method": "identity"
+      },
+      {
+        "original": "espaço negativo",
+        "normalized": "espaço negativo",
+        "method": "identity"
+      },
+      {
+        "original": "contorno",
+        "normalized": "contorno",
+        "method": "identity"
+      }
+    ],
+    "movement": [
+      {
+        "original": "escalar",
+        "normalized": "escalar",
+        "method": "identity"
+      },
+      {
+        "original": "interligar",
+        "normalized": "interligar",
+        "method": "identity"
+      },
+      {
+        "original": "contornar",
+        "normalized": "contornar",
+        "method": "identity"
+      }
+    ]
+  },
+  {
+    "id": "580216a0-1ede-4f95-9213-f9b16ceb6e0f",
+    "state": [
+      {
+        "original": "formal",
+        "normalized": "formal",
+        "method": "identity"
+      },
+      {
+        "original": "declarative",
+        "normalized": "declarative",
+        "method": "identity"
+      },
+      {
+        "original": "organized",
+        "normalized": "organized",
+        "method": "identity"
+      }
+    ],
+    "matter": [
+      {
+        "original": "ink",
+        "normalized": "tinta",
+        "method": "dictionary"
+      },
+      {
+        "original": "paper",
+        "normalized": "papel",
+        "method": "dictionary"
+      },
+      {
+        "original": "digital",
+        "normalized": "digital",
+        "method": "identity"
+      }
+    ],
+    "movement": [
+      {
+        "original": "imposing",
+        "normalized": "imposing",
+        "method": "identity"
+      },
+      {
+        "original": "labeling",
+        "normalized": "labeling",
+        "method": "identity"
+      },
+      {
+        "original": "cataloging",
+        "normalized": "cataloging",
+        "method": "identity"
+      }
+    ]
+  },
+  {
+    "id": "45728069-60a2-44b9-bcbf-a516dbebb011",
+    "state": [
+      {
+        "original": "orgânico",
+        "normalized": "orgânico",
+        "method": "identity"
+      },
+      {
+        "original": "propagante",
+        "normalized": "propagante",
+        "method": "identity"
+      },
+      {
+        "original": "fragmentado",
+        "normalized": "fragmentado",
+        "method": "identity"
+      }
+    ],
+    "matter": [
+      {
+        "original": "esporos",
+        "normalized": "esporos",
+        "method": "identity"
+      },
+      {
+        "original": "tinta",
+        "normalized": "tinta",
+        "method": "identity"
+      },
+      {
+        "original": "poeira",
+        "normalized": "poeira",
+        "method": "identity"
+      }
+    ],
+    "movement": [
+      {
+        "original": "crescendo",
+        "normalized": "crescendo",
+        "method": "identity"
+      },
+      {
+        "original": "espalhando",
+        "normalized": "espalhando",
+        "method": "identity"
+      },
+      {
+        "original": "brotando",
+        "normalized": "brotando",
+        "method": "identity"
+      }
+    ]
+  },
+  {
+    "id": "9bb8de15-9509-476d-bfe3-07958868bd36",
+    "state": [
+      {
+        "original": "intenso",
+        "normalized": "intenso",
+        "method": "identity"
+      },
+      {
+        "original": "urgente",
+        "normalized": "urgente",
+        "method": "identity"
+      },
+      {
+        "original": "informativo",
+        "normalized": "informativo",
+        "method": "identity"
+      }
+    ],
+    "matter": [
+      {
+        "original": "luz neon",
+        "normalized": "luz neon",
+        "method": "identity"
+      },
+      {
+        "original": "onda digital",
+        "normalized": "onda digital",
+        "method": "identity"
+      },
+      {
+        "original": "fluxo de dados",
+        "normalized": "fluxo de dados",
+        "method": "identity"
+      }
+    ],
+    "movement": [
+      {
+        "original": "pulsar",
+        "normalized": "pulsar",
+        "method": "identity"
+      },
+      {
+        "original": "transmitir",
+        "normalized": "transmitir",
+        "method": "identity"
+      },
+      {
+        "original": "bombardear",
+        "normalized": "bombardear",
+        "method": "identity"
+      }
+    ]
+  },
+  {
+    "id": "3a1a67ed-71b8-483d-bc7f-611710594bba",
+    "state": [
+      {
+        "original": "vibrante",
+        "normalized": "vibrante",
+        "method": "identity"
+      },
+      {
+        "original": "informativo",
+        "normalized": "informativo",
+        "method": "identity"
+      },
+      {
+        "original": "cultural",
+        "normalized": "cultural",
+        "method": "identity"
+      }
+    ],
+    "matter": [
+      {
+        "original": "grão dourado",
+        "normalized": "grão dourado",
+        "method": "identity"
+      },
+      {
+        "original": "tinta fosca",
+        "normalized": "tinta fosca",
+        "method": "identity"
+      },
+      {
+        "original": "papel texturizado",
+        "normalized": "papel texturizado",
+        "method": "identity"
+      }
+    ],
+    "movement": [
+      {
+        "original": "pulsar",
+        "normalized": "pulsar",
+        "method": "identity"
+      },
+      {
+        "original": "fluir",
+        "normalized": "fluir",
+        "method": "identity"
+      },
+      {
+        "original": "circular",
+        "normalized": "circular",
+        "method": "identity"
+      }
+    ]
+  },
+  {
+    "id": "761e88eb-94c6-4af5-a0fc-f2e54de1a128",
+    "state": [
+      {
+        "original": "organizado",
+        "normalized": "organizado",
+        "method": "identity"
+      },
+      {
+        "original": "coletivo",
+        "normalized": "coletivo",
+        "method": "identity"
+      },
+      {
+        "original": "estilizado",
+        "normalized": "estilizado",
+        "method": "identity"
+      }
+    ],
+    "matter": [
+      {
+        "original": "plástico",
+        "normalized": "plástico",
+        "method": "identity"
+      },
+      {
+        "original": "papel",
+        "normalized": "papel",
+        "method": "identity"
+      },
+      {
+        "original": "ar",
+        "normalized": "ar",
+        "method": "identity"
+      }
+    ],
+    "movement": [
+      {
+        "original": "deslizando",
+        "normalized": "deslizando",
+        "method": "identity"
+      },
+      {
+        "original": "sobrepondo",
+        "normalized": "sobrepondo",
+        "method": "identity"
+      },
+      {
+        "original": "organizando",
+        "normalized": "organizando",
+        "method": "identity"
+      }
+    ]
+  },
+  {
+    "id": "b3ececeb-b9e2-4131-874c-1a9e8afaa69c",
+    "state": [
+      {
+        "original": "caótico",
+        "normalized": "caótico",
+        "method": "identity"
+      },
+      {
+        "original": "fragmentado",
+        "normalized": "fragmentado",
+        "method": "identity"
+      },
+      {
+        "original": "urgente",
+        "normalized": "urgente",
+        "method": "identity"
+      }
+    ],
+    "matter": [
+      {
+        "original": "tinta fresca",
+        "normalized": "tinta fresca",
+        "method": "identity"
+      },
+      {
+        "original": "papel rasgado",
+        "normalized": "papel rasgado",
+        "method": "identity"
+      },
+      {
+        "original": "ruído visual",
+        "normalized": "ruído visual",
+        "method": "identity"
+      }
+    ],
+    "movement": [
+      {
+        "original": "sobrepor",
+        "normalized": "sobrepor",
+        "method": "identity"
+      },
+      {
+        "original": "sangrar",
+        "normalized": "sangrar",
+        "method": "identity"
+      },
+      {
+        "original": "pulverizar",
+        "normalized": "pulverizar",
+        "method": "identity"
+      }
+    ]
+  },
+  {
+    "id": "d355b2ea-0ffb-4e6b-9043-9bd957f8fa2f",
+    "state": [
+      {
+        "original": "enérgico",
+        "normalized": "enérgico",
+        "method": "identity"
+      },
+      {
+        "original": "descontraído",
+        "normalized": "descontraído",
+        "method": "identity"
+      },
+      {
+        "original": "divertido",
+        "normalized": "divertido",
+        "method": "identity"
+      }
+    ],
+    "matter": [
+      {
+        "original": "tinta vibrante",
+        "normalized": "tinta vibrante",
+        "method": "identity"
+      },
+      {
+        "original": "papel liso",
+        "normalized": "papel liso",
+        "method": "identity"
+      },
+      {
+        "original": "memória pop",
+        "normalized": "memória pop",
+        "method": "identity"
+      }
+    ],
+    "movement": [
+      {
+        "original": "saltar",
+        "normalized": "saltar",
+        "method": "identity"
+      },
+      {
+        "original": "dançar",
+        "normalized": "dançar",
+        "method": "identity"
+      },
+      {
+        "original": "chamar",
+        "normalized": "chamar",
+        "method": "identity"
+      }
+    ]
+  },
+  {
+    "id": "f9102c9f-704c-4773-864b-f499ce9cef6e",
+    "state": [
+      {
+        "original": "energético",
+        "normalized": "energético",
+        "method": "identity"
+      },
+      {
+        "original": "artesanal",
+        "normalized": "artesanal",
+        "method": "identity"
+      },
+      {
+        "original": "enigmático",
+        "normalized": "enigmático",
+        "method": "identity"
+      }
+    ],
+    "matter": [
+      {
+        "original": "tinta",
+        "normalized": "tinta",
+        "method": "identity"
+      },
+      {
+        "original": "plástico",
+        "normalized": "plástico",
+        "method": "identity"
+      },
+      {
+        "original": "luz neon",
+        "normalized": "luz neon",
+        "method": "identity"
+      }
+    ],
+    "movement": [
+      {
+        "original": "pulsa",
+        "normalized": "pulsa",
+        "method": "identity"
+      },
+      {
+        "original": "borra",
+        "normalized": "borra",
+        "method": "identity"
+      },
+      {
+        "original": "traça",
+        "normalized": "traça",
+        "method": "identity"
+      }
+    ]
+  },
+  {
+    "id": "129f7722-1cbb-47a7-933c-f53e2380b00a",
+    "state": [
+      {
+        "original": "digital",
+        "normalized": "digital",
+        "method": "identity"
+      },
+      {
+        "original": "futurista",
+        "normalized": "futurista",
+        "method": "identity"
+      },
+      {
+        "original": "funcional",
+        "normalized": "funcional",
+        "method": "identity"
+      }
+    ],
+    "matter": [
+      {
+        "original": "pixels",
+        "normalized": "pixels",
+        "method": "identity"
+      },
+      {
+        "original": "papel",
+        "normalized": "papel",
+        "method": "identity"
+      },
+      {
+        "original": "circuito",
+        "normalized": "circuito",
+        "method": "identity"
+      }
+    ],
+    "movement": [
+      {
+        "original": "escanear",
+        "normalized": "escanear",
+        "method": "identity"
+      },
+      {
+        "original": "processar",
+        "normalized": "processar",
+        "method": "identity"
+      },
+      {
+        "original": "deslizar",
+        "normalized": "deslizar",
+        "method": "identity"
+      }
+    ]
+  },
+  {
+    "id": "81b7ffce-c586-4e5a-ae1d-7ce76356a1fd",
+    "state": [
+      {
+        "original": "evocativo",
+        "normalized": "evocativo",
+        "method": "identity"
+      },
+      {
+        "original": "refinado",
+        "normalized": "refinado",
+        "method": "identity"
+      },
+      {
+        "original": "moderno",
+        "normalized": "moderno",
+        "method": "identity"
+      }
+    ],
+    "matter": [
+      {
+        "original": "luz",
+        "normalized": "luz",
+        "method": "identity"
+      },
+      {
+        "original": "design",
+        "normalized": "design",
+        "method": "identity"
+      },
+      {
+        "original": "elegância",
+        "normalized": "elegância",
+        "method": "identity"
+      }
+    ],
+    "movement": [
+      {
+        "original": "flutuar",
+        "normalized": "flutuar",
+        "method": "identity"
+      },
+      {
+        "original": "surgir",
+        "normalized": "surgir",
+        "method": "identity"
+      },
+      {
+        "original": "revelar",
+        "normalized": "revelar",
+        "method": "identity"
+      }
+    ]
+  },
+  {
+    "id": "e5320fb2-aec3-4d66-ab76-d75463d19466",
+    "state": [
+      {
+        "original": "analítico",
+        "normalized": "analítico",
+        "method": "identity"
+      },
+      {
+        "original": "técnico",
+        "normalized": "técnico",
+        "method": "identity"
+      },
+      {
+        "original": "preciso",
+        "normalized": "preciso",
+        "method": "identity"
+      }
+    ],
+    "matter": [
+      {
+        "original": "circuitos",
+        "normalized": "circuitos",
+        "method": "identity"
+      },
+      {
+        "original": "dados",
+        "normalized": "dados",
+        "method": "identity"
+      },
+      {
+        "original": "esquema",
+        "normalized": "esquema",
+        "method": "identity"
+      }
+    ],
+    "movement": [
+      {
+        "original": "calculando",
+        "normalized": "calculando",
+        "method": "identity"
+      },
+      {
+        "original": "rotulando",
+        "normalized": "rotulando",
+        "method": "identity"
+      },
+      {
+        "original": "processando",
+        "normalized": "processando",
+        "method": "identity"
+      }
+    ]
+  },
+  {
+    "id": "09b4f387-1616-49ed-83df-04d724d4820f",
+    "state": [
+      {
+        "original": "tenso",
+        "normalized": "tenso",
+        "method": "identity"
+      },
+      {
+        "original": "frenético",
+        "normalized": "frenético",
+        "method": "identity"
+      },
+      {
+        "original": "urbano",
+        "normalized": "urbano",
+        "method": "identity"
+      }
+    ],
+    "matter": [
+      {
+        "original": "neon",
+        "normalized": "neon",
+        "method": "dictionary"
+      },
+      {
+        "original": "asfalto molhado",
+        "normalized": "asfalto molhado",
+        "method": "identity"
+      },
+      {
+        "original": "ruído visual",
+        "normalized": "ruído visual",
+        "method": "identity"
+      }
+    ],
+    "movement": [
+      {
+        "original": "pulsar",
+        "normalized": "pulsar",
+        "method": "identity"
+      },
+      {
+        "original": "desmoronar",
+        "normalized": "desmoronar",
+        "method": "identity"
+      },
+      {
+        "original": "inundar",
+        "normalized": "inundar",
+        "method": "identity"
+      }
+    ]
+  },
+  {
+    "id": "7218cf32-626d-4a24-8724-b242e7b15201",
+    "state": [
+      {
+        "original": "inquietante",
+        "normalized": "inquietante",
+        "method": "identity"
+      },
+      {
+        "original": "caótico",
+        "normalized": "caótico",
+        "method": "identity"
+      },
+      {
+        "original": "agressivo",
+        "normalized": "agressivo",
+        "method": "identity"
+      }
+    ],
+    "matter": [
+      {
+        "original": "tinta barata",
+        "normalized": "tinta barata",
+        "method": "identity"
+      },
+      {
+        "original": "papel velho",
+        "normalized": "papel velho",
+        "method": "identity"
+      },
+      {
+        "original": "ruído digital",
+        "normalized": "ruído digital",
+        "method": "identity"
+      }
+    ],
+    "movement": [
+      {
+        "original": "gritar",
+        "normalized": "gritar",
+        "method": "identity"
+      },
+      {
+        "original": "ameaçar",
+        "normalized": "ameaçar",
+        "method": "identity"
+      },
+      {
+        "original": "colidir",
+        "normalized": "colidir",
+        "method": "identity"
+      }
+    ]
+  },
+  {
+    "id": "34a4fff2-8fd5-4910-ab50-6c712f8da4cd",
+    "state": [
+      {
+        "original": "alegre",
+        "normalized": "alegre",
+        "method": "identity"
+      },
+      {
+        "original": "educacional",
+        "normalized": "educacional",
+        "method": "identity"
+      },
+      {
+        "original": "digital",
+        "normalized": "digital",
+        "method": "identity"
+      }
+    ],
+    "matter": [
+      {
+        "original": "plástico",
+        "normalized": "plástico",
+        "method": "identity"
+      },
+      {
+        "original": "pixelado",
+        "normalized": "pixelado",
+        "method": "identity"
+      },
+      {
+        "original": "vetorizado",
+        "normalized": "vetorizado",
+        "method": "identity"
+      }
+    ],
+    "movement": [
+      {
+        "original": "brilhando",
+        "normalized": "brilhando",
+        "method": "identity"
+      },
+      {
+        "original": "notificando",
+        "normalized": "notificando",
+        "method": "identity"
+      },
+      {
+        "original": "organizando",
+        "normalized": "organizando",
+        "method": "identity"
+      }
+    ]
+  },
+  {
+    "id": "5ad46f54-a6e1-41cd-bef0-7b13fefd400b",
+    "state": [
+      {
+        "original": "organizado",
+        "normalized": "organizado",
+        "method": "identity"
+      },
+      {
+        "original": "minimalista",
+        "normalized": "minimalista",
+        "method": "identity"
+      },
+      {
+        "original": "informativo",
+        "normalized": "informativo",
+        "method": "identity"
+      }
+    ],
+    "matter": [
+      {
+        "original": "papel",
+        "normalized": "papel",
+        "method": "identity"
+      },
+      {
+        "original": "plástico",
+        "normalized": "plástico",
+        "method": "identity"
+      },
+      {
+        "original": "pixels",
+        "normalized": "pixels",
+        "method": "identity"
+      }
+    ],
+    "movement": [
+      {
+        "original": "conectar",
+        "normalized": "conectar",
+        "method": "identity"
+      },
+      {
+        "original": "apresentar",
+        "normalized": "apresentar",
+        "method": "identity"
+      },
+      {
+        "original": "reorganizar",
+        "normalized": "reorganizar",
+        "method": "identity"
+      }
+    ]
+  }
+]

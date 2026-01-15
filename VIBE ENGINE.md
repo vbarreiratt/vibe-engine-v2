@@ -41,7 +41,36 @@ Ao explicitar também **o que a vibe não é**, cria-se uma atmosfera reconhecí
 
 ---
 
-## 4. PROCESSO DE CONSTRUÇÃO DE VIBES
+## 4. PROCESSO DE CONSTRUÇÃO DE VIBES E CAMADA SEMÂNTICA
+
+O sistema implementa uma **Clustering Methodológico** que organiza e "fala" sobre as vibes encontradas.
+
+### Classificação e Maturidade (Gates)
+
+Os clusters não são iguais. Eles são categorizados semanticamente:
+
+1.  **STRONG (Vibe Consolidada)**
+    - *Definição*: Densidade alta, recorrência de sinais em múltiplas camadas, núcleo visível.
+    - *Ação*: Nomear, tensionar, consolidar. É um mundo pronto.
+    
+2.  **PROTO (Mundo Emergente)**
+    - *Definição*: Alta recorrência de sinais, mas baixa densidade ou poucos itens (<4).
+    - *Ação*: Decidir. Expandir com mais referências ou fundir com outros grupos?
+
+3.  **NOISE (Ruído / Isolado)**
+    - *Definição*: Itens isolados ou conexões fracas (< 0.35).
+    - *Ação*: Manter como outlier ou descartar.
+
+### O Motor da Vibe
+
+Todo cluster possui um **Motor Semântico** visível no Canvas:
+> `Estado: [Top Signal] · Matéria: [Top Signal] · Movimento: [Top Signal]`
+
+Isso serve como "assinatura genética" do grupo, permitindo leitura rápida sem análise profunda.
+
+---
+
+## 5. PROCESSO DE OPERAÇÃO
 
 ### Passo 1 — Varredura
 

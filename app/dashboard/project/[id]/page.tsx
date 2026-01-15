@@ -1,12 +1,14 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import { Uploader } from './uploader' // We'll make this next
-import { Play, Download, Settings, Sliders } from 'lucide-react'
+import { Uploader } from './uploader'
+import { Sliders, CheckCircle2 } from 'lucide-react'
 import { ProjectSettingsDialog } from './project-settings-dialog'
 import { ProjectGallery } from './gallery'
 import { StartScanButton } from './start-scan-button'
+import { ScansGallery } from './scans-gallery'
+import { getProjectScans } from './scan/actions'
+import { DashboardShell } from '@/components/dashboard-shell'
 
-// MVP: Only Ingestion Phase implemented visually for now
 export default async function ProjectPage({ params }: { params: Promise<{ id: string }> }) {
     const supabase = await createClient()
     const projectId = (await params).id
@@ -19,44 +21,18 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
     const memberCheck = await supabase.from('project_members').select('role').eq('project_id', projectId).eq('user_id', user.id).maybeSingle()
     const { data: profile } = await supabase.from('profiles').select('role').eq('user_id', user.id).single()
 
-    console.log('[DEBUG] Access Check:', {
-        projectId,
-        userId: user.id,
-        isMember: !!memberCheck.data,
-        userRole: profile?.role
-    })
-
     if (!memberCheck.data && profile?.role !== 'admin') {
-        console.log('[DEBUG] Redirecting Forbidden')
-        redirect('/dashboard') // Forbidden
-    }
-
-    // Get Data (Standard Client - RLS Subject)
-    const { data: project, error: projError } = await supabase.from('projects').select('*').eq('id', projectId).single()
-
-    if (projError || !project) {
-        console.error('[DEBUG] Standard Fetch Error:', projError)
-
-        // DEBUG: Try with Admin Client to see if it exists
-        const { createAdminClient } = await import('@/lib/supabase/admin')
-        const adminSupabase = createAdminClient()
-        const { data: adminProject, error: adminError } = await adminSupabase.from('projects').select('*').eq('id', projectId).single()
-
-        console.log('[DEBUG] Admin Client Check:', {
-            exists: !!adminProject,
-            adminError,
-            projectIdInUrl: projectId
-        })
-
-        if (adminProject) {
-            console.error('[CRITICAL] Project exists but RLS is blocking access.')
-            console.error('User ID:', user.id)
-            console.error('User Role in Profile:', profile?.role)
-        }
-
         redirect('/dashboard')
     }
 
+    // Get Project
+    const { data: project, error: projError } = await supabase.from('projects').select('*').eq('id', projectId).single()
+
+    if (projError || !project) {
+        redirect('/dashboard')
+    }
+
+    // Get Images
     const { data: images } = await supabase
         .from('images')
         .select(`
@@ -67,6 +43,9 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
         `)
         .eq('project_id', projectId)
         .order('created_at', { ascending: false })
+
+    // Get Scans (Varreduras)
+    const { scans } = await getProjectScans(projectId)
 
     // Fetch Members for Settings
     const { data: members } = await supabase
@@ -79,9 +58,12 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
         .eq('project_id', projectId)
 
     const isAdmin = profile?.role === 'admin'
+    const hasScans = scans && scans.length > 0
+    const hasSignals = scans?.some(s => (s.signals_run_count || 0) > 0)
 
     return (
-        <div className="space-y-8 max-w-7xl mx-auto">
+        <DashboardShell>
+            <div className="space-y-8 max-w-7xl mx-auto">
             {/* Header */}
             <div className="flex items-center justify-between border-b border-white/5 pb-8">
                 <div>
@@ -112,30 +94,40 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
                                 <span className="text-white font-mono">{images?.length || 0}</span>
                             </div>
                             <div className="flex justify-between text-xs">
-                                <span className="text-zinc-500">Varridas</span>
-                                <span className="text-white font-mono">0</span>
+                                <span className="text-zinc-500">Varreduras</span>
+                                <span className="text-white font-mono">{scans?.length || 0}</span>
                             </div>
                             <div className="w-full bg-zinc-800 h-1.5 rounded-full overflow-hidden">
-                                <div className="bg-purple-500 h-full w-[0%]" />
+                                <div
+                                    className="bg-purple-500 h-full transition-all"
+                                    style={{ width: `${images?.length ? (hasScans ? (hasSignals ? 75 : 50) : 25) : 0}%` }}
+                                />
                             </div>
                         </div>
                     </div>
 
-                    {/* Mode Switcher */}
+                    {/* Mode Switcher with Indicators */}
                     <nav className="space-y-1">
                         {[
-                            { name: 'Ingestão', path: '' },
-                            { name: 'Varredura', path: '/scan' },
-                            { name: 'Sinais', path: '/tagging' },
-                            { name: 'Ressonância', path: '/resonance' }
+                            { name: 'Ingestão', path: '', active: true, done: (images?.length || 0) > 0 },
+                            { name: 'Varredura', path: '/scan', active: false, done: hasScans },
+                            { name: 'Sinais', path: '/signals', active: false, done: hasSignals, enabled: hasScans },
+                            { name: 'Ressonância', path: '/resonance', active: false, done: false, enabled: hasSignals }
                         ].map((step, i) => (
                             <a
                                 key={step.name}
-                                href={`/dashboard/project/${projectId}${step.path}`}
-                                className={`px-4 py-3 rounded-lg text-sm font-medium flex items-center justify-between transition-colors ${i === 0 ? 'bg-white/10 text-white' : 'text-zinc-500 hover:text-white hover:bg-white/5'}`}
+                                href={step.enabled === false && !step.done ? undefined : `/dashboard/project/${projectId}${step.path}`}
+                                className={`px-4 py-3 rounded-lg text-sm font-medium flex items-center justify-between transition-colors ${step.active
+                                    ? 'bg-white/10 text-white'
+                                    : step.enabled === false && !step.done
+                                        ? 'text-zinc-700 cursor-not-allowed'
+                                        : 'text-zinc-500 hover:text-white hover:bg-white/5'
+                                    }`}
                             >
                                 <span>{i + 1}. {step.name}</span>
-                                {i === 0 && <span className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]" />}
+                                {step.done && (
+                                    <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                                )}
                             </a>
                         ))}
                     </nav>
@@ -145,8 +137,22 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
                 <div className="lg:col-span-3 space-y-6">
                     <Uploader projectId={projectId} />
 
+                    {/* Scans Gallery Section */}
+                    {hasScans && (
+                        <div className="mt-8">
+                            <h2 className="text-xl font-medium text-white mb-4">Varreduras</h2>
+                            <ScansGallery
+                                projectId={projectId}
+                                scans={scans as any}
+                                currentUserId={user.id}
+                                isAdmin={isAdmin}
+                            />
+                        </div>
+                    )}
+
                     {/* Gallery Grid */}
                     <div className="mt-8">
+                        <h2 className="text-xl font-medium text-white mb-4">Galeria de Imagens</h2>
                         <ProjectGallery
                             images={images || []}
                             currentUserId={user.id}
@@ -157,5 +163,6 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
                 </div>
             </div>
         </div>
+        </DashboardShell>
     )
 }

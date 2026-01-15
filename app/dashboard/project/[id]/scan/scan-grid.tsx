@@ -1,8 +1,9 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Check, Loader2, Layers, RotateCcw, Maximize2, X, ChevronLeft, ChevronRight, Keyboard } from 'lucide-react'
+import { Check, Loader2, Layers, RotateCcw, Maximize2, X, ChevronLeft, ChevronRight, Keyboard, Save } from 'lucide-react'
 import { batchSubmitScan } from './actions'
+import { SaveScanModal } from './save-scan-modal'
 
 interface ImageItem {
     id: string
@@ -19,6 +20,9 @@ export function ScanGrid({ images, projectId }: { images: ImageItem[], projectId
     // Stage Mode State
     const [isStageMode, setIsStageMode] = useState(false)
     const [currentIndex, setCurrentIndex] = useState(0)
+
+    // Save Modal State
+    const [showSaveModal, setShowSaveModal] = useState(false)
 
     const toggleSelection = (id: string) => {
         const next = new Set(selectedIds)
@@ -37,23 +41,12 @@ export function ScanGrid({ images, projectId }: { images: ImageItem[], projectId
         setSelectedIds(next)
     }
 
-    const handleFinish = async () => {
-        if (images.length === 0) return
-        setIsSubmitting(true)
-
-        // Selected = Vibra
-        // Others = Nao Vibra
-        const decisions = images.map(img => ({
-            imageId: img.id,
-            status: selectedIds.has(img.id) ? 'vibra' : 'nao_vibra'
-        })) as { imageId: string, status: 'vibra' | 'nao_vibra' }[]
-
-        try {
-            await batchSubmitScan(projectId, decisions)
-        } catch (e) {
-            alert('Erro ao salvar varredura')
-            setIsSubmitting(false)
+    const handleFinish = () => {
+        if (selectedIds.size === 0) {
+            alert('Selecione ao menos uma imagem que vibra')
+            return
         }
+        setShowSaveModal(true)
     }
 
     // Keyboard Handler
@@ -275,6 +268,15 @@ export function ScanGrid({ images, projectId }: { images: ImageItem[], projectId
                     Concluir
                 </button>
             </div>
+
+            {/* Save Scan Modal */}
+            {showSaveModal && (
+                <SaveScanModal
+                    projectId={projectId}
+                    selectedImageIds={Array.from(selectedIds)}
+                    onClose={() => setShowSaveModal(false)}
+                />
+            )}
         </div>
     )
 }

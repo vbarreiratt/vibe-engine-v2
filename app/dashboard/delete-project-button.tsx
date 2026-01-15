@@ -38,8 +38,13 @@ export function DeleteProjectButton({ projectId, projectName }: { projectId: str
         setError(null)
 
         try {
-            await deleteProject(projectId)
-            setShowConfirm(false)
+            const result = await deleteProject(projectId)
+            if (result && result.error) {
+                setError(result.error)
+                setIsDeleting(false)
+            } else {
+                setShowConfirm(false)
+            }
         } catch (err: any) {
             setError(err.message || 'Erro ao apagar projeto')
             setIsDeleting(false)
