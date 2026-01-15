@@ -8,7 +8,7 @@ export function ResonanceLegend() {
         <div className="absolute bottom-6 right-6 z-[100]">
             {/* Toggle Button */}
             {!isOpen && (
-                <button 
+                <button
                     onClick={() => setIsOpen(true)}
                     className="w-10 h-10 rounded-full bg-zinc-900 border border-white/10 flex items-center justify-center text-zinc-400 hover:text-white shadow-lg transition-all"
                     title="Legenda Cognitiva"
@@ -31,31 +31,31 @@ export function ResonanceLegend() {
                         {/* Status Legend */}
                         <div className="space-y-2">
                             <div className="text-[10px] uppercase text-zinc-500 font-mono tracking-wider">Status & Maturidade</div>
-                            
-                            <LegendItem 
-                                type="strong" 
-                                label="STRONG (Consolidado)" 
+
+                            <LegendItem
+                                type="strong"
+                                label="STRONG (Consolidado)"
                                 desc="Vibe madura. Alta densidade e ressonância múltipla. Pronto para ser nomeado."
                             />
-                            <LegendItem 
-                                type="proto" 
-                                label="PROTO (Emergente)" 
+                            <LegendItem
+                                type="proto"
+                                label="PROTO (Emergente)"
                                 desc="Início de um mundo. Sinais fortes, mas pouca massa crítica. Requer decisão."
                             />
-                            <LegendItem 
-                                type="noise" 
-                                label="WEAK / NOISE" 
-                                desc="Sementes isoladas ou ruído. Referências soltas sem gravidade suficiente."
+                            <LegendItem
+                                type="noise"
+                                label="BOLHA LATENTE"
+                                desc="Mundos em estado inicial. Semente isolada aguardando conexão."
                             />
                         </div>
 
                         {/* Topography */}
                         <div className="pt-2 border-t border-white/5 space-y-2">
-                             <div className="text-[10px] uppercase text-zinc-500 font-mono tracking-wider">Topografia</div>
-                             <p className="text-xs text-zinc-300 leading-relaxed">
-                                Distância = Diferença Semântica.<br/>
+                            <div className="text-[10px] uppercase text-zinc-500 font-mono tracking-wider">Topografia</div>
+                            <p className="text-xs text-zinc-300 leading-relaxed">
+                                Distância = Diferença Semântica.<br />
                                 Clusters próximos compartilham "vibes" adjacentes. Clusters distantes são mundos opostos.
-                             </p>
+                            </p>
                         </div>
                     </div>
                 </div>

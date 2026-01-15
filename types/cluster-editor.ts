@@ -47,3 +47,16 @@ export type ClusterEditorData = {
     metrics: ClusterMetrics;
     synthesis: ClusterSynthesis;
 };
+
+export type CanvasSnapshot = {
+    id: string;
+    label: string;
+    kind: 'base' | 'version';
+    created_at: string;
+    graph_json: {
+        nodes: any[]; // Using any for flexibility in V1
+        edges: any[];
+        clusters?: any[];
+    };
+    ui?: any;
+};

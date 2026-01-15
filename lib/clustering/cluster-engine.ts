@@ -122,7 +122,7 @@ export class ClusterEngine {
                     matter: embMatter,
                     movement: embMove
                 };
-                
+
                 this.logger.logEmbedding({
                     imageId: img.id,
                     dimension: embState.length,
@@ -159,7 +159,7 @@ export class ClusterEngine {
             for (let j = i + 1; j < ids.length; j++) {
                 const idA = ids[i];
                 const idB = ids[j];
-                
+
                 const imgA = this.images.find(x => x.id === idA)!;
                 const imgB = this.images.find(x => x.id === idB)!;
                 const empA = this.embeddings[idA];
@@ -209,7 +209,7 @@ export class ClusterEngine {
                 const sharedState = getShared(normDetailsA.state, normDetailsB.state);
                 const sharedMatter = getShared(normDetailsA.matter, normDetailsB.matter);
                 const sharedMove = getShared(normDetailsA.movement, normDetailsB.movement);
-                
+
                 const allShared = [...sharedState.map(s => `state:${s}`), ...sharedMatter.map(s => `matter:${s}`), ...sharedMove.map(s => `mov:${s}`)];
 
                 // Weight calculation
@@ -270,7 +270,7 @@ export class ClusterEngine {
         // Save inputs_canonical.csv
         const inputsCsv = ['image_id,canonical_text,hash'];
         normalizedData.forEach(n => {
-            const text = `state: ${n.state.map(x=>x.normalized).join(' ')} | matter: ${n.matter.map(x=>x.normalized).join(' ')} | movement: ${n.movement.map(x=>x.normalized).join(' ')}`;
+            const text = `state: ${n.state.map(x => x.normalized).join(' ')} | matter: ${n.matter.map(x => x.normalized).join(' ')} | movement: ${n.movement.map(x => x.normalized).join(' ')}`;
             const hash = ClusterAuditor.hashString(text);
             inputsCsv.push(`${n.id},"${text}",${hash}`);
         });
@@ -286,41 +286,41 @@ export class ClusterEngine {
         this.images.forEach(img => {
             const degree = graph.degree(img.id);
             if (degree === 0) {
-                 // Try to find ANY neighbor with at least minimal overlap (1 shared or threshold > 0.6) representing a weak link
-                 // This reduces fragmentation into NOISE for valid but weak items
-                 let bestMatch = null;
-                 let maxScore = -1;
-                 
-                 this.images.forEach(other => {
-                      if (img.id === other.id) return;
-                      // Recalculate basic sim (inefficient but safe fallback method)
-                      const empA = this.embeddings[img.id];
-                      const empB = this.embeddings[other.id];
-                      if (!empA || !empB) return;
-                      
-                      const s = cosineSimilarity(empA.state, empB.state);
-                      const m = cosineSimilarity(empA.matter, empB.matter);
-                      const v = cosineSimilarity(empA.movement, empB.movement);
-                      const avg = (s + m + v) / 3;
-                      
-                      if (avg > maxScore) {
-                          maxScore = avg;
-                          bestMatch = other.id;
-                      }
-                 });
+                // Try to find ANY neighbor with at least minimal overlap (1 shared or threshold > 0.6) representing a weak link
+                // This reduces fragmentation into NOISE for valid but weak items
+                let bestMatch = null;
+                let maxScore = -1;
 
-                 if (bestMatch && maxScore > 0.65) {
-                     graph.addEdge(img.id, bestMatch, {
-                         weight: maxScore,
-                         layers: ['knn_rescue'],
-                         simState: 0, simMatter: 0, simMove: 0,
-                         sharedState: [], sharedMatter: [], sharedMove: [],
-                         isRescue: true
-                     });
-                 }
+                this.images.forEach(other => {
+                    if (img.id === other.id) return;
+                    // Recalculate basic sim (inefficient but safe fallback method)
+                    const empA = this.embeddings[img.id];
+                    const empB = this.embeddings[other.id];
+                    if (!empA || !empB) return;
+
+                    const s = cosineSimilarity(empA.state, empB.state);
+                    const m = cosineSimilarity(empA.matter, empB.matter);
+                    const v = cosineSimilarity(empA.movement, empB.movement);
+                    const avg = (s + m + v) / 3;
+
+                    if (avg > maxScore) {
+                        maxScore = avg;
+                        bestMatch = other.id;
+                    }
+                });
+
+                if (bestMatch && maxScore > 0.65) {
+                    graph.addEdge(img.id, bestMatch, {
+                        weight: maxScore,
+                        layers: ['knn_rescue'],
+                        simState: 0, simMatter: 0, simMove: 0,
+                        sharedState: [], sharedMatter: [], sharedMove: [],
+                        isRescue: true
+                    });
+                }
             }
         });
-        
+
         // Save graph_edges.csv with Expanded Components
         const edgesCsv = ['source,target,weight,layers,sim_state,sim_matter,sim_move,overlap_state,overlap_matter,overlap_move,is_rescue'];
         graph.edges().forEach(e => {
@@ -328,8 +328,8 @@ export class ClusterEngine {
             const ovS = attr.sharedState ? attr.sharedState.length : 0;
             const ovM = attr.sharedMatter ? attr.sharedMatter.length : 0;
             const ovV = attr.sharedMove ? attr.sharedMove.length : 0;
-            
-            edgesCsv.push(`${graph.source(e)},${graph.target(e)},${attr.weight.toFixed(4)},"${attr.layers.join('|')}",${attr.simState?.toFixed(2)||0},${attr.simMatter?.toFixed(2)||0},${attr.simMove?.toFixed(2)||0},${ovS},${ovM},${ovV},${attr.isRescue||false}`);
+
+            edgesCsv.push(`${graph.source(e)},${graph.target(e)},${attr.weight.toFixed(4)},"${attr.layers.join('|')}",${attr.simState?.toFixed(2) || 0},${attr.simMatter?.toFixed(2) || 0},${attr.simMove?.toFixed(2) || 0},${ovS},${ovM},${ovV},${attr.isRescue || false}`);
         });
         await fs.writeFile(path.join(evidenceDir, 'graph_edges.csv'), edgesCsv.join('\n'));
 
@@ -341,7 +341,7 @@ export class ClusterEngine {
             method: 'Louvain Modularity + ForceAtlas2',
             parameters: { resolution: 1.0, threshold: this.T_PRIMARY },
             totalClusters: uniqueClusters.size,
-            outliersCount: 0 
+            outliersCount: 0
         });
 
         // Apply initial layout
@@ -364,14 +364,14 @@ export class ClusterEngine {
         const clustersFormatted = Object.entries(clustersMap).map(([cId, itemIds]) => {
             // Re-fetch normalized signals for these items
             const clusterItems = normalizedData.filter(n => itemIds.includes(n.id));
-            
+
             const allStates = clusterItems.flatMap(i => i.state.map(s => s.normalized));
             const allMatters = clusterItems.flatMap(i => i.matter.map(s => s.normalized));
             const allMovements = clusterItems.flatMap(i => i.movement.map(s => s.normalized));
 
             const topState = this.getTopTag(allStates, ['vibra', 'neutro']);
             const topMatter = this.getTopTag(allMatters, []);
-            
+
             const dominantSignals = {
                 state: this.getTopTags(allStates, 3),
                 matter: this.getTopTags(allMatters, 3),
@@ -398,9 +398,9 @@ export class ClusterEngine {
             let edgeCount = 0;
             let weights: number[] = [];
 
-            for(let i=0; i<itemIds.length; i++) {
-                for(let j=i+1; j<itemIds.length; j++) {
-                    const src = itemIds[i]; 
+            for (let i = 0; i < itemIds.length; i++) {
+                for (let j = i + 1; j < itemIds.length; j++) {
+                    const src = itemIds[i];
                     const tgt = itemIds[j];
                     if (graph.hasEdge(src, tgt)) {
                         const w = graph.getEdgeAttribute(src, tgt, 'weight');
@@ -415,10 +415,10 @@ export class ClusterEngine {
                     }
                 }
             }
-            const strongestEdges = edgesInCluster.sort((a,b) => b.weight - a.weight).slice(0, 5);
+            const strongestEdges = edgesInCluster.sort((a, b) => b.weight - a.weight).slice(0, 5);
 
             // --- Real Metrics ---
-            
+
             // 1. Density
             const avgWeight = edgeCount > 0 ? totalWeight / edgeCount : (itemIds.length === 1 ? 0.0 : 0.0);
             const minWeight = weights.length > 0 ? Math.min(...weights) : 0;
@@ -429,42 +429,42 @@ export class ClusterEngine {
             const countSignal = (list: typeof normalizedData, layer: 'state' | 'matter' | 'movement', signal: string) => {
                 if (!signal) return 0;
                 return list.filter(img => {
-                     // @ts-ignore
+                    // @ts-ignore
                     const signals = img[layer] || [];
                     return signals.map((s: any) => s.normalized).includes(signal);
                 }).length;
             };
-            
+
             const recState = dominantSignals.state[0] ? countSignal(clusterItems, 'state', dominantSignals.state[0]) / itemIds.length : 0;
             const recMatter = dominantSignals.matter[0] ? countSignal(clusterItems, 'matter', dominantSignals.matter[0]) / itemIds.length : 0;
             const recMove = dominantSignals.movement[0] ? countSignal(clusterItems, 'movement', dominantSignals.movement[0]) / itemIds.length : 0;
-            
+
             // New: Multi-Layer Recurrence Logic (Method requirement)
-            const recValues = [recState, recMatter, recMove].sort((a,b) => b-a);
+            const recValues = [recState, recMatter, recMove].sort((a, b) => b - a);
             const recurrenceMulti = (recValues[0] + recValues[1]) / 2; // Avg of top 2
-            
+
             const recurrence = { state: recState, matter: recMatter, movement: recMove };
-            
+
             // 3. Stability (Leave-One-Out Simulation)
             let stabilityScore = 0;
             if (itemIds.length >= 3) {
                 let consistentCores = 0;
                 // Try removing each node and checking if the remaining nodes still have high connectivity
                 itemIds.forEach(removedNode => {
-                     const remaining = itemIds.filter(id => id !== removedNode);
-                     // Calculate density of remaining
-                     let subTotalW = 0;
-                     let subCount = 0;
-                     for(let i=0; i<remaining.length; i++){
-                        for(let j=i+1; j<remaining.length; j++){
-                            if(graph.hasEdge(remaining[i], remaining[j])) {
+                    const remaining = itemIds.filter(id => id !== removedNode);
+                    // Calculate density of remaining
+                    let subTotalW = 0;
+                    let subCount = 0;
+                    for (let i = 0; i < remaining.length; i++) {
+                        for (let j = i + 1; j < remaining.length; j++) {
+                            if (graph.hasEdge(remaining[i], remaining[j])) {
                                 subTotalW += graph.getEdgeAttribute(remaining[i], remaining[j], 'weight');
                                 subCount++;
                             }
                         }
-                     }
-                     const subDensity = subCount > 0 ? subTotalW / subCount : 0;
-                     if (subDensity >= (avgWeight * 0.85)) consistentCores++; // If density drops less than 15%
+                    }
+                    const subDensity = subCount > 0 ? subTotalW / subCount : 0;
+                    if (subDensity >= (avgWeight * 0.85)) consistentCores++; // If density drops less than 15%
                 });
                 stabilityScore = consistentCores / itemIds.length;
             } else if (itemIds.length === 2) {
@@ -474,7 +474,7 @@ export class ClusterEngine {
             // 4. Strength Score (No Dummies)
             const maxRecurrence = Math.max(recState, recMatter, recMove);
             // Base strength is density
-            let rawStrength = density.avg; 
+            let rawStrength = density.avg;
             // Boost with recurrence
             rawStrength += (maxRecurrence * 0.3);
             // Penalty for small size
@@ -487,7 +487,7 @@ export class ClusterEngine {
 
             // 5. Classification Rules (Strict Gates from Method)
             let classification: 'STRONG' | 'WEAK' | 'PROTO' | 'NOISE' = 'WEAK';
-            
+
             const maxEdgeWeight = strongestEdges[0]?.weight || 0;
 
             // Gate 1: Noise (Too small or too disconnected)
@@ -497,7 +497,7 @@ export class ClusterEngine {
             // Gate 2 & 3 & 4 (Check Quality)
             else {
                 const passesRecurrenceGate = recurrenceMulti >= 0.6;
-                
+
                 if (passesRecurrenceGate) {
                     if (itemIds.length >= 4 && density.avg > 0.6) {
                         classification = 'STRONG';
@@ -510,11 +510,11 @@ export class ClusterEngine {
                     classification = 'WEAK';
                 }
             }
-            
+
             // Generate justification
-            let justification = `Cluster ${classification} (${(strengthScore*100).toFixed(0)}%). `;
+            let justification = `Cluster ${classification} (${(strengthScore * 100).toFixed(0)}%). `;
             if (classification === 'STRONG') {
-                justification += `Vibe forte. Recorrência multi-camada (${(recurrenceMulti*100).toFixed(0)}%) e densidade alta.`;
+                justification += `Vibe forte. Recorrência multi-camada (${(recurrenceMulti * 100).toFixed(0)}%) e densidade alta.`;
             } else if (classification === 'PROTO') {
                 justification += `Núcleo em formação. Sinais fortes, mas quantidade/densidade abaixo do limiar.`;
             } else if (classification === 'NOISE') {
@@ -566,22 +566,22 @@ export class ClusterEngine {
             if (!buckets[key]) buckets[key] = [];
             buckets[key].push(node.id);
         });
-        
+
         // Identify buckets that didn't form a single cluster
         Object.entries(buckets).forEach(([key, ids]) => {
-             if (ids.length >= 2) {
-                 // Check if these are split across clusters
-                 const involvedClusters = new Set(ids.map(id => {
-                     return clustersFormatted.find(c => c.items.includes(id))?.id;
-                 }));
-                 if (involvedClusters.size > 1) {
-                     nearClusters.push({
-                         signals: key,
-                         nodes: ids,
-                         reason: 'Split across clusters'
-                     });
-                 }
-             }
+            if (ids.length >= 2) {
+                // Check if these are split across clusters
+                const involvedClusters = new Set(ids.map(id => {
+                    return clustersFormatted.find(c => c.items.includes(id))?.id;
+                }));
+                if (involvedClusters.size > 1) {
+                    nearClusters.push({
+                        signals: key,
+                        nodes: ids,
+                        reason: 'Split across clusters'
+                    });
+                }
+            }
         });
         await fs.writeFile(path.join(evidenceDir, 'near_clusters.json'), JSON.stringify(nearClusters, null, 2));
 
@@ -661,7 +661,7 @@ export class ClusterEngine {
         // Audit
         const audit = ClusterAuditor.runSanityChecks(result, clusterMetricsForAudit, hashes);
         await fs.writeFile(path.join(evidenceDir, 'sanity_checks.json'), JSON.stringify(audit, null, 2));
-        
+
         result.audit = audit;
 
         // Attach log

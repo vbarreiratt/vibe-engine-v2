@@ -167,7 +167,7 @@ export class ClusterLogger {
 
         md += `## 2. Decisões de Grafo (Arestas)\n`;
         md += `Total de conexões avaliadas relevantes: ${t.edges.length}\n\n`;
-        
+
         // Amostra de arestas fortes
         const strongEdges = t.edges.filter(e => e.isEdgeCreated).sort((a, b) => b.score - a.score).slice(0, 5);
         md += `### Top 5 Conexões Mais Fortes\n`;
@@ -189,7 +189,7 @@ export class ClusterLogger {
                 grouped[c.classification].push(c);
             } else {
                 // Fallback for unexpected or mixed types if any
-                grouped.WEAK.push(c); 
+                grouped.WEAK.push(c);
             }
         });
 
@@ -197,11 +197,11 @@ export class ClusterLogger {
             if (list.length === 0) return;
             md += `### ${title}\n`;
             list.forEach(c => {
-                 md += `**[Cluster ${c.clusterId}]** (Força: ${c.strengthScore?.toFixed(2) || 'N/A'}, Estabilidade: ${c.stabilityScore?.toFixed(2) || 'N/A'}, Densidade: ${c.density?.avg.toFixed(2) || 'N/A'})\n`;
-                 md += `- **Cadeia de Formação**:\n`;
-                 md += `  - Sinais Recorrentes: Estado=${(c.recurrence?.state * 100).toFixed(0)}%, Matéria=${(c.recurrence?.matter * 100).toFixed(0)}%, Movimento=${(c.recurrence?.movement * 100).toFixed(0)}%\n`;
-                 md += `  - Sinais Dominantes: ${c.dominantSignals.state[0] || '-'} / ${c.dominantSignals.matter[0] || '-'} / ${c.dominantSignals.movement[0] || '-'}\n`;
-                 md += `- **Interpretação**: ${c.justification}\n\n`;
+                md += `**[Cluster ${c.clusterId}]** (Força: ${c.strengthScore?.toFixed(2) || 'N/A'}, Estabilidade: ${c.stabilityScore?.toFixed(2) || 'N/A'}, Densidade: ${c.density?.avg.toFixed(2) || 'N/A'})\n`;
+                md += `- **Cadeia de Formação**:\n`;
+                md += `  - Sinais Recorrentes: Estado=${(c.recurrence?.state * 100).toFixed(0)}%, Matéria=${(c.recurrence?.matter * 100).toFixed(0)}%, Movimento=${(c.recurrence?.movement * 100).toFixed(0)}%\n`;
+                md += `  - Sinais Dominantes: ${c.dominantSignals.state[0] || '-'} / ${c.dominantSignals.matter[0] || '-'} / ${c.dominantSignals.movement[0] || '-'}\n`;
+                md += `- **Interpretação**: ${c.justification}\n\n`;
             });
         };
 
@@ -219,7 +219,7 @@ export class ClusterLogger {
         md += `- **Atribuições**: \`evidence/cluster_assignments.csv\`\n`;
         md += `- **Arestas Auditadas**: \`evidence/graph_edges.csv\`\n`;
         md += `- **Inputs Canônicos**: \`evidence/inputs_canonical.csv\`\n\n`;
-        
+
         md += `> _Relatório gerado automaticamente pelo Vibe Engine v2 (Audit Mode)._\n`;
 
         return md;
@@ -272,7 +272,7 @@ export class ClusterLogger {
             await fs.writeFile(path.join(baseDir, 'cluster_log_tecnico.json'), JSON.stringify(this.generateTechnicalJson(), null, 2));
             await fs.writeFile(path.join(baseDir, 'cluster_nodes.csv'), this.generateNodesCSV());
             await fs.writeFile(path.join(baseDir, 'cluster_graph.csv'), this.generateEdgesCSV());
-            
+
             console.log(`Logs exportados com sucesso para ${baseDir}`);
         } catch (error) {
             console.error("Erro ao exportar logs:", error);

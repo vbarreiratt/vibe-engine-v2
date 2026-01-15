@@ -42,7 +42,7 @@ export async function getClusterEditorData(clusterId: string): Promise<ClusterEd
             )
         `)
         .eq('cluster_id', clusterId);
-    
+
     if (nodesError || !clusterNodes) {
         console.error("Error fetching cluster nodes:", nodesError);
         return null;
@@ -56,7 +56,7 @@ export async function getClusterEditorData(clusterId: string): Promise<ClusterEd
     clusterNodes.forEach((cn: any) => {
         const image = cn.images;
         const sigObj = Array.isArray(image.image_signals) ? image.image_signals[0] : image.image_signals;
-        
+
         if (!sigObj) return;
 
         const nodeSignals: string[] = [];
@@ -67,7 +67,7 @@ export async function getClusterEditorData(clusterId: string): Promise<ClusterEd
             if (Array.isArray(terms)) {
                 terms.forEach((term: string) => {
                     nodeSignals.push(term);
-                    
+
                     if (!signalCounts[term]) {
                         signalCounts[term] = { count: 0, layer };
                     }
@@ -89,9 +89,9 @@ export async function getClusterEditorData(clusterId: string): Promise<ClusterEd
     // 4. Calculate Signals Metrics (with Overrides)
     const signals: EditorSignal[] = Object.entries(signalCounts).map(([term, data]) => {
         const recurrence = data.count / totalNodes;
-        
+
         // Default Logic
-        let role: SignalRole = 'fragile';
+        let role: SignalRole = 'neutral';
         if (recurrence > 0.6) role = 'structural'; // was 'structural'
         else if (recurrence > 0.3) role = 'support';
 
@@ -113,8 +113,8 @@ export async function getClusterEditorData(clusterId: string): Promise<ClusterEd
     }).sort((a, b) => b.recurrence - a.recurrence);
 
     // 5. Derive Cluster Metrics
-    const avgRecurrence = signals.length > 0 
-        ? signals.reduce((acc, s) => acc + s.recurrence, 0) / signals.length 
+    const avgRecurrence = signals.length > 0
+        ? signals.reduce((acc, s) => acc + s.recurrence, 0) / signals.length
         : 0;
 
     const density = clusterNodes.length > 0 ? (signals.length / clusterNodes.length) : 0; // Simple proxy
@@ -154,7 +154,7 @@ export async function getClusterEditorData(clusterId: string): Promise<ClusterEd
 
 export async function updateClusterSynthesis(clusterId: string, data: { name?: string, description?: string, role?: string }) {
     const supabase = await createClient();
-    
+
     // Build update object
     const update: any = {};
     if (data.name !== undefined) update.name_final = data.name;
@@ -177,27 +177,27 @@ export async function logClusterEditorAction(clusterId: string, action: string, 
 
     // In a real scenario, insert into 'audit_log' table
     console.log(`[AUDIT] Cluster: ${clusterId} | Action: ${action} | User: ${user.id}`, details);
-    
+
     // For V1, we just return true to simulate success
     return true;
 }
 
 export async function setSignalRole(clusterId: string, signal: string, role: SignalRole, layer: string, currentOverrides: any = {}) {
     const supabase = await createClient();
-    
+
     // Logic: If role is different from default, store it. If back to 'neural', maybe remove it?
     // For simplicity, we just store what comes unless it is cleared.
     // Also, enforce "Only one MOTOR per layer" if role is 'structural'.
-    
+
     const newOverrides = { ...currentOverrides };
-    
+
     // Unset other structural in same layer if promoting this one
     if (role === 'structural') {
         Object.keys(newOverrides).forEach(key => {
             if (newOverrides[key].layer === layer && newOverrides[key].role === 'structural') {
-                 // Demote previous motor to support or just remove override?
-                 // Let's demote to support for safety
-                 newOverrides[key] = { ...newOverrides[key], role: 'support' };
+                // Demote previous motor to support or just remove override?
+                // Let's demote to support for safety
+                newOverrides[key] = { ...newOverrides[key], role: 'support' };
             }
         });
     }
@@ -212,7 +212,7 @@ export async function setSignalRole(clusterId: string, signal: string, role: Sig
     if (!error) {
         await logClusterEditorAction(clusterId, 'set_signal_role', { signal, role, layer });
     }
-    
+
     return { success: !error, error };
 }
 
@@ -230,3 +230,266 @@ export async function setNodeCuration(clusterId: string, nodeId: string, status:
 
     return { success: !error, error };
 }
+
+export async function mergeClusters(targetId: string, sourceId: string) {
+    const supabase = await createClient();
+
+    // 1. Get info on both clusters
+    const { data: target } = await supabase.from('clusters').select('name_suggested').eq('id', targetId).single();
+    const { data: source } = await supabase.from('clusters').select('name_suggested').eq('id', sourceId).single();
+
+    if (!target || !source) return { success: false, error: "Cluster not found" };
+
+    // 2. Component Logic: Fetch Nodes to Determine Geometry
+    // We need to know who is who before we merge IDs
+    const { data: sourceNodes } = await supabase.from('cluster_nodes').select('id, x, y').eq('cluster_id', sourceId);
+    const { data: targetNodes } = await supabase.from('cluster_nodes').select('id, x, y').eq('cluster_id', targetId);
+
+    const sNodes = sourceNodes || [];
+    const tNodes = targetNodes || [];
+    const allNodes = [...sNodes, ...tNodes];
+
+    if (allNodes.length === 0) return { success: false, error: "No nodes to merge" };
+
+    // 3. Calculation of New Positions
+    const updates: { id: string, cluster_id: string, x?: number, y?: number }[] = [];
+
+    // Strategy A: Fusion (Small groups) -> Pull everyone together
+    // Strategy B: Absorption (Large groups) -> Pull source into target
+    const isFusion = allNodes.length <= 5;
+
+    if (isFusion) {
+        // Calculate Combined Centroid
+        const cx = allNodes.reduce((sum, n) => sum + (n.x || 0), 0) / allNodes.length;
+        const cy = allNodes.reduce((sum, n) => sum + (n.y || 0), 0) / allNodes.length;
+
+        // Reposition ALL nodes tightly around centroid
+        allNodes.forEach(n => {
+            // Vector from center
+            const dx = (n.x || 0) - cx;
+            const dy = (n.y || 0) - cy;
+            const dist = Math.hypot(dx, dy);
+
+            // Normalize to fixed radius (e.g. 50px spread) if distant
+            // If dist is 0 (same spot), add jitter
+            let scale = 0;
+            if (dist > 50) scale = 50 / dist;
+            else scale = 1; // Keep if already close
+
+            // Add slight jitter to prevent perfect overlap if dist was 0
+            const jitterX = (Math.random() - 0.5) * 10;
+            const jitterY = (Math.random() - 0.5) * 10;
+
+            updates.push({
+                id: n.id,
+                cluster_id: targetId,
+                x: cx + (dx * scale) + jitterX,
+                y: cy + (dy * scale) + jitterY
+            });
+        });
+    } else {
+        // Absorption: Target stays puts, Source comes in
+        const cx = tNodes.reduce((sum, n) => sum + (n.x || 0), 0) / tNodes.length;
+        const cy = tNodes.reduce((sum, n) => sum + (n.y || 0), 0) / tNodes.length;
+
+        // Move Source Nodes to Target Centroid
+        sNodes.forEach(n => {
+            updates.push({
+                id: n.id,
+                cluster_id: targetId,
+                x: cx + (Math.random() - 0.5) * 40, // Random placement in core
+                y: cy + (Math.random() - 0.5) * 40
+            });
+        });
+    }
+
+    // 4. Perform Updates
+    await Promise.all(updates.map(u =>
+        supabase.from('cluster_nodes').update({
+            cluster_id: u.cluster_id,
+            x: u.x,
+            y: u.y
+        }).eq('id', u.id)
+    ));
+
+    // 5. Update Target Metadata (PROTO)
+    await supabase.from('clusters').update({
+        classification: 'PROTO',
+        name_suggested: "Fusão Latente",
+        description_suggested: "Resultado da fusão de mundos latentes."
+    }).eq('id', targetId);
+
+    // 6. Delete Source Cluster
+    await supabase.from('clusters').delete().eq('id', sourceId);
+
+    // 7. Log
+    await logClusterEditorAction(targetId, 'merge_clusters', { mergedWith: sourceId });
+
+    return { success: true };
+}
+
+export async function detachNodeFromCluster(
+    nodeId: string,
+    currentClusterId: string,
+    position: { x: number, y: number },
+    customNewClusterId?: string
+) {
+    console.log(`[Detach] Node: ${nodeId}, Cluster: ${currentClusterId}, CustomID: ${customNewClusterId}`);
+
+    const supabase = await createClient();
+
+    try {
+        // 0. Fetch Parent Cluster Info
+        const { data: parentCluster, error: parentError } = await supabase
+            .from('clusters')
+            .select('clusters_run_id')
+            .eq('id', currentClusterId)
+            .single();
+
+        if (parentError || !parentCluster) {
+            console.error("[Detach] Parent Error:", parentError);
+            return { success: false, error: parentError?.message || "Parent cluster not found" };
+        }
+
+        // 1. Create New Cluster (Latent Bubble)
+        const uniqueName = `Nova Bolha ${Date.now().toString().slice(-4)}`;
+        const { data: newCluster, error: createError } = await supabase
+            .from('clusters')
+            .insert({
+                ...(customNewClusterId ? { id: customNewClusterId } : {}),
+                clusters_run_id: parentCluster.clusters_run_id,
+                name_suggested: uniqueName,
+                description_suggested: "Item destacado manualmente.",
+                classification: 'NOISE' // Matches ClusterMetrics type
+            })
+            .select()
+            .single();
+
+        if (createError || !newCluster) {
+            console.error("[Detach] Create Error:", createError);
+            return { success: false, error: createError?.message || "Failed to create bubble" };
+        }
+
+        // 2. Move Node to New Cluster
+        const { error: moveError } = await supabase
+            .from('cluster_nodes')
+            .update({
+                cluster_id: newCluster.id,
+                x: position.x,
+                y: position.y
+            })
+            .eq('id', nodeId);
+
+        if (moveError) {
+            console.error("[Detach] Move Error:", moveError);
+            return { success: false, error: moveError.message };
+        }
+
+        // 3. Cleanup Old Cluster if Empty
+        const { count } = await supabase
+            .from('cluster_nodes')
+            .select('*', { count: 'exact', head: true })
+            .eq('cluster_id', currentClusterId);
+
+        if (count === 0) {
+            await supabase.from('clusters').delete().eq('id', currentClusterId);
+        }
+
+        // 4. Log
+        await logClusterEditorAction(newCluster.id, 'detach_node', { nodeId, from: currentClusterId });
+
+        return { success: true, newClusterId: newCluster.id };
+    } catch (e: any) {
+        console.error("[Detach] Exception:", e);
+        return { success: false, error: e.message || "Unknown server error" };
+    }
+}
+
+export async function attachNodeToCluster(
+    nodeId: string,
+    targetClusterId: string
+) {
+    console.log(`[Attach] Node: ${nodeId} to Cluster: ${targetClusterId}`);
+    const supabase = await createClient();
+
+    try {
+        // 1. Get current cluster ID for cleanup later
+        const { data: currentNode } = await supabase
+            .from('cluster_nodes')
+            .select('cluster_id')
+            .eq('id', nodeId)
+            .single();
+
+        const sourceClusterId = currentNode?.cluster_id;
+
+        // 2. Move Node
+        const { error: moveError } = await supabase
+            .from('cluster_nodes')
+            .update({
+                cluster_id: targetClusterId
+            })
+            .eq('id', nodeId);
+
+        if (moveError) throw moveError;
+
+        // 3. Cleanup Source Cluster if empty
+        if (sourceClusterId && sourceClusterId !== targetClusterId) {
+            const { count } = await supabase
+                .from('cluster_nodes')
+                .select('*', { count: 'exact', head: true })
+                .eq('cluster_id', sourceClusterId);
+
+            if (count === 0) {
+                await supabase.from('clusters').delete().eq('id', sourceClusterId);
+            }
+        }
+
+        await logClusterEditorAction(targetClusterId, 'attach_node', { nodeId, from: sourceClusterId });
+        return { success: true };
+
+    } catch (e: any) {
+        console.error("[Attach] Exception:", e);
+        return { success: false, error: e.message || "Unknown error" };
+    }
+}
+
+export async function saveSnapshot(
+    runId: string,
+    label: string,
+    graph: { nodes: any[], edges: any[] },
+    ui?: any
+) {
+    const supabase = await createClient();
+    const { data, error } = await supabase
+        .from('resonance_snapshots')
+        .insert({
+            run_id: runId,
+            label,
+            graph_json: graph,
+            ui_json: ui,
+            kind: 'version'
+        })
+        .select('id')
+        .single();
+
+    if (error) {
+        console.error("Save Snapshot Error:", error);
+        return { success: false, error: error.message };
+    }
+    return { success: true, id: data.id };
+}
+
+export async function getSnapshots(runId: string) {
+    const supabase = await createClient();
+    const { data, error } = await supabase
+        .from('resonance_snapshots')
+        .select('*')
+        .eq('run_id', runId)
+        .order('created_at', { ascending: false });
+
+    if (error) return { success: false, error: error.message };
+
+    return { success: true, snapshots: data };
+}
+
+
