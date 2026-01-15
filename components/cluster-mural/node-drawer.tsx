@@ -156,16 +156,16 @@ export function NodeDrawer({
                                     </div>
                                 </>
                             ) : hasSignals ? (
-                                // STATE: Signals Only
+                                // STATE: Signals Only -> READINGS DONE (Perceptive)
                                 <>
-                                    <h1 className="text-2xl font-light text-white/90 font-serif tracking-wide drop-shadow-lg">
-                                        Leitura sem descrição textual.
+                                    <h1 className="text-2xl font-light text-white/90 font-serif tracking-wide drop-shadow-lg leading-tight">
+                                        Leitura vibracional detectada
                                     </h1>
-                                    <p className="text-zinc-400 font-light text-sm leading-relaxed">
-                                        Frequências vibracionais detectadas — mas o texto ainda não emergiu.
+                                    <p className="text-zinc-400 font-light text-sm leading-relaxed mt-2">
+                                        Esta referência já foi analisada por sinais de estado, matéria e movimento.
                                     </p>
-                                    <p className="text-[10px] text-zinc-600 uppercase tracking-wider">
-                                        A descrição é uma camada posterior. O que existe aqui é o DNA de sinais.
+                                    <p className="text-[10px] text-zinc-600 uppercase tracking-wider mt-4 border-t border-white/10 pt-2">
+                                        A descrição narrativa ainda não foi sintetizada.
                                     </p>
                                 </>
                             ) : (
