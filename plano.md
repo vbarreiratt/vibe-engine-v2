@@ -162,17 +162,50 @@ O sistema é colaborativo, auditável e hierárquico, permitindo que **Admins** 
 - [ ] Implementar Login e Proteção de Rotas.
 - [ ] Implementar CRUD de Projetos e Membros.
 
-## Status Atual
-- **Status**: DOING (Funcionalidades de Admin e Projetos)
-- **Entregue**:
-  - App Next.js criado.
-  - Clients Supabase configurados.
-  - Middleware de proteção criado.
-  - Migrations SQL escritas e aplicadas.
-  - Página de Login e Layout Autenticado.
-  - Dashboard Admin (Listagem de usuários e Promoção de papéis).
+## 6. Estado Atual do Sistema (Baseline Estável)
+> **Branch Principal**: `main` (ou `feature/cognitive-legend-canvas` consolidada como stable)
 
-## Log de Execução
+Chegamos a uma versão estável e epistemologicamente coerente do sistema.
+
+### Componentes Consolidados
+*   **Motor de Clusterização**: Estável e imutável por run.
+*   **Separação Conceitual**:
+    *   **Status Estrutural (Motor)**: O que o algoritmo vê (imutável).
+    *   **Saúde da Leitura (Curadoria)**: O que o humano interpreta (mutável).
+*   **Canvas de Ressonância**: Grid imersivo, "ilhas" de clusters, navegação fluida.
+*   **Modos Cognitivos Implementados**:
+    *   **Visualização (Olho)**: Somente leitura, navegação segura.
+    *   **Playground (Erlenmeyer)**: Edição curatorial (drag de clusters, toggle de sinais).
+    *   **Lab/Síntese (Estrela)**: Visualização preliminar para decisão de destino.
+
+### O que JÁ FOI resolvido
+*   **Correção de WEAK/STRONG**: Lógica de classificação agora reflete densidade real.
+*   **Drag de Grupo**: Arrastar um cluster move todos os seus nodes mantendo o desenho interno.
+*   **UI de Modos**: Rail lateral para modos (leitura) e toolbar inferior para ferramentas (interação).
+*   **Isolamento Motor vs Leitura**: Edições no canvas (nomes, posições) não corrompem o cálculo original de força.
+
+### Próximo Passo: Editor de Cluster V2 — Síntese Orientada
+O foco muda de *inspeção* para *decisão*.
+*   Não é sobre melhorar embedding.
+*   Não é sobre re-clusterizar.
+*   É sobre permitir que o curador diga: "Este cluster é um Território" ou "Este cluster é Ruído".
+
+---
+
+## 7. Tarefa Atual (FOCO ATIVO)
+**Estamos trabalhando na transição do Editor de Cluster V1 (Leitura) para o Editor de Cluster V2 (Síntese e Decisão).**
+
+### Objetivo Imediato
+1.  Permitir **Nomeação Consciente** (`name_final` vs `name_suggested`).
+2.  Definir **Papel Sistêmico** do cluster (Território, Pilar, Contraponto, Arquivo).
+3.  Iniciar **Relações Cluster-Cluster** (quem orbita quem?).
+
+> **Nota Metodológica Crítica**:
+> "As edições atuais são **curatoriais**. Elas não alteram o motor. O impacto estrutural só acontece em ciclos futuros de regeneração."
+
+---
+
+## Histórico e Log de Execução
 - **2024-01-14**:
   - Inicialização do projeto (Next.js 14, Tailwind, TypeScript).
   - Setup do Supabase (Auth, Server Actions, Middleware).

@@ -254,3 +254,19 @@ Transformar o Canvas de Ressonância de um "debug de pontos" para um **editor pr
   - Updates to `ClusterEditorData` to include synthesis state.
   - Optimistic UI updates for Synthesis fields.
 
+
+## [2026-01-15] Handover & Consolidation
+
+### Epistemological Alignment
+- **Separation of Concerns**: We firmly separated 'Structural Status' (Engine Health) from 'Reading Health' (Curator Interpretation). This prevents valid curatorial moves from appearing as 'engine errors'.
+- **Sandbox Mode**: Current canvas edits (drag, rename) are strictly **curatorial**. They are saved as 'overrides' (`clusters_runs` metadata) and do not trigger a recalculation of the underlying graph (ForceAtlas2). This ensures stability during presentation.
+- **Cognitive Modes**: Implemented distinct mental modes to guide the user:
+  - **View**: Passive consumption.
+  - **Playground**: Active experimentation (what if I move this here?).
+  - **Synthesis**: Final decision making (this *is* here).
+
+### Technical Baseline
+- Established `feature/cognitive-legend-canvas` as the Vibe Engine V1 Baseline.
+- Fixed UI interactions: Ghosting in Mode Rail, Cluster Drag Logic (Group movement).
+- Ready for V2: The system is prepared to receive the 'Synthesis Layer' (Roles & Relations) without architectural refactors.
+
