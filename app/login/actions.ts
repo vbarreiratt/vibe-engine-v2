@@ -20,7 +20,7 @@ export async function login(formData: FormData) {
         // Let's redirect to login with error param for simplicity or just fail.
         // Ideally we use useFormState.
         console.error(error)
-        return { error: error.message }
+        redirect('/login?error=Invalid credentials')
     }
 
     revalidatePath('/', 'layout')

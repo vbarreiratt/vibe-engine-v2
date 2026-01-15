@@ -456,7 +456,7 @@ export async function attachNodeToCluster(
 export async function saveSnapshot(
     runId: string,
     label: string,
-    graph: { nodes: any[], edges: any[] },
+    graph: { nodes: any[], edges: any[], clusters?: any[] },
     ui?: any
 ) {
     const supabase = await createClient();

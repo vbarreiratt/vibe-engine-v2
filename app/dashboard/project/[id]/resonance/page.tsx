@@ -352,7 +352,7 @@ export default function ResonancePage() {
             const res = await saveSnapshot(activeRunId, saveName, { nodes: draftNodes, clusters: draftClusters, edges: baseEdges });
             if (res.success) {
                 const snapRes = await getSnapshots(activeRunId);
-                if (snapRes.success) setSnapshots(snapRes.snapshots);
+                if (snapRes.success) setSnapshots(snapRes.snapshots || []);
                 setIsSaveModalOpen(false);
                 // Success feedback? Could use toast, but modal closing is feedback enough for now
             } else {

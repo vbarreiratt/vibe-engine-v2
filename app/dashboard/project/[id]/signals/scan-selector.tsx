@@ -27,7 +27,8 @@ export function ScanSelector({ scans, projectId, currentUserId }: { scans: Scan[
         if (result && !result.error) {
             router.refresh()
         }
-        return result
+        // Normalize return type for DeleteWithConfirmation (expects { error?: string } | void)
+        return result?.error ? { error: result.error } : undefined
     }
 
     return (

@@ -14,7 +14,7 @@ export function DeleteRunButton({ runId }: { runId: string }) {
                 return res
             } else {
                 router.refresh()
-                return { success: true }
+                return undefined
             }
         } catch (err) {
             console.error(err)
