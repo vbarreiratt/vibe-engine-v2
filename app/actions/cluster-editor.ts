@@ -1,7 +1,7 @@
 'use server';
 
 import { createClient } from '@/lib/supabase/server';
-import { ClusterEditorData, EditorNode, EditorSignal, ClusterMetrics } from '@/types/cluster-editor';
+import { ClusterEditorData, EditorNode, EditorSignal, ClusterMetrics, SignalRole, NodeCurationStatus } from '@/types/cluster-editor';
 
 /**
  * Fetches deep details for the Cluster Editor V1
@@ -19,11 +19,15 @@ export async function getClusterEditorData(clusterId: string): Promise<ClusterEd
 
     if (clusterError || !cluster) return null;
 
+    const signalOverrides: Record<string, { role: SignalRole, layer: string }> = cluster.signal_overrides || {};
+
     // 2. Get Nodes (Images) in this Cluster
     const { data: clusterNodes, error: nodesError } = await supabase
         .from('cluster_nodes')
         .select(`
+            id,
             image_id,
+            curation_status,
             x,
             y,
             images!image_id (
@@ -38,7 +42,7 @@ export async function getClusterEditorData(clusterId: string): Promise<ClusterEd
             )
         `)
         .eq('cluster_id', clusterId);
-
+    
     if (nodesError || !clusterNodes) {
         console.error("Error fetching cluster nodes:", nodesError);
         return null;
@@ -51,9 +55,6 @@ export async function getClusterEditorData(clusterId: string): Promise<ClusterEd
 
     clusterNodes.forEach((cn: any) => {
         const image = cn.images;
-        // In the new schema signals are directly in columns text[]
-        // Supabase One-to-One might return an object or array. Usually array if !single not used.
-        // Assuming array or object, we handle both.
         const sigObj = Array.isArray(image.image_signals) ? image.image_signals[0] : image.image_signals;
         
         if (!sigObj) return;
@@ -77,19 +78,27 @@ export async function getClusterEditorData(clusterId: string): Promise<ClusterEd
 
         nodes.push({
             id: image.id,
+            nodeId: cn.id,
             url: image.thumb_url || image.original_url,
             signals: nodeSignals,
-            connectionStrength: 1 // V1 Simplification (could use distance from center later)
+            connectionStrength: 1, // V1 Simplification
+            curationStatus: cn.curation_status || 'active'
         });
     });
 
-    // 4. Calculate Signals Metrics
+    // 4. Calculate Signals Metrics (with Overrides)
     const signals: EditorSignal[] = Object.entries(signalCounts).map(([term, data]) => {
         const recurrence = data.count / totalNodes;
         
-        let role: 'structural' | 'support' | 'fragile' = 'fragile';
-        if (recurrence > 0.6) role = 'structural';
+        // Default Logic
+        let role: SignalRole = 'fragile';
+        if (recurrence > 0.6) role = 'structural'; // was 'structural'
         else if (recurrence > 0.3) role = 'support';
+
+        // Override Logic (Level 1)
+        if (signalOverrides[term]) {
+            role = signalOverrides[term].role;
+        }
 
         return {
             term,
@@ -98,8 +107,8 @@ export async function getClusterEditorData(clusterId: string): Promise<ClusterEd
             count: data.count,
             totalNodes,
             role,
-            isActive: true,
-            isPromoted: false
+            isActive: true, // Default view
+            isPromoted: role === 'structural'
         };
     }).sort((a, b) => b.recurrence - a.recurrence);
 
@@ -152,4 +161,53 @@ export async function logClusterEditorAction(clusterId: string, action: string, 
     
     // For V1, we just return true to simulate success
     return true;
+}
+
+export async function setSignalRole(clusterId: string, signal: string, role: SignalRole, layer: string, currentOverrides: any = {}) {
+    const supabase = await createClient();
+    
+    // Logic: If role is different from default, store it. If back to 'neural', maybe remove it?
+    // For simplicity, we just store what comes unless it is cleared.
+    // Also, enforce "Only one MOTOR per layer" if role is 'structural'.
+    
+    const newOverrides = { ...currentOverrides };
+    
+    // Unset other structural in same layer if promoting this one
+    if (role === 'structural') {
+        Object.keys(newOverrides).forEach(key => {
+            if (newOverrides[key].layer === layer && newOverrides[key].role === 'structural') {
+                 // Demote previous motor to support or just remove override?
+                 // Let's demote to support for safety
+                 newOverrides[key] = { ...newOverrides[key], role: 'support' };
+            }
+        });
+    }
+
+    newOverrides[signal] = { role, layer };
+
+    const { error } = await supabase
+        .from('clusters')
+        .update({ signal_overrides: newOverrides })
+        .eq('id', clusterId);
+
+    if (!error) {
+        await logClusterEditorAction(clusterId, 'set_signal_role', { signal, role, layer });
+    }
+    
+    return { success: !error, error };
+}
+
+export async function setNodeCuration(clusterId: string, nodeId: string, status: NodeCurationStatus) {
+    const supabase = await createClient();
+
+    const { error } = await supabase
+        .from('cluster_nodes')
+        .update({ curation_status: status })
+        .eq('id', nodeId); // This is the join table ID
+
+    if (!error) {
+        await logClusterEditorAction(clusterId, 'set_node_status', { nodeId, status });
+    }
+
+    return { success: !error, error };
 }
