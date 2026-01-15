@@ -225,3 +225,15 @@ Transformar o Canvas de Ressonância de um "debug de pontos" para um **editor pr
   - New Server Action `getClusterEditorData` aggregates complex graph relationships efficiently.
   - New Component `ClusterEditor` manages local simulation state.
   - Integrated into `ResonanceCanvas` with immersive overlay.
+
+## [2026-01-15] Cluster Editor UX - Pedagogical Layer
+
+### Features
+- **Pedagogical Tooltips**:
+  - Implemented rich "Health Panel" tooltips (Stability, Dominance, Curation) explaining the Vibe methodology.
+  - Added "How to Influence" sections to guide curators.
+- **Visual Feedback**:
+  - Added interaction Toasts (Success, Warning) for Signal and Node actions.
+  - Improved Signal Dropdown with color-coded Method definitions (Motor/Support/Noise).
+- **Bug Fixes**:
+  - Fixed `overflow-hidden` clipping issue on Image Grid tooltips by refactoring DOM structure.
