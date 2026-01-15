@@ -209,3 +209,19 @@ Transformar o Canvas de Ressonância de um "debug de pontos" para um **editor pr
 3.  **Update Graph Builder**: Add kNN fallback and expanded edge logging.
 4.  **Refactor Metrics**: Implement Gates for Classification and capped Strength Score.
 5.  **Run & Verify**: Test the job.
+
+## [2026-01-14] Cluster Editor V1 - Causal Inspection
+
+### Features
+- **Cluster Inspector**:
+  - Implemented "Level 1" analysis tool triggered by double-clicking a cluster.
+  - Three-pane interface:
+    1. **Signal DNA**: List of shared signals (Structural vs Functional indicators).
+    2. **Reference Grid**: Visual list of nodes in the cluster with description/movement.
+    3. **Metrics Panel**: Stability score, Density, and Homogeneity calculations.
+- **Simulation**:
+  - Ability to toggle signals "off" to simulate their impact on cluster stability (Client-side calculation).
+- **Architecture**:
+  - New Server Action `getClusterEditorData` aggregates complex graph relationships efficiently.
+  - New Component `ClusterEditor` manages local simulation state.
+  - Integrated into `ResonanceCanvas` with immersive overlay.

@@ -6,6 +6,7 @@ import { ResonanceLegend } from './resonance-legend';
 import { ClusterPanel } from './cluster-panel';
 
 import { NodeDrawer } from './node-drawer';
+import { ClusterEditor } from './cluster-editor';
 
 // Types
 interface Node {
@@ -75,6 +76,7 @@ export function ResonanceCanvas({ nodes, edges, clusters, edgesByNode, logText, 
     const containerRef = useRef<HTMLDivElement>(null);
     const [transform, setTransform] = useState({ scale: 1, x: 0, y: 0 });
     const [selectedNode, setSelectedNode] = useState<string | null>(null);
+    const [editingClusterId, setEditingClusterId] = useState<string | null>(null);
     const [tool, setTool] = useState<'select' | 'pan'>('select');
     const [isDragging, setIsDragging] = useState(false);
     const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
@@ -336,6 +338,10 @@ export function ResonanceCanvas({ nodes, edges, clusters, edgesByNode, logText, 
                                     onClick={(e) => {
                                         e.stopPropagation();
                                         setClickedCluster(cluster);
+                                    }}
+                                    onDoubleClick={(e) => {
+                                        e.stopPropagation();
+                                        setEditingClusterId(cluster.id);
                                     }}
                                     style={{ cursor: 'pointer' }}
                                 >
@@ -666,6 +672,14 @@ export function ResonanceCanvas({ nodes, edges, clusters, edgesByNode, logText, 
 
             {/* Cognitive Panel (New Interaction) */}
             <ClusterPanel cluster={clickedCluster} onClose={() => setClickedCluster(null)} />
+
+            {/* Cluster Editor (Level 1 Analysis) */}
+            {editingClusterId && (
+                <ClusterEditor 
+                    clusterId={editingClusterId} 
+                    onClose={() => setEditingClusterId(null)} 
+                />
+            )}
         </div>
     );
 }
