@@ -120,7 +120,7 @@ export default function ResonancePage() {
                 // 2. Load Snapshots
                 const snapRes = await getSnapshots(runId);
                 if (snapRes.success) {
-                    setSnapshots(snapRes.snapshots);
+                    setSnapshots(snapRes.snapshots ?? []);
                 }
 
                 // 3. Initialize Draft (Local First)
