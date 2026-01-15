@@ -181,6 +181,47 @@ export default function ResonancePage() {
         }
     };
 
+    // Helper: Reorganize Cluster Layout (Circular Distribution)
+    const reorganizeClusterNodes = (clusterId: string, allNodes: any[]) => {
+        const clusterNodes = allNodes.filter(n => n.cluster_id === clusterId);
+        const count = clusterNodes.length;
+        if (count === 0) return allNodes;
+
+        // Calculate current visual center of the cluster
+        const cx = clusterNodes.reduce((sum, n) => sum + (n.x || 0), 0) / count;
+        const cy = clusterNodes.reduce((sum, n) => sum + (n.y || 0), 0) / count;
+
+        return allNodes.map(n => {
+            if (n.cluster_id !== clusterId) return n;
+
+            const idx = clusterNodes.findIndex(cn => cn.id === n.id);
+            let ox = 0, oy = 0;
+
+            if (count === 1) {
+                ox = 0; oy = 0;
+            } else if (count === 2) {
+                // Side by side (Balanced)
+                // Use Node ID sort to keep stability? Or just Index
+                // Index is based on filter order (usually stable in draftNodes)
+                ox = idx === 0 ? -40 : 40;
+                oy = 0;
+            } else {
+                // Circular Layout for 3+ nodes
+                // Scaled radius to push nodes to the "inner edge" of the force field
+                // Base 70 + slight growth per node
+                const radius = 70 + (count * 6);
+                const angle = (idx / count) * Math.PI * 2; // Evenly distributed
+                ox = Math.cos(angle) * radius;
+                oy = Math.sin(angle) * radius;
+            }
+
+            const nx = cx + ox;
+            const ny = cy + oy;
+
+            return { ...n, x: nx, y: ny, position: { x: nx, y: ny } };
+        });
+    };
+
     const handleNodeMove = (nodeId: string, x: number, y: number) => {
         if (canvasMode !== 'playground') return;
 
@@ -193,43 +234,35 @@ export default function ResonancePage() {
 
         console.log(`[Draft] Merging ${sourceId} into ${targetId}`);
 
-        const nodesToMerge = draftNodes.filter(n => n.cluster_id === sourceId || n.cluster_id === targetId);
-
-        let avgX = 0, avgY = 0;
-        if (nodesToMerge.length > 0) {
-            avgX = nodesToMerge.reduce((sum, n) => sum + (n.x || 0), 0) / nodesToMerge.length;
-            avgY = nodesToMerge.reduce((sum, n) => sum + (n.y || 0), 0) / nodesToMerge.length;
+        // 1. Calculate Target Center (Anchor)
+        const targetNodes = draftNodes.filter(n => n.cluster_id === targetId);
+        let centerX = 0, centerY = 0;
+        if (targetNodes.length > 0) {
+            centerX = targetNodes.reduce((s, n) => s + (n.x || 0), 0) / targetNodes.length;
+            centerY = targetNodes.reduce((s, n) => s + (n.y || 0), 0) / targetNodes.length;
+        } else {
+            // Fallback
+            const sourceNodes = draftNodes.filter(n => n.cluster_id === sourceId);
+            if (sourceNodes.length > 0) {
+                centerX = sourceNodes.reduce((s, n) => s + (n.x || 0), 0) / sourceNodes.length;
+                centerY = sourceNodes.reduce((s, n) => s + (n.y || 0), 0) / sourceNodes.length;
+            }
         }
 
-        const layoutMap = new Map();
-        const count = nodesToMerge.length;
-        nodesToMerge.forEach((n, i) => {
-            let ox = 0, oy = 0;
-            if (count === 2) {
-                ox = i === 0 ? -40 : 40;
-            } else {
-                const r = 50 + (count * 5);
-                const a = (i / count) * Math.PI * 2;
-                ox = Math.cos(a) * r;
-                oy = Math.sin(a) * r;
-            }
-            layoutMap.set(n.id, { x: avgX + ox, y: avgY + oy });
-        });
-
-        const newNodes = draftNodes.map(n => {
+        // 2. Update Source Nodes to Target ID
+        // Move them to center so reorganizer expands them outwards from target
+        const mergedNodes = draftNodes.map(n => {
             if (n.cluster_id === sourceId) {
-                const pos = layoutMap.get(n.id) || { x: avgX, y: avgY };
-                return { ...n, cluster_id: targetId, x: pos.x, y: pos.y, position: pos };
-            }
-            if (n.cluster_id === targetId && layoutMap.has(n.id)) {
-                const pos = layoutMap.get(n.id)!;
-                return { ...n, x: pos.x, y: pos.y, position: pos };
+                return { ...n, cluster_id: targetId, x: centerX, y: centerY, position: { x: centerX, y: centerY } };
             }
             return n;
         });
 
+        // 3. Reorganize Layout
+        const reorganizedNodes = reorganizeClusterNodes(targetId, mergedNodes);
+
         const newClusters = draftClusters.filter(c => c.id !== sourceId);
-        persistDraft(newNodes, newClusters);
+        persistDraft(reorganizedNodes, newClusters);
     };
 
     const handleAttachNode = async (nodeId: string, targetClusterId: string) => {
@@ -240,42 +273,35 @@ export default function ResonancePage() {
         const node = draftNodes.find(n => n.id === nodeId);
         const sourceClusterId = node?.cluster_id;
 
-        const targetNodes = draftNodes.filter(n => n.cluster_id === targetClusterId);
-
-        // Simple center based Attach
-        let cx = 0, cy = 0;
-        if (targetNodes.length > 0) {
-            cx = targetNodes.reduce((s, n) => s + (n.x || 0), 0) / targetNodes.length;
-            cy = targetNodes.reduce((s, n) => s + (n.y || 0), 0) / targetNodes.length;
-        } else {
-            cx = node?.x || 0;
-            cy = node?.y || 0;
-        }
-
-        const angle = Math.random() * Math.PI * 2;
-        const dist = Math.random() * 40;
-
+        // Update Node Cluster ID
         const newNodes = draftNodes.map(n => {
             if (n.id === nodeId) {
-                return {
-                    ...n,
-                    cluster_id: targetClusterId,
-                    x: cx + Math.cos(angle) * dist,
-                    y: cy + Math.sin(angle) * dist
-                };
+                return { ...n, cluster_id: targetClusterId };
             }
             return n;
         });
 
+        // Reorganize Target Cluster
+        let reorganizedNodes = reorganizeClusterNodes(targetClusterId, newNodes);
+
+        // Reorganize Source Cluster (if nodes remain)
+        if (sourceClusterId) {
+            const remaining = reorganizedNodes.filter(n => n.cluster_id === sourceClusterId).length;
+            if (remaining > 0) {
+                reorganizedNodes = reorganizeClusterNodes(sourceClusterId, reorganizedNodes);
+            }
+        }
+
+        // Cleanup empty clusters
         let newClusters = [...draftClusters];
         if (sourceClusterId) {
-            const remaining = newNodes.filter(n => n.cluster_id === sourceClusterId).length;
+            const remaining = reorganizedNodes.filter(n => n.cluster_id === sourceClusterId).length;
             if (remaining === 0) {
                 newClusters = newClusters.filter(c => c.id !== sourceClusterId);
             }
         }
 
-        persistDraft(newNodes, newClusters);
+        persistDraft(reorganizedNodes, newClusters);
     };
 
     const handleDetachNode = async (nodeId: string, currentClusterId: string, position: { x: number, y: number }) => {
@@ -296,15 +322,18 @@ export default function ResonancePage() {
 
         const newNodes = draftNodes.map(n => {
             if (n.id === nodeId) {
-                return { ...n, cluster_id: newBubbleId, x: position.x, y: position.y, position };
+                return { ...n, cluster_id: newBubbleId, x: position.x, y: position.y, position: { x: position.x, y: position.y } };
             }
             return n;
         });
 
-        const remaining = newNodes.filter(n => n.cluster_id === currentClusterId).length;
+        // 3. Reorganize the Source Cluster (fill the hole)
+        const reorganizedNodes = reorganizeClusterNodes(currentClusterId, newNodes);
+
+        const remaining = reorganizedNodes.filter(n => n.cluster_id === currentClusterId).length;
         const finalClusters = remaining === 0 ? newClusters.filter(c => c.id !== currentClusterId) : newClusters;
 
-        persistDraft(newNodes, finalClusters);
+        persistDraft(reorganizedNodes, finalClusters);
     };
 
     // --- Modal Handlers ---

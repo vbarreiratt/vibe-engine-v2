@@ -402,8 +402,8 @@ export function ResonanceCanvas({ nodes, edges, clusters, edgesByNode, logText, 
             const sourceClusterId = node ? nodeClusterMap.get(node.id) : null;
 
             if (hoveredDropTargetId !== sourceClusterId) {
-                const dbNodeId = node?.cluster_node_id || draggingNodeId;
-                onAttachNode(dbNodeId, hoveredDropTargetId);
+                // Pass Image ID for local state update (Page will handle DB ID lookup)
+                onAttachNode(node?.id || draggingNodeId, hoveredDropTargetId);
 
                 // Reset drag state immediately
                 setIsDragging(false);
@@ -441,9 +441,8 @@ export function ResonanceCanvas({ nodes, edges, clusters, edgesByNode, logText, 
                 const dist = Math.hypot(tempNodePos.x - refCx, tempNodePos.y - refCy);
 
                 if (dist > radius + 20) { // Reduced buffer to 20px
-                    // Pass cluster_node_id (DB ID) not image_id
-                    const dbNodeId = node.cluster_node_id || draggingNodeId;
-                    onNodeDetach(dbNodeId, clusterId, tempNodePos);
+                    // Pass Image ID for local state update (Page will handle DB ID lookup)
+                    onNodeDetach(node.id, clusterId, tempNodePos);
                 }
             }
         }
