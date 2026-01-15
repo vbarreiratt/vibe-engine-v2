@@ -1,4 +1,4 @@
-import { X, Copy,  Waves, Activity,  Minus } from 'lucide-react';
+import { X, Copy,  Waves, Activity,  Minus, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useState, useRef, useEffect } from 'react';
 import { cn } from '@/lib/utils';
@@ -42,6 +42,7 @@ export function NodeDrawer({
     } = node;
 
     const shortId = id.slice(0, 8);
+    const hasSignals = signals?.state?.length > 0 || signals?.matter?.length > 0 || signals?.movement?.length > 0;
     
     // Fallback copy logic
     const handleCopyId = () => {
@@ -52,11 +53,10 @@ export function NodeDrawer({
 
     const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
         const scrollTop = e.currentTarget.scrollTop;
-        const triggerPoint = window.innerHeight * 0.3; // 30% down
         
         // Calculate dynamic opacity for the dark overlay behind text to improve readability
-        // as the user scrolls deeper
-        const maxOpacity = 0.9;
+        // as the user scrolls deeper. Capped at 0.6 to ensure image never dies.
+        const maxOpacity = 0.6;
         const newOpacity = Math.min(maxOpacity, Math.max(0, (scrollTop) / (window.innerHeight * 0.6)));
         setOverlayOpacity(newOpacity);
 
@@ -66,7 +66,7 @@ export function NodeDrawer({
     return (
         <div 
             className={cn(
-                "fixed inset-y-0 right-0 z-[100] w-full md:w-[600px] bg-black shadow-2xl transition-transform duration-500 ease-out",
+                "fixed inset-y-0 right-0 z-[100] w-full md:w-[600px] bg-black/90 shadow-2xl transition-transform duration-500 ease-out",
                 mounted ? "translate-x-0" : "translate-x-full"
             )}
         >
@@ -85,10 +85,12 @@ export function NodeDrawer({
                          </div>
                     </div>
                 )}
-                {/* Dynamic Darkening Layer - emergent visibility */}
+                
+                {/* Dynamic Darkening Layer - emergent visibility - Max 60% */}
+                {/* This provides the "dimming" effect on the image itself */}
                 <div 
                     className="absolute inset-0 bg-black pointer-events-none transition-opacity duration-100 ease-linear"
-                    style={{ opacity: 0.2 + (overlayOpacity * 0.7) }} 
+                    style={{ opacity: overlayOpacity }} 
                 />
             </div>
 
@@ -130,99 +132,137 @@ export function NodeDrawer({
                 <div className="h-[75vh] w-full snap-start" />
 
                 {/* Text Content - Emerges from bottom */}
+                {/* The background here is the gradient that provides the text backdrop */}
                 <div 
                     ref={contentRef}
-                    className="min-h-screen relative z-10 px-8 pb-32 pt-20 bg-gradient-to-b from-transparent via-black/80 to-black snap-start"
+                    className="min-h-screen relative z-10 px-8 pb-32 pt-20 bg-gradient-to-b from-transparent via-black/40 to-black/80 snap-start"
                 >
                     {/* The Emergent Text */}
                     <div className="max-w-lg mx-auto space-y-16">
                         
-                        {/* Description */}
+                        {/* A. HEADER & DESCRIPTION */}
                         <section className="space-y-6">
                             {description_ai ? (
-                                <h2 className="text-3xl md:text-3xl leading-tight font-light text-white/90 font-serif tracking-wide drop-shadow-lg">
-                                    {description_ai}
-                                </h2>
-                            ) : (
-                                <div className="space-y-2">
-                                    <h2 className="text-3xl md:text-3xl leading-tight font-light text-white/70 font-serif tracking-wide drop-shadow-lg italic">
-                                        {(signals?.state?.length > 0 || signals?.matter?.length > 0 || signals?.movement?.length > 0) 
-                                            ? "Leitura sem descrição textual." 
-                                            : "Ainda sem palavras."}
+                                // STATE: Textual Reading
+                                <>
+                                    <h1 className="text-xs font-bold text-lime-400 uppercase tracking-widest mb-4">
+                                        Leitura textual
+                                    </h1>
+                                    <h2 className="text-3xl md:text-3xl leading-tight font-light text-white/90 font-serif tracking-wide drop-shadow-lg">
+                                        {description_ai}
                                     </h2>
-                                    <p className="text-zinc-500 font-light text-sm">
-                                        {(signals?.state?.length > 0 || signals?.matter?.length > 0 || signals?.movement?.length > 0)
-                                            ? "Frequências vibracionais detectadas, mas o texto ainda não emergiu."
-                                            : "Sem sinais nesta leitura."}
+                                    <div className="text-[10px] uppercase tracking-wider text-white/40 border-t border-white/10 pt-4 mt-6">
+                                        Descrição da peça
+                                    </div>
+                                </>
+                            ) : hasSignals ? (
+                                // STATE: Signals Only
+                                <>
+                                    <h1 className="text-2xl font-light text-white/90 font-serif tracking-wide drop-shadow-lg">
+                                        Leitura sem descrição textual.
+                                    </h1>
+                                    <p className="text-zinc-400 font-light text-sm leading-relaxed">
+                                        Frequências vibracionais detectadas — mas o texto ainda não emergiu.
                                     </p>
-                                </div>
+                                    <p className="text-[10px] text-zinc-600 uppercase tracking-wider">
+                                        A descrição é uma camada posterior. O que existe aqui é o DNA de sinais.
+                                    </p>
+                                </>
+                            ) : (
+                                // STATE: No Reading
+                                <>
+                                    <h1 className="text-2xl font-light text-white/70 font-serif tracking-wide drop-shadow-lg italic">
+                                        Referência ainda não atravessada.
+                                    </h1>
+                                    <p className="text-zinc-500 font-light text-sm leading-relaxed">
+                                        Esta imagem ainda não passou pela etapa de Sinais — não há leitura registrada.
+                                    </p>
+                                    {/* CTA - Visual Only */}
+                                    <div className="flex items-center gap-2 text-xs text-lime-400/80 uppercase tracking-widest pt-4 opacity-50">
+                                        Ir para Sinais <ArrowRight className="w-3 h-3" />
+                                    </div>
+                                </>
                             )}
                         </section>
 
-                        {/* Signals as Frequencies - ALWAYS RENDER if at least one exists, or placeholder if we are in a 'read' state */}
-                        <section className="space-y-8 animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-100 fill-mode-both">
-                            <div className="w-12 h-[1px] bg-white/20" /> {/* Divider */}
+                        {/* B. DNA VIBRACIONAL - Always rendered if signals exist or structure is needed */}
+                        {(hasSignals || description_ai) && (
+                            <section className="space-y-10 animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-100 fill-mode-both">
+                                <div className="w-12 h-[1px] bg-white/20" /> {/* Divider */}
 
-                            <h3 className="text-xs uppercase tracking-[0.3em] text-lime-400/80 font-bold mb-6">
-                                DNA Vibracional
-                            </h3>
+                                <h3 className="text-xs uppercase tracking-[0.3em] text-zinc-500 font-bold mb-6">
+                                    DNA Vibracional
+                                </h3>
 
-                            <div className="grid grid-cols-1 gap-10">
-                                {/* State Frequencies */}
-                                <div className="space-y-3">
-                                    <span className="text-[10px] uppercase tracking-[0.2em] text-white/30 block flex items-center gap-2">
-                                        Frequência de Estado
-                                        {!signals?.state?.length && <span className="text-zinc-700 italic lowercase tracking-normal ml-auto">Não manifesto</span>}
-                                    </span>
-                                    {signals?.state?.length > 0 ? (
-                                        <div className="flex flex-col gap-2">
-                                            {signals.state.map((s: string) => (
-                                                <FrequencyItem key={s} label={s} intensity={3} />
-                                            ))}
+                                <div className="grid grid-cols-1 gap-12">
+                                    {/* 1. STATE */}
+                                    <div className="space-y-3">
+                                        <div className="flex flex-col gap-1">
+                                            <span className="text-xs uppercase tracking-[0.2em] text-lime-400/90 font-medium">
+                                                Estado
+                                                <span className="text-zinc-600 font-normal normal-case tracking-normal ml-2 opacity-60">(como isso faz sentir)</span>
+                                            </span>
+                                            <p className="text-[10px] text-zinc-500">Afeto dominante e clima interno.</p>
                                         </div>
-                                    ) : (
-                                       <div className="h-0.5 w-8 bg-white/5 rounded-full" />
-                                    )}
-                                </div>
 
-                                {/* Matter Frequencies */}
-                                <div className="space-y-3">
-                                    <span className="text-[10px] uppercase tracking-[0.2em] text-white/30 block flex items-center gap-2">
-                                         Matéria Percebida
-                                         {!signals?.matter?.length && <span className="text-zinc-700 italic lowercase tracking-normal ml-auto">Não manifesto</span>}
-                                    </span>
-                                    {signals?.matter?.length > 0 ? (
-                                        <div className="flex flex-col gap-2">
-                                            {signals.matter.map((s: string) => (
-                                                 <FrequencyItem key={s} label={s} intensity={2} />
-                                            ))}
-                                        </div>
-                                    ) : (
-                                        <div className="h-0.5 w-8 bg-white/5 rounded-full" />
-                                    )}
-                                </div>
+                                        {signals?.state?.length > 0 ? (
+                                            <div className="flex flex-col gap-2 pt-2">
+                                                {signals.state.map((s: string) => (
+                                                    <FrequencyItem key={s} label={s} intensity={3} />
+                                                ))}
+                                            </div>
+                                        ) : (
+                                           <div className="h-px w-full bg-white/5 mt-4" title="Não manifesto" />
+                                        )}
+                                    </div>
 
-                                {/* Movement Frequencies - NEW */}
-                                <div className="space-y-3">
-                                    <span className="text-[10px] uppercase tracking-[0.2em] text-white/30 block flex items-center gap-2">
-                                         Movimento / Comportamento
-                                         {!signals?.movement?.length && <span className="text-zinc-700 italic lowercase tracking-normal ml-auto">Não manifesto</span>}
-                                    </span>
-                                    {signals?.movement?.length > 0 ? (
-                                        <div className="flex flex-col gap-2">
-                                            {signals.movement.map((s: string) => (
-                                                 <FrequencyItem key={s} label={s} intensity={3} />
-                                            ))}
+                                    {/* 2. MATTER */}
+                                    <div className="space-y-3">
+                                        <div className="flex flex-col gap-1">
+                                            <span className="text-xs uppercase tracking-[0.2em] text-amber-400/90 font-medium">
+                                                Matéria
+                                                <span className="text-zinc-600 font-normal normal-case tracking-normal ml-2 opacity-60">(do que parece feito)</span>
+                                            </span>
+                                            <p className="text-[10px] text-zinc-500">Textura, substância, densidade.</p>
                                         </div>
-                                    ) : (
-                                        <div className="h-0.5 w-8 bg-white/5 rounded-full" />
-                                    )}
+
+                                        {signals?.matter?.length > 0 ? (
+                                            <div className="flex flex-col gap-2 pt-2">
+                                                {signals.matter.map((s: string) => (
+                                                     <FrequencyItem key={s} label={s} intensity={2} />
+                                                ))}
+                                            </div>
+                                        ) : (
+                                            <div className="h-px w-full bg-white/5 mt-4" title="Não manifesto" />
+                                        )}
+                                    </div>
+
+                                    {/* 3. MOVEMENT */}
+                                    <div className="space-y-3">
+                                        <div className="flex flex-col gap-1">
+                                            <span className="text-xs uppercase tracking-[0.2em] text-blue-400/90 font-medium">
+                                                Movimento
+                                                <span className="text-zinc-600 font-normal normal-case tracking-normal ml-2 opacity-60">(como se comporta)</span>
+                                            </span>
+                                            <p className="text-[10px] text-zinc-500">Ritmo, gesto, comportamento.</p>
+                                        </div>
+
+                                        {signals?.movement?.length > 0 ? (
+                                            <div className="flex flex-col gap-2 pt-2">
+                                                {signals.movement.map((s: string) => (
+                                                     <FrequencyItem key={s} label={s} intensity={3} />
+                                                ))}
+                                            </div>
+                                        ) : (
+                                            <div className="h-px w-full bg-white/5 mt-4" title="Não manifesto" />
+                                        )}
+                                    </div>
                                 </div>
-                            </div>
-                        </section>
+                            </section>
+                        )}
 
                         {/* System Trace (Low Hierarchy) */}
-                        <section className="pt-24 opacity-40 hover:opacity-100 transition-opacity duration-700">
+                        <section className="pt-24 opacity-40 hover:opacity-100 transition-opacity duration-700 pb-20">
                              <div className="border-t border-white/10 pt-8 flex flex-col gap-4">
                                 <span className="text-[10px] uppercase tracking-[0.2em] text-white/40">
                                     Rastro do Sistema
@@ -258,7 +298,7 @@ export function NodeDrawer({
 // "Frequency" visual component
 function FrequencyItem({ label, intensity = 2 }: { label: string, intensity?: number }) {
     return (
-        <div className="group flex items-center justify-between py-1 border-b border-white/5 hover:border-white/20 transition-colors duration-500 cursor-default">
+        <div className="group flex items-center justify-between py-2 border-b border-white/5 hover:border-white/20 transition-colors duration-500 cursor-default">
             <span className="text-lg font-light text-zinc-300 group-hover:text-white transition-colors tracking-wide">
                 {label}
             </span>
@@ -275,14 +315,4 @@ function FrequencyItem({ label, intensity = 2 }: { label: string, intensity?: nu
             </div>
         </div>
     );
-}
-
-// Helper icon component for vibes (unused currently but consistent with style)
-function VibeIcon({ className }: { className?: string }) {
-    return (
-        <svg className={className} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M2 12C2 12 5 8 12 8C19 8 22 12 22 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-            <path d="M2 16C2 16 5 12 12 12C19 12 22 16 22 16" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-        </svg>
-    )
 }
