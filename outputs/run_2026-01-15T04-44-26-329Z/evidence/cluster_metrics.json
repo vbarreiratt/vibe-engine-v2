@@ -1,0 +1,770 @@
+[
+  {
+    "clusterId": "0",
+    "nodeCount": 1,
+    "medoidNodeId": "29c4cb5d-1832-45e3-8434-5d619b3c2c72",
+    "dominantSignals": {
+      "state": [
+        "impactante",
+        "preciso",
+        "moderno"
+      ],
+      "matter": [
+        "espaço",
+        "vetor",
+        "silhueta"
+      ],
+      "movement": [
+        "expansão",
+        "centralização",
+        "definição"
+      ]
+    },
+    "strongestEdges": [],
+    "classification": "NOISE",
+    "strengthScore": 0.7,
+    "stabilityScore": 0,
+    "density": {
+      "avg": 0,
+      "min": 0,
+      "max": 0
+    },
+    "recurrence": {
+      "state": 1,
+      "matter": 1,
+      "movement": 1
+    },
+    "justification": "Cluster NOISE (70%). Descartado. Tamanho insuficiente ou arestas fracas."
+  },
+  {
+    "clusterId": "1",
+    "nodeCount": 6,
+    "medoidNodeId": "0c7401e0-31ff-414b-a1a5-37788125a8d4",
+    "dominantSignals": {
+      "state": [
+        "intenso",
+        "energético",
+        "impactante"
+      ],
+      "matter": [
+        "tinta vibrante",
+        "vinil",
+        "tinta fresca"
+      ],
+      "movement": [
+        "saltar",
+        "chamar",
+        "sorrir"
+      ]
+    },
+    "strongestEdges": [
+      {
+        "source": "5ed94bf1-6de4-4233-9aee-9fbe1482502c",
+        "target": "d355b2ea-0ffb-4e6b-9043-9bd957f8fa2f",
+        "weight": 0.7569371131555759
+      },
+      {
+        "source": "90c72c62-9fdd-4ca2-bc89-b327b78c5fc0",
+        "target": "d355b2ea-0ffb-4e6b-9043-9bd957f8fa2f",
+        "weight": 0.7524828951129072
+      },
+      {
+        "source": "0c7401e0-31ff-414b-a1a5-37788125a8d4",
+        "target": "d355b2ea-0ffb-4e6b-9043-9bd957f8fa2f",
+        "weight": 0.7355614755094938
+      },
+      {
+        "source": "df9dcc5e-e809-4ffe-933a-8d6772a72800",
+        "target": "5ed94bf1-6de4-4233-9aee-9fbe1482502c",
+        "weight": 0.7257022298264362
+      },
+      {
+        "source": "0c7401e0-31ff-414b-a1a5-37788125a8d4",
+        "target": "5ed94bf1-6de4-4233-9aee-9fbe1482502c",
+        "weight": 0.7214197561477679
+      }
+    ],
+    "classification": "WEAK",
+    "strengthScore": 0.5131928748517974,
+    "stabilityScore": 1,
+    "density": {
+      "avg": 0.7384206939504361,
+      "min": 0.7214197561477679,
+      "max": 0.7569371131555759
+    },
+    "recurrence": {
+      "state": 0.3333333333333333,
+      "matter": 0.3333333333333333,
+      "movement": 0.5
+    },
+    "justification": "Cluster WEAK (51%). Vibe fraca. Sinais dispersos (Recorrência < 60%). Requer curadoria."
+  },
+  {
+    "clusterId": "2",
+    "nodeCount": 3,
+    "medoidNodeId": "b8ace381-cb66-4aa2-b93b-51f1386e7c5f",
+    "dominantSignals": {
+      "state": [
+        "formal",
+        "ousado",
+        "moderno"
+      ],
+      "matter": [
+        "papel",
+        "tinta",
+        "acrílico"
+      ],
+      "movement": [
+        "ancorar",
+        "definir",
+        "moldar"
+      ]
+    },
+    "strongestEdges": [
+      {
+        "source": "61bf0b1b-bca2-4604-9036-c3006b1a9a4a",
+        "target": "580216a0-1ede-4f95-9213-f9b16ceb6e0f",
+        "weight": 0.751754949102853
+      },
+      {
+        "source": "b8ace381-cb66-4aa2-b93b-51f1386e7c5f",
+        "target": "61bf0b1b-bca2-4604-9036-c3006b1a9a4a",
+        "weight": 0.7414390306401826
+      }
+    ],
+    "classification": "PROTO",
+    "strengthScore": 0.6906457636281219,
+    "stabilityScore": 0.6666666666666666,
+    "density": {
+      "avg": 0.7465969898715178,
+      "min": 0.7414390306401826,
+      "max": 0.751754949102853
+    },
+    "recurrence": {
+      "state": 0.6666666666666666,
+      "matter": 0.6666666666666666,
+      "movement": 0.6666666666666666
+    },
+    "justification": "Cluster PROTO (69%). Núcleo em formação. Sinais fortes, mas quantidade/densidade abaixo do limiar."
+  },
+  {
+    "clusterId": "3",
+    "nodeCount": 8,
+    "medoidNodeId": "9836cde7-2b04-410a-bbe8-5ddba64d38b7",
+    "dominantSignals": {
+      "state": [
+        "informativo",
+        "digital",
+        "organizado"
+      ],
+      "matter": [
+        "plástico",
+        "papel",
+        "vinil"
+      ],
+      "movement": [
+        "deslizar",
+        "organizando",
+        "saltar"
+      ]
+    },
+    "strongestEdges": [
+      {
+        "source": "761e88eb-94c6-4af5-a0fc-f2e54de1a128",
+        "target": "5ad46f54-a6e1-41cd-bef0-7b13fefd400b",
+        "weight": 0.779766247956753
+      },
+      {
+        "source": "9836cde7-2b04-410a-bbe8-5ddba64d38b7",
+        "target": "5ad46f54-a6e1-41cd-bef0-7b13fefd400b",
+        "weight": 0.75237065570274
+      },
+      {
+        "source": "34a4fff2-8fd5-4910-ab50-6c712f8da4cd",
+        "target": "5ad46f54-a6e1-41cd-bef0-7b13fefd400b",
+        "weight": 0.7466449123077414
+      },
+      {
+        "source": "39b12e1b-50ba-4376-bb72-05d53d815686",
+        "target": "761e88eb-94c6-4af5-a0fc-f2e54de1a128",
+        "weight": 0.7360313155727869
+      },
+      {
+        "source": "1a4e4133-08d3-4676-948c-d018846cde04",
+        "target": "9836cde7-2b04-410a-bbe8-5ddba64d38b7",
+        "weight": 0.7358461882528269
+      }
+    ],
+    "classification": "STRONG",
+    "strengthScore": 0.6575422234505144,
+    "stabilityScore": 1,
+    "density": {
+      "avg": 0.7334740781683815,
+      "min": 0.6803984740131063,
+      "max": 0.779766247956753
+    },
+    "recurrence": {
+      "state": 0.375,
+      "matter": 0.875,
+      "movement": 0.25
+    },
+    "justification": "Cluster STRONG (66%). Vibe forte. Recorrência multi-camada (63%) e densidade alta."
+  },
+  {
+    "clusterId": "4",
+    "nodeCount": 10,
+    "medoidNodeId": "0ebe866b-c55b-4e71-bcde-e5fcd7284fb9",
+    "dominantSignals": {
+      "state": [
+        "energético",
+        "vibrante",
+        "urgente"
+      ],
+      "matter": [
+        "luz neon",
+        "neon",
+        "pixels"
+      ],
+      "movement": [
+        "pulsar",
+        "desfocar",
+        "sobrepor"
+      ]
+    },
+    "strongestEdges": [
+      {
+        "source": "0ebe866b-c55b-4e71-bcde-e5fcd7284fb9",
+        "target": "9bb8de15-9509-476d-bfe3-07958868bd36",
+        "weight": 0.7881300554156914
+      },
+      {
+        "source": "c3cd49f1-d0e2-478b-ab04-8e079f1b513b",
+        "target": "f9102c9f-704c-4773-864b-f499ce9cef6e",
+        "weight": 0.7733106728843729
+      },
+      {
+        "source": "c4a20d0b-3ee6-417d-962f-ac80bfaed2ef",
+        "target": "9bb8de15-9509-476d-bfe3-07958868bd36",
+        "weight": 0.7666116029573239
+      },
+      {
+        "source": "24285c4c-372c-4857-8c1c-658ba0a4b647",
+        "target": "0ebe866b-c55b-4e71-bcde-e5fcd7284fb9",
+        "weight": 0.7559699584705537
+      },
+      {
+        "source": "0ebe866b-c55b-4e71-bcde-e5fcd7284fb9",
+        "target": "09b4f387-1616-49ed-83df-04d724d4820f",
+        "weight": 0.755309801162733
+      }
+    ],
+    "classification": "STRONG",
+    "strengthScore": 0.6438950061466691,
+    "stabilityScore": 1,
+    "density": {
+      "avg": 0.7463166871555637,
+      "min": 0.7015020739364989,
+      "max": 0.7881300554156914
+    },
+    "recurrence": {
+      "state": 0.3,
+      "matter": 0.5,
+      "movement": 0.7
+    },
+    "justification": "Cluster STRONG (64%). Vibe forte. Recorrência multi-camada (60%) e densidade alta."
+  },
+  {
+    "clusterId": "5",
+    "nodeCount": 1,
+    "medoidNodeId": "559edd31-01ed-47f0-a5f2-a20b4c07cdde",
+    "dominantSignals": {
+      "state": [
+        "alegre",
+        "acolhedor",
+        "simples"
+      ],
+      "matter": [
+        "açúcar",
+        "algodão",
+        "calor"
+      ],
+      "movement": [
+        "correr",
+        "acender",
+        "oferecer"
+      ]
+    },
+    "strongestEdges": [],
+    "classification": "NOISE",
+    "strengthScore": 0.7,
+    "stabilityScore": 0,
+    "density": {
+      "avg": 0,
+      "min": 0,
+      "max": 0
+    },
+    "recurrence": {
+      "state": 1,
+      "matter": 1,
+      "movement": 1
+    },
+    "justification": "Cluster NOISE (70%). Descartado. Tamanho insuficiente ou arestas fracas."
+  },
+  {
+    "clusterId": "6",
+    "nodeCount": 1,
+    "medoidNodeId": "96203f8c-e3e8-4966-9c3d-f7ac9168f992",
+    "dominantSignals": {
+      "state": [
+        "lúdico",
+        "acolhedor",
+        "gentil"
+      ],
+      "matter": [
+        "feltro macio",
+        "borracha",
+        "massa de modelar"
+      ],
+      "movement": [
+        "saltitar",
+        "flutuar",
+        "acolher"
+      ]
+    },
+    "strongestEdges": [],
+    "classification": "NOISE",
+    "strengthScore": 0.7,
+    "stabilityScore": 0,
+    "density": {
+      "avg": 0,
+      "min": 0,
+      "max": 0
+    },
+    "recurrence": {
+      "state": 1,
+      "matter": 1,
+      "movement": 1
+    },
+    "justification": "Cluster NOISE (70%). Descartado. Tamanho insuficiente ou arestas fracas."
+  },
+  {
+    "clusterId": "7",
+    "nodeCount": 1,
+    "medoidNodeId": "a462e427-6593-4b04-8909-07003b8a76e9",
+    "dominantSignals": {
+      "state": [
+        "digital",
+        "energetic",
+        "informational"
+      ],
+      "matter": [
+        "luz neon",
+        "digital grid",
+        "bold typography"
+      ],
+      "movement": [
+        "pulsante",
+        "scrolling",
+        "aligning"
+      ]
+    },
+    "strongestEdges": [],
+    "classification": "NOISE",
+    "strengthScore": 0.7,
+    "stabilityScore": 0,
+    "density": {
+      "avg": 0,
+      "min": 0,
+      "max": 0
+    },
+    "recurrence": {
+      "state": 1,
+      "matter": 1,
+      "movement": 1
+    },
+    "justification": "Cluster NOISE (70%). Descartado. Tamanho insuficiente ou arestas fracas."
+  },
+  {
+    "clusterId": "8",
+    "nodeCount": 1,
+    "medoidNodeId": "68830f51-7115-4dde-ac53-f6d8be34de1b",
+    "dominantSignals": {
+      "state": [
+        "intenso",
+        "abstrato",
+        "minimalist"
+      ],
+      "matter": [
+        "luz digital",
+        "static energy",
+        "processed air"
+      ],
+      "movement": [
+        "desvanecer",
+        "shimmering",
+        "pulsing"
+      ]
+    },
+    "strongestEdges": [],
+    "classification": "NOISE",
+    "strengthScore": 0.7,
+    "stabilityScore": 0,
+    "density": {
+      "avg": 0,
+      "min": 0,
+      "max": 0
+    },
+    "recurrence": {
+      "state": 1,
+      "matter": 1,
+      "movement": 1
+    },
+    "justification": "Cluster NOISE (70%). Descartado. Tamanho insuficiente ou arestas fracas."
+  },
+  {
+    "clusterId": "9",
+    "nodeCount": 3,
+    "medoidNodeId": "7d372b41-9eec-48d5-97fd-28c556d7475a",
+    "dominantSignals": {
+      "state": [
+        "analítico",
+        "digital",
+        "texturizado"
+      ],
+      "matter": [
+        "dados",
+        "pixel",
+        "caracteres"
+      ],
+      "movement": [
+        "processando",
+        "renderizando",
+        "desenhando"
+      ]
+    },
+    "strongestEdges": [
+      {
+        "source": "7d372b41-9eec-48d5-97fd-28c556d7475a",
+        "target": "e5320fb2-aec3-4d66-ab76-d75463d19466",
+        "weight": 0.7477898032438541
+      }
+    ],
+    "classification": "PROTO",
+    "strengthScore": 0.6910036076398228,
+    "stabilityScore": 0.3333333333333333,
+    "density": {
+      "avg": 0.7477898032438541,
+      "min": 0.7477898032438541,
+      "max": 0.7477898032438541
+    },
+    "recurrence": {
+      "state": 0.6666666666666666,
+      "matter": 0.6666666666666666,
+      "movement": 0.6666666666666666
+    },
+    "justification": "Cluster PROTO (69%). Núcleo em formação. Sinais fortes, mas quantidade/densidade abaixo do limiar."
+  },
+  {
+    "clusterId": "10",
+    "nodeCount": 2,
+    "medoidNodeId": "6db3da82-b45f-40f0-a543-3f1937a9b77d",
+    "dominantSignals": {
+      "state": [
+        "melancólico",
+        "introspectivo",
+        "sensual"
+      ],
+      "matter": [
+        "veludo",
+        "pétala",
+        "sombra"
+      ],
+      "movement": [
+        "sussurrar",
+        "desabrochar",
+        "contemplar"
+      ]
+    },
+    "strongestEdges": [
+      {
+        "source": "6db3da82-b45f-40f0-a543-3f1937a9b77d",
+        "target": "0c5c54c4-92bf-4d2b-8e84-833bcc4c4de4",
+        "weight": 0.811603258256633
+      }
+    ],
+    "classification": "PROTO",
+    "strengthScore": 0.9434809774769899,
+    "stabilityScore": 0.5,
+    "density": {
+      "avg": 0.811603258256633,
+      "min": 0.811603258256633,
+      "max": 0.811603258256633
+    },
+    "recurrence": {
+      "state": 1,
+      "matter": 0.5,
+      "movement": 1
+    },
+    "justification": "Cluster PROTO (94%). Núcleo em formação. Sinais fortes, mas quantidade/densidade abaixo do limiar."
+  },
+  {
+    "clusterId": "11",
+    "nodeCount": 2,
+    "medoidNodeId": "b94dea90-0a9d-4b59-9fbc-535749306fd2",
+    "dominantSignals": {
+      "state": [
+        "desorientador",
+        "digitalmente fragmentado",
+        "nostálgico confuso"
+      ],
+      "matter": [
+        "glitch",
+        "pixels",
+        "pelo digital"
+      ],
+      "movement": [
+        "corrompendo",
+        "fragmentando",
+        "pixelizando"
+      ]
+    },
+    "strongestEdges": [
+      {
+        "source": "b94dea90-0a9d-4b59-9fbc-535749306fd2",
+        "target": "f5082190-f6b3-468f-bda3-6ba9e8c519ea",
+        "weight": 0.7648234527107438
+      }
+    ],
+    "classification": "PROTO",
+    "strengthScore": 0.9294470358132231,
+    "stabilityScore": 0.2,
+    "density": {
+      "avg": 0.7648234527107438,
+      "min": 0.7648234527107438,
+      "max": 0.7648234527107438
+    },
+    "recurrence": {
+      "state": 0.5,
+      "matter": 1,
+      "movement": 1
+    },
+    "justification": "Cluster PROTO (93%). Núcleo em formação. Sinais fortes, mas quantidade/densidade abaixo do limiar."
+  },
+  {
+    "clusterId": "12",
+    "nodeCount": 1,
+    "medoidNodeId": "c374c250-2e51-4b59-906d-3bd36e009aa8",
+    "dominantSignals": {
+      "state": [
+        "lúdico",
+        "brilhante",
+        "descolado"
+      ],
+      "matter": [
+        "holográfico",
+        "prateado",
+        "iridescente"
+      ],
+      "movement": [
+        "cintilar",
+        "ondular",
+        "brilhar"
+      ]
+    },
+    "strongestEdges": [],
+    "classification": "NOISE",
+    "strengthScore": 0.7,
+    "stabilityScore": 0,
+    "density": {
+      "avg": 0,
+      "min": 0,
+      "max": 0
+    },
+    "recurrence": {
+      "state": 1,
+      "matter": 1,
+      "movement": 1
+    },
+    "justification": "Cluster NOISE (70%). Descartado. Tamanho insuficiente ou arestas fracas."
+  },
+  {
+    "clusterId": "13",
+    "nodeCount": 2,
+    "medoidNodeId": "009e1ba9-0676-4a07-99df-cbb5564f3c57",
+    "dominantSignals": {
+      "state": [
+        "fragmentado",
+        "caótico",
+        "vertiginoso"
+      ],
+      "matter": [
+        "vidro quebrado",
+        "energia vibrante",
+        "metais frios"
+      ],
+      "movement": [
+        "girando",
+        "pulsando",
+        "rasgando"
+      ]
+    },
+    "strongestEdges": [
+      {
+        "source": "009e1ba9-0676-4a07-99df-cbb5564f3c57",
+        "target": "45728069-60a2-44b9-bcbf-a516dbebb011",
+        "weight": 0.7046366472444278
+      }
+    ],
+    "classification": "PROTO",
+    "strengthScore": 0.7363909941733282,
+    "stabilityScore": 0.2,
+    "density": {
+      "avg": 0.7046366472444278,
+      "min": 0.7046366472444278,
+      "max": 0.7046366472444278
+    },
+    "recurrence": {
+      "state": 1,
+      "matter": 0.5,
+      "movement": 0.5
+    },
+    "justification": "Cluster PROTO (74%). Núcleo em formação. Sinais fortes, mas quantidade/densidade abaixo do limiar."
+  },
+  {
+    "clusterId": "14",
+    "nodeCount": 6,
+    "medoidNodeId": "5401cb7c-08da-446a-b4c1-40989be206ca",
+    "dominantSignals": {
+      "state": [
+        "caótico",
+        "intenso",
+        "fragmentado"
+      ],
+      "matter": [
+        "papel",
+        "tinta",
+        "papel rasgado"
+      ],
+      "movement": [
+        "sobrepor",
+        "empilhar",
+        "desdobrar"
+      ]
+    },
+    "strongestEdges": [
+      {
+        "source": "77d039a0-1709-4794-9cde-07991ce82833",
+        "target": "b3ececeb-b9e2-4131-874c-1a9e8afaa69c",
+        "weight": 0.7721750659575037
+      },
+      {
+        "source": "5e238faf-b677-483a-8b3a-e1c4fcf6479f",
+        "target": "291bb266-687f-4ca1-a7da-e45c010d7790",
+        "weight": 0.7635820270355891
+      },
+      {
+        "source": "5401cb7c-08da-446a-b4c1-40989be206ca",
+        "target": "b3ececeb-b9e2-4131-874c-1a9e8afaa69c",
+        "weight": 0.7404378845920422
+      },
+      {
+        "source": "77d039a0-1709-4794-9cde-07991ce82833",
+        "target": "7218cf32-626d-4a24-8724-b242e7b15201",
+        "weight": 0.7334636851172298
+      },
+      {
+        "source": "5401cb7c-08da-446a-b4c1-40989be206ca",
+        "target": "77d039a0-1709-4794-9cde-07991ce82833",
+        "weight": 0.7144052561630078
+      }
+    ],
+    "classification": "WEAK",
+    "strengthScore": 0.6290081585099064,
+    "stabilityScore": 1,
+    "density": {
+      "avg": 0.7355827505885771,
+      "min": 0.7110159583294169,
+      "max": 0.7721750659575037
+    },
+    "recurrence": {
+      "state": 0.6666666666666666,
+      "matter": 0.5,
+      "movement": 0.5
+    },
+    "justification": "Cluster WEAK (63%). Vibe fraca. Sinais dispersos (Recorrência < 60%). Requer curadoria."
+  },
+  {
+    "clusterId": "15",
+    "nodeCount": 1,
+    "medoidNodeId": "27891bd3-a828-45a4-bf5a-6b7a8105565c",
+    "dominantSignals": {
+      "state": [
+        "estático",
+        "técnico",
+        "informativo"
+      ],
+      "matter": [
+        "pixels",
+        "dados",
+        "sinais"
+      ],
+      "movement": [
+        "exibir",
+        "registrar",
+        "processar"
+      ]
+    },
+    "strongestEdges": [],
+    "classification": "NOISE",
+    "strengthScore": 0.7,
+    "stabilityScore": 0,
+    "density": {
+      "avg": 0,
+      "min": 0,
+      "max": 0
+    },
+    "recurrence": {
+      "state": 1,
+      "matter": 1,
+      "movement": 1
+    },
+    "justification": "Cluster NOISE (70%). Descartado. Tamanho insuficiente ou arestas fracas."
+  },
+  {
+    "clusterId": "16",
+    "nodeCount": 1,
+    "medoidNodeId": "81b7ffce-c586-4e5a-ae1d-7ce76356a1fd",
+    "dominantSignals": {
+      "state": [
+        "evocativo",
+        "refinado",
+        "moderno"
+      ],
+      "matter": [
+        "luz",
+        "design",
+        "elegância"
+      ],
+      "movement": [
+        "flutuar",
+        "surgir",
+        "revelar"
+      ]
+    },
+    "strongestEdges": [],
+    "classification": "NOISE",
+    "strengthScore": 0.7,
+    "stabilityScore": 0,
+    "density": {
+      "avg": 0,
+      "min": 0,
+      "max": 0
+    },
+    "recurrence": {
+      "state": 1,
+      "matter": 1,
+      "movement": 1
+    },
+    "justification": "Cluster NOISE (70%). Descartado. Tamanho insuficiente ou arestas fracas."
+  }
+]

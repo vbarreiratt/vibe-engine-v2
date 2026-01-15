@@ -1,0 +1,10 @@
+[
+  {
+    "signals": "digital|pixels",
+    "nodes": [
+      "de05fcf5-afb4-423c-82c2-c9ebb81673ae",
+      "129f7722-1cbb-47a7-933c-f53e2380b00a"
+    ],
+    "reason": "Split across clusters"
+  }
+]

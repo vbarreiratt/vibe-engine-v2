@@ -1,0 +1,14 @@
+services:
+  web:
+    container_name: vibe-engine
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+    # Load env vars from .env file (ensure this file exists on server)
+    env_file:
+      - .env

@@ -1,0 +1,34 @@
+{
+  "status": "PASS",
+  "checks": [
+    {
+      "checkName": "Language Normalization Cleanliness",
+      "passed": true,
+      "details": "No forbidden tokens found.",
+      "severity": "CRITICAL"
+    },
+    {
+      "checkName": "NOISE Classification Rules",
+      "passed": true,
+      "details": "0 clusters marked NOISE but have internal density > 0.1.",
+      "severity": "CRITICAL"
+    },
+    {
+      "checkName": "Metrics Variance (No Dummies)",
+      "passed": true,
+      "details": "Unique scores: 10/17",
+      "severity": "CRITICAL"
+    },
+    {
+      "checkName": "Chain of Evidence Integrity",
+      "passed": true,
+      "details": "Hashes present: Inputs=true, Edges=true, Metrics=true",
+      "severity": "CRITICAL"
+    }
+  ],
+  "hashes": {
+    "inputs": "5d2fdebd195096bc32ad59e6945c5f5a4f4e7cb34621bc3524852f0a16df0c84",
+    "edges": "f1963e989c43b706277947070de250fc2f302e18f728e4c1de18541c228a0b7e",
+    "metrics": "bc544001f7103b1e66c48251303a9463cfc5cd6bc23cc23acff223ab67bef389"
+  }
+}

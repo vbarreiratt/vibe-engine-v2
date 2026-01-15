@@ -1,0 +1,421 @@
+{
+  "result": {
+    "clusters": [
+      {
+        "id": "0",
+        "name_suggested": "direto tinta plana",
+        "motor": "state",
+        "items": [
+          "29c4cb5d-1832-45e3-8434-5d619b3c2c72",
+          "b8ace381-cb66-4aa2-b93b-51f1386e7c5f",
+          "0c7401e0-31ff-414b-a1a5-37788125a8d4",
+          "1a4e4133-08d3-4676-948c-d018846cde04"
+        ]
+      },
+      {
+        "id": "1",
+        "name_suggested": "agressivo tinta grossa",
+        "motor": "state",
+        "items": [
+          "df9dcc5e-e809-4ffe-933a-8d6772a72800"
+        ]
+      },
+      {
+        "id": "2",
+        "name_suggested": "desconectado pixels",
+        "motor": "state",
+        "items": [
+          "de05fcf5-afb4-423c-82c2-c9ebb81673ae"
+        ]
+      },
+      {
+        "id": "3",
+        "name_suggested": "alegre desenho animado",
+        "motor": "state",
+        "items": [
+          "559edd31-01ed-47f0-a5f2-a20b4c07cdde"
+        ]
+      },
+      {
+        "id": "4",
+        "name_suggested": "jovial espuma",
+        "motor": "state",
+        "items": [
+          "96203f8c-e3e8-4966-9c3d-f7ac9168f992"
+        ]
+      },
+      {
+        "id": "5",
+        "name_suggested": "monocromático concreto",
+        "motor": "state",
+        "items": [
+          "9ce55986-f267-422b-977e-e7ce4bc8940c"
+        ]
+      },
+      {
+        "id": "6",
+        "name_suggested": "organizado papel",
+        "motor": "state",
+        "items": [
+          "7c711d2f-59bc-499d-b6c6-45aa143c3286"
+        ]
+      },
+      {
+        "id": "7",
+        "name_suggested": "elegante papel",
+        "motor": "state",
+        "items": [
+          "b08f13cb-1eb4-4013-a30c-6c0674d06059"
+        ]
+      },
+      {
+        "id": "8",
+        "name_suggested": "técnico sintético",
+        "motor": "state",
+        "items": [
+          "79b5f99f-2922-4179-9a64-c512d231ab52",
+          "6ea7bbf4-8193-436d-a1c0-d53cf1d911b0"
+        ]
+      },
+      {
+        "id": "9",
+        "name_suggested": "dinâmico neon",
+        "motor": "state",
+        "items": [
+          "9190c85a-759f-4d8f-9ca9-a081948219f4",
+          "64ffb29c-8557-4301-b115-cf1ee7e83737"
+        ]
+      }
+    ],
+    "nodes": [
+      {
+        "id": "29c4cb5d-1832-45e3-8434-5d619b3c2c72",
+        "x": 100,
+        "y": 0,
+        "cluster_index": 0,
+        "is_outlier": false
+      },
+      {
+        "id": "df9dcc5e-e809-4ffe-933a-8d6772a72800",
+        "x": 91.35454576426008,
+        "y": 40.67366430758001,
+        "cluster_index": 1,
+        "is_outlier": true
+      },
+      {
+        "id": "b8ace381-cb66-4aa2-b93b-51f1386e7c5f",
+        "x": 66.91306063588583,
+        "y": 74.31448254773943,
+        "cluster_index": 0,
+        "is_outlier": false
+      },
+      {
+        "id": "0c7401e0-31ff-414b-a1a5-37788125a8d4",
+        "x": 30.901699437494745,
+        "y": 95.10565162951535,
+        "cluster_index": 0,
+        "is_outlier": false
+      },
+      {
+        "id": "1a4e4133-08d3-4676-948c-d018846cde04",
+        "x": -10.452846326765334,
+        "y": 99.45218953682733,
+        "cluster_index": 0,
+        "is_outlier": false
+      },
+      {
+        "id": "de05fcf5-afb4-423c-82c2-c9ebb81673ae",
+        "x": -49.99999999999998,
+        "y": 86.60254037844388,
+        "cluster_index": 2,
+        "is_outlier": true
+      },
+      {
+        "id": "559edd31-01ed-47f0-a5f2-a20b4c07cdde",
+        "x": -80.90169943749473,
+        "y": 58.77852522924732,
+        "cluster_index": 3,
+        "is_outlier": true
+      },
+      {
+        "id": "96203f8c-e3e8-4966-9c3d-f7ac9168f992",
+        "x": -97.81476007338057,
+        "y": 20.79116908177593,
+        "cluster_index": 4,
+        "is_outlier": true
+      },
+      {
+        "id": "9ce55986-f267-422b-977e-e7ce4bc8940c",
+        "x": -97.81476007338057,
+        "y": -20.791169081775905,
+        "cluster_index": 5,
+        "is_outlier": true
+      },
+      {
+        "id": "7c711d2f-59bc-499d-b6c6-45aa143c3286",
+        "x": -80.90169943749474,
+        "y": -58.7785252292473,
+        "cluster_index": 6,
+        "is_outlier": true
+      },
+      {
+        "id": "b08f13cb-1eb4-4013-a30c-6c0674d06059",
+        "x": -50.00000000000004,
+        "y": -86.60254037844385,
+        "cluster_index": 7,
+        "is_outlier": true
+      },
+      {
+        "id": "79b5f99f-2922-4179-9a64-c512d231ab52",
+        "x": -10.452846326765423,
+        "y": -99.45218953682733,
+        "cluster_index": 8,
+        "is_outlier": false
+      },
+      {
+        "id": "6ea7bbf4-8193-436d-a1c0-d53cf1d911b0",
+        "x": 30.901699437494724,
+        "y": -95.10565162951536,
+        "cluster_index": 8,
+        "is_outlier": false
+      },
+      {
+        "id": "9190c85a-759f-4d8f-9ca9-a081948219f4",
+        "x": 66.91306063588584,
+        "y": -74.3144825477394,
+        "cluster_index": 9,
+        "is_outlier": false
+      },
+      {
+        "id": "64ffb29c-8557-4301-b115-cf1ee7e83737",
+        "x": 91.3545457642601,
+        "y": -40.67366430758001,
+        "cluster_index": 9,
+        "is_outlier": false
+      }
+    ],
+    "edges": [
+      {
+        "source": "29c4cb5d-1832-45e3-8434-5d619b3c2c72",
+        "target": "0c7401e0-31ff-414b-a1a5-37788125a8d4",
+        "weight": 0.7591216433154372,
+        "layers": [
+          "state",
+          "movement"
+        ]
+      },
+      {
+        "source": "b8ace381-cb66-4aa2-b93b-51f1386e7c5f",
+        "target": "0c7401e0-31ff-414b-a1a5-37788125a8d4",
+        "weight": 0.7122833477190043,
+        "layers": [
+          "state",
+          "matter"
+        ]
+      },
+      {
+        "source": "0c7401e0-31ff-414b-a1a5-37788125a8d4",
+        "target": "1a4e4133-08d3-4676-948c-d018846cde04",
+        "weight": 0.7469859021143214,
+        "layers": [
+          "state",
+          "matter",
+          "movement"
+        ]
+      },
+      {
+        "source": "79b5f99f-2922-4179-9a64-c512d231ab52",
+        "target": "6ea7bbf4-8193-436d-a1c0-d53cf1d911b0",
+        "weight": 0.7235639718829479,
+        "layers": [
+          "matter",
+          "movement"
+        ]
+      },
+      {
+        "source": "9190c85a-759f-4d8f-9ca9-a081948219f4",
+        "target": "64ffb29c-8557-4301-b115-cf1ee7e83737",
+        "weight": 0.7652052661434303,
+        "layers": [
+          "state",
+          "matter"
+        ]
+      }
+    ]
+  },
+  "nodes": [
+    {
+      "clusters_run_id": "b6e97ec7-f51a-4798-b3fb-b70d6a8fbe1b",
+      "image_id": "29c4cb5d-1832-45e3-8434-5d619b3c2c72",
+      "cluster_id": "d4093eab-2ba1-43af-b03b-a8b46c4f9dff",
+      "x": 100,
+      "y": 0,
+      "is_outlier": false
+    },
+    {
+      "clusters_run_id": "b6e97ec7-f51a-4798-b3fb-b70d6a8fbe1b",
+      "image_id": "df9dcc5e-e809-4ffe-933a-8d6772a72800",
+      "cluster_id": "6e336fe4-a8c3-4cbb-b11f-e6ce2f8bc598",
+      "x": 91.35454576426008,
+      "y": 40.67366430758001,
+      "is_outlier": true
+    },
+    {
+      "clusters_run_id": "b6e97ec7-f51a-4798-b3fb-b70d6a8fbe1b",
+      "image_id": "b8ace381-cb66-4aa2-b93b-51f1386e7c5f",
+      "cluster_id": "d4093eab-2ba1-43af-b03b-a8b46c4f9dff",
+      "x": 66.91306063588583,
+      "y": 74.31448254773943,
+      "is_outlier": false
+    },
+    {
+      "clusters_run_id": "b6e97ec7-f51a-4798-b3fb-b70d6a8fbe1b",
+      "image_id": "0c7401e0-31ff-414b-a1a5-37788125a8d4",
+      "cluster_id": "d4093eab-2ba1-43af-b03b-a8b46c4f9dff",
+      "x": 30.901699437494745,
+      "y": 95.10565162951535,
+      "is_outlier": false
+    },
+    {
+      "clusters_run_id": "b6e97ec7-f51a-4798-b3fb-b70d6a8fbe1b",
+      "image_id": "1a4e4133-08d3-4676-948c-d018846cde04",
+      "cluster_id": "d4093eab-2ba1-43af-b03b-a8b46c4f9dff",
+      "x": -10.452846326765334,
+      "y": 99.45218953682733,
+      "is_outlier": false
+    },
+    {
+      "clusters_run_id": "b6e97ec7-f51a-4798-b3fb-b70d6a8fbe1b",
+      "image_id": "de05fcf5-afb4-423c-82c2-c9ebb81673ae",
+      "cluster_id": "96e830e8-6396-428c-9a4d-8547f749ee08",
+      "x": -49.99999999999998,
+      "y": 86.60254037844388,
+      "is_outlier": true
+    },
+    {
+      "clusters_run_id": "b6e97ec7-f51a-4798-b3fb-b70d6a8fbe1b",
+      "image_id": "559edd31-01ed-47f0-a5f2-a20b4c07cdde",
+      "cluster_id": "149b48b4-a8af-4628-8c0a-6d418d01fb0e",
+      "x": -80.90169943749473,
+      "y": 58.77852522924732,
+      "is_outlier": true
+    },
+    {
+      "clusters_run_id": "b6e97ec7-f51a-4798-b3fb-b70d6a8fbe1b",
+      "image_id": "96203f8c-e3e8-4966-9c3d-f7ac9168f992",
+      "cluster_id": "94cf3e29-22c8-4653-abd3-2fb8a5abf807",
+      "x": -97.81476007338057,
+      "y": 20.79116908177593,
+      "is_outlier": true
+    },
+    {
+      "clusters_run_id": "b6e97ec7-f51a-4798-b3fb-b70d6a8fbe1b",
+      "image_id": "9ce55986-f267-422b-977e-e7ce4bc8940c",
+      "cluster_id": "3d801531-916f-4193-bd8b-e6789792d529",
+      "x": -97.81476007338057,
+      "y": -20.791169081775905,
+      "is_outlier": true
+    },
+    {
+      "clusters_run_id": "b6e97ec7-f51a-4798-b3fb-b70d6a8fbe1b",
+      "image_id": "7c711d2f-59bc-499d-b6c6-45aa143c3286",
+      "cluster_id": "32868c6d-fdec-48f5-9447-c1f1419a059a",
+      "x": -80.90169943749474,
+      "y": -58.7785252292473,
+      "is_outlier": true
+    },
+    {
+      "clusters_run_id": "b6e97ec7-f51a-4798-b3fb-b70d6a8fbe1b",
+      "image_id": "b08f13cb-1eb4-4013-a30c-6c0674d06059",
+      "cluster_id": "65ff165c-83cb-4a06-a6fc-d2b2006ecc65",
+      "x": -50.00000000000004,
+      "y": -86.60254037844385,
+      "is_outlier": true
+    },
+    {
+      "clusters_run_id": "b6e97ec7-f51a-4798-b3fb-b70d6a8fbe1b",
+      "image_id": "79b5f99f-2922-4179-9a64-c512d231ab52",
+      "cluster_id": "dc8c72a9-34eb-4d7b-86cc-5d2c18950aab",
+      "x": -10.452846326765423,
+      "y": -99.45218953682733,
+      "is_outlier": false
+    },
+    {
+      "clusters_run_id": "b6e97ec7-f51a-4798-b3fb-b70d6a8fbe1b",
+      "image_id": "6ea7bbf4-8193-436d-a1c0-d53cf1d911b0",
+      "cluster_id": "dc8c72a9-34eb-4d7b-86cc-5d2c18950aab",
+      "x": 30.901699437494724,
+      "y": -95.10565162951536,
+      "is_outlier": false
+    },
+    {
+      "clusters_run_id": "b6e97ec7-f51a-4798-b3fb-b70d6a8fbe1b",
+      "image_id": "9190c85a-759f-4d8f-9ca9-a081948219f4",
+      "cluster_id": "58b6cd34-3288-4f38-96a7-627aaccc921d",
+      "x": 66.91306063588584,
+      "y": -74.3144825477394,
+      "is_outlier": false
+    },
+    {
+      "clusters_run_id": "b6e97ec7-f51a-4798-b3fb-b70d6a8fbe1b",
+      "image_id": "64ffb29c-8557-4301-b115-cf1ee7e83737",
+      "cluster_id": "58b6cd34-3288-4f38-96a7-627aaccc921d",
+      "x": 91.3545457642601,
+      "y": -40.67366430758001,
+      "is_outlier": false
+    }
+  ],
+  "edges": [
+    {
+      "clusters_run_id": "b6e97ec7-f51a-4798-b3fb-b70d6a8fbe1b",
+      "source_image_id": "29c4cb5d-1832-45e3-8434-5d619b3c2c72",
+      "target_image_id": "0c7401e0-31ff-414b-a1a5-37788125a8d4",
+      "weight": 0.7591216433154372,
+      "layers": [
+        "state",
+        "movement"
+      ]
+    },
+    {
+      "clusters_run_id": "b6e97ec7-f51a-4798-b3fb-b70d6a8fbe1b",
+      "source_image_id": "b8ace381-cb66-4aa2-b93b-51f1386e7c5f",
+      "target_image_id": "0c7401e0-31ff-414b-a1a5-37788125a8d4",
+      "weight": 0.7122833477190043,
+      "layers": [
+        "state",
+        "matter"
+      ]
+    },
+    {
+      "clusters_run_id": "b6e97ec7-f51a-4798-b3fb-b70d6a8fbe1b",
+      "source_image_id": "0c7401e0-31ff-414b-a1a5-37788125a8d4",
+      "target_image_id": "1a4e4133-08d3-4676-948c-d018846cde04",
+      "weight": 0.7469859021143214,
+      "layers": [
+        "state",
+        "matter",
+        "movement"
+      ]
+    },
+    {
+      "clusters_run_id": "b6e97ec7-f51a-4798-b3fb-b70d6a8fbe1b",
+      "source_image_id": "79b5f99f-2922-4179-9a64-c512d231ab52",
+      "target_image_id": "6ea7bbf4-8193-436d-a1c0-d53cf1d911b0",
+      "weight": 0.7235639718829479,
+      "layers": [
+        "matter",
+        "movement"
+      ]
+    },
+    {
+      "clusters_run_id": "b6e97ec7-f51a-4798-b3fb-b70d6a8fbe1b",
+      "source_image_id": "9190c85a-759f-4d8f-9ca9-a081948219f4",
+      "target_image_id": "64ffb29c-8557-4301-b115-cf1ee7e83737",
+      "weight": 0.7652052661434303,
+      "layers": [
+        "state",
+        "matter"
+      ]
+    }
+  ]
+}
