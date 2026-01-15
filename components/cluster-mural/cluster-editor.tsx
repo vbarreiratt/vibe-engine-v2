@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo, useRef } from 'react';
-import { X, Activity, Layers, Play, AlertTriangle, ShieldCheck, Zap, Lock, Unlock, Crown, Trash2, RotateCcw, Save, MoreHorizontal, Check, Flame, Plus, CloudFog, Ban, Undo2, Eye } from 'lucide-react';
+import { X, Activity, Layers, Play, AlertTriangle, ShieldCheck, Zap, Lock, Unlock, Crown, Trash2, RotateCcw, Save, MoreHorizontal, Check, Flame, Plus, CloudFog, Ban, Undo2, Eye, Info } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { ClusterEditorData, EditorSignal, EditorNode, SignalRole, NodeCurationStatus } from '@/types/cluster-editor';
@@ -21,6 +21,19 @@ export function ClusterEditor({ clusterId, onClose }: ClusterEditorProps) {
     const [highlightedSignal, setHighlightedSignal] = useState<string | null>(null);
     const [selectedSignals, setSelectedSignals] = useState<Set<string>>(new Set()); // Formerly lockedSignals (Tension)
     const [activeMenuSignal, setActiveMenuSignal] = useState<string | null>(null); // For the 3-dots menu
+    const [hoveredRole, setHoveredRole] = useState<string | null>(null); // For rich tooltips in menu
+    
+    // Feedback State
+    const [feedback, setFeedback] = useState<{ message: string, type: 'neutral'|'success'|'warning' } | null>(null);
+    const [pulseCluster, setPulseCluster] = useState(false);
+
+    // Clear feedback timer
+    useEffect(() => {
+        if (feedback) {
+            const t = setTimeout(() => setFeedback(null), 2500);
+            return () => clearTimeout(t);
+        }
+    }, [feedback]);
 
     // Initial Fetch
     useEffect(() => {
@@ -66,6 +79,19 @@ export function ClusterEditor({ clusterId, onClose }: ClusterEditorProps) {
     const handleSetRole = async (signal: EditorSignal, role: SignalRole) => {
         if (!data) return;
 
+        // Feedback Logic
+        if (role === 'structural') {
+            setFeedback({ message: `Sinal "${signal.term}" definido como MOTOR — Estabilidade recalculada`, type: 'success' });
+            setPulseCluster(true);
+            setTimeout(() => setPulseCluster(false), 800);
+        } else if (role === 'support') {
+            setFeedback({ message: `Sinal "${signal.term}" definido como APOIO`, type: 'neutral' });
+        } else if (role === 'noise') {
+            setFeedback({ message: `Sinal "${signal.term}" removido da estrutura (RUÍDO)`, type: 'warning' });
+        } else {
+            setFeedback({ message: `Papel do sinal "${signal.term}" resetado`, type: 'neutral' });
+        }
+
         // Optimistic Update
         const updatedSignals = data.signals.map(s => {
              // Enforce One Motor Per Layer rule locally
@@ -87,6 +113,10 @@ export function ClusterEditor({ clusterId, onClose }: ClusterEditorProps) {
     const handleNodeCuration = async (nodeId: string, status: NodeCurationStatus) => {
         if (!data) return;
         
+        // Feedback
+        if (status === 'pillar') setFeedback({ message: "Referência marcada como PILAR CANÔNICO", type: 'success' });
+        if (status === 'removed') setFeedback({ message: "Referência marcada como REMOVIDA", type: 'warning' });
+
         // Optimistic
         const updatedNodes = data.nodes.map(n => n.nodeId === nodeId ? { ...n, curationStatus: status } : n);
         setData({ ...data, nodes: updatedNodes });
@@ -161,7 +191,10 @@ export function ClusterEditor({ clusterId, onClose }: ClusterEditorProps) {
     );
 
     return (
-        <div className="fixed inset-0 z-[150] flex flex-col bg-zinc-950/95 backdrop-blur-md animate-in fade-in duration-300">
+        <div className={cn(
+            "fixed inset-0 z-[150] flex flex-col bg-zinc-950/95 backdrop-blur-md animate-in fade-in duration-300 transition-all",
+            pulseCluster && "scale-[1.005] ring-2 ring-lime-500/50 shadow-[0_0_50px_rgba(132,204,22,0.2)]"
+        )}>
             
             {/* HERADER */}
             <header className="flex h-16 items-center justify-between px-6 border-b border-white/10 bg-black/40">
@@ -314,21 +347,69 @@ export function ClusterEditor({ clusterId, onClose }: ClusterEditorProps) {
 
                                     {/* 5. Dropdown Menu */}
                                     {isMenuOpen && (
-                                        <div className="absolute right-2 top-10 w-48 bg-zinc-900 border border-white/10 rounded-lg shadow-2xl z-50 flex flex-col p-1 animate-in fade-in zoom-in-95 overflow-hidden">
+                                        <div className="absolute right-2 top-10 w-48 bg-zinc-900 border border-white/10 rounded-lg shadow-2xl z-50 flex flex-col p-1 animate-in fade-in zoom-in-95 overflow-visible">
+                                           {/* RICH TOOLTIP SIDE PANEL */}
+                                           {hoveredRole && (
+                                               <div className="absolute right-full top-0 mr-2 w-64 bg-zinc-950/95 border border-white/20 p-4 rounded-lg shadow-2xl backdrop-blur-xl animate-in fade-in slide-in-from-right-2 pointer-events-none">
+                                                   <h4 className={cn("font-bold text-xs uppercase mb-2", 
+                                                        hoveredRole === 'structural' ? "text-lime-400" :
+                                                        hoveredRole === 'support' ? "text-blue-400" : "text-red-400"
+                                                   )}>
+                                                       {hoveredRole === 'structural' ? "Tornar sinal MOTOR" :
+                                                        hoveredRole === 'support' ? "Tornar sinal APOIO" : "Marcar como RUÍDO"}
+                                                   </h4>
+                                                   <p className="text-zinc-300 text-[11px] leading-relaxed mb-2">
+                                                       {hoveredRole === 'structural' ? "Este sinal passa a ser estrutural para a vibe. Sem ele, o cluster perde identidade." :
+                                                        hoveredRole === 'support' ? "Este sinal reforça a vibe, mas não a define." :
+                                                        "Este sinal aparece, mas não pertence à vibe."}
+                                                   </p>
+                                                   <div className="bg-white/5 p-2 rounded mb-2">
+                                                       <p className="text-[10px] text-zinc-400 italic">
+                                                          {hoveredRole === 'structural' ? 'Ex: "pulsar" como motor define uma vibe energética contínua.' :
+                                                           hoveredRole === 'support' ? 'Ex: "tinta vibrante" adiciona textura, mas não sustenta o cluster sozinha.' :
+                                                           'Ex: um efeito visual recorrente, mas acidental.'}
+                                                       </p>
+                                                   </div>
+                                                   <div className="flex items-center gap-1.5 text-[10px] font-medium text-zinc-500 border-t border-white/10 pt-2">
+                                                       <Activity className="w-3 h-3" />
+                                                       <span>
+                                                           {hoveredRole === 'structural' ? "O sinal ancora a estabilidade." :
+                                                            hoveredRole === 'support' ? "Contribui para densidade/recorrência." :
+                                                            "Removido da simulação de estabilidade."}
+                                                       </span>
+                                                   </div>
+                                               </div>
+                                           )}
+
                                            <div className="px-2 py-1.5 bg-black/20 text-[10px] text-zinc-500 uppercase tracking-widest border-b border-white/5 mb-1">
                                                Definir Papel
                                            </div>
                                            
-                                           <button onClick={() => handleSetRole(signal, 'structural')} className="flex items-center gap-2 px-2 py-1.5 text-xs text-zinc-300 hover:bg-white/10 rounded text-left">
-                                               <Flame className="w-3 h-3 text-lime-400" />
+                                           <button 
+                                                onMouseEnter={() => setHoveredRole('structural')}
+                                                onMouseLeave={() => setHoveredRole(null)}
+                                                onClick={() => handleSetRole(signal, 'structural')} 
+                                                className="flex items-center gap-2 px-2 py-1.5 text-xs text-zinc-300 hover:bg-white/10 rounded text-left group"
+                                           >
+                                               <Flame className="w-3 h-3 text-lime-400 group-hover:scale-110 transition-transform" />
                                                <span>Tornar Motor</span>
                                            </button>
-                                           <button onClick={() => handleSetRole(signal, 'support')} className="flex items-center gap-2 px-2 py-1.5 text-xs text-zinc-300 hover:bg-white/10 rounded text-left">
-                                               <Plus className="w-3 h-3 text-blue-400" />
+                                           <button 
+                                                onMouseEnter={() => setHoveredRole('support')}
+                                                onMouseLeave={() => setHoveredRole(null)}
+                                                onClick={() => handleSetRole(signal, 'support')} 
+                                                className="flex items-center gap-2 px-2 py-1.5 text-xs text-zinc-300 hover:bg-white/10 rounded text-left group"
+                                           >
+                                               <Plus className="w-3 h-3 text-blue-400 group-hover:scale-110 transition-transform" />
                                                <span>Tornar Apoio</span>
                                            </button>
-                                           <button onClick={() => handleSetRole(signal, 'noise')} className="flex items-center gap-2 px-2 py-1.5 text-xs text-zinc-300 hover:bg-white/10 rounded text-left">
-                                               <CloudFog className="w-3 h-3 text-red-400" />
+                                           <button 
+                                                onMouseEnter={() => setHoveredRole('noise')}
+                                                onMouseLeave={() => setHoveredRole(null)}
+                                                onClick={() => handleSetRole(signal, 'noise')} 
+                                                className="flex items-center gap-2 px-2 py-1.5 text-xs text-zinc-300 hover:bg-white/10 rounded text-left group"
+                                           >
+                                               <CloudFog className="w-3 h-3 text-red-400 group-hover:scale-110 transition-transform" />
                                                <span>Marcar como Ruído</span>
                                            </button>
                                            
@@ -415,16 +496,6 @@ export function ClusterEditor({ clusterId, onClose }: ClusterEditorProps) {
                                     isDimmed = false; // Undim if matches hover
                                 }
                            } else {
-                                // In Locked Mode
-                                const isIntersection = intersectionNodes.intersection.includes(node);
-                                isHighlighted = isIntersection;
-                                isDimmed = !isIntersection; // Dim everything else
-                                
-                                // Specific Case: Highlighting active Hover even in locked mode
-                                if (highlightedSignal && node.signals.includes(highlightedSignal)) {
-                                    isDimmed = false; // Undim if matches hover
-                                }
-                           } else {
                                 // Normal Mode
                                 isHighlighted = isHoverMatch;
                                 isDimmed = highlightedSignal && !isHoverMatch ? true : false;
@@ -450,18 +521,33 @@ export function ClusterEditor({ clusterId, onClose }: ClusterEditorProps) {
                                     )}
 
                                     {/* Curation Overlays (Level 2) - Visible on Group Hover */}
-                                    <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                         <button 
-                                            onClick={(e) => { e.stopPropagation(); handleNodeCuration(node.nodeId, node.curationStatus === 'pillar' ? 'active' : 'pillar'); }}
-                                            className={cn("p-1.5 rounded backdrop-blur-md", node.curationStatus === 'pillar' ? "bg-amber-500 text-black" : "bg-black/50 text-white hover:bg-amber-500 hover:text-black")}
-                                            title="Marcar como Pilar"
-                                         >
-                                            <Crown className="w-3 h-3" />
-                                         </button>
+                                    <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity z-20">
+                                         <div className="relative group/btn">
+                                             <button 
+                                                onClick={(e) => { e.stopPropagation(); handleNodeCuration(node.nodeId, node.curationStatus === 'pillar' ? 'active' : 'pillar'); }}
+                                                className={cn("p-1.5 rounded backdrop-blur-md transition-colors", node.curationStatus === 'pillar' ? "bg-amber-500 text-black shadow-[0_0_10px_rgba(245,158,11,0.5)]" : "bg-black/50 text-white hover:bg-amber-500 hover:text-black")}
+                                             >
+                                                <Crown className="w-3 h-3" />
+                                             </button>
+                                             {/* PILLAR TOOLTIP */}
+                                             <div className="absolute right-0 top-full mt-2 w-48 bg-zinc-900/95 border border-amber-500/20 p-3 rounded shadow-2xl backdrop-blur-xl pointer-events-none opacity-0 group-hover/btn:opacity-100 transition-opacity z-50">
+                                                <h5 className="text-amber-400 font-bold text-[10px] mb-1 uppercase tracking-wider flex items-center gap-1">
+                                                    <Crown className="w-3 h-3" /> Definir como Pilar
+                                                </h5>
+                                                <p className="text-zinc-300 text-[10px] leading-relaxed mb-1.5">
+                                                    Esta referência é um exemplo canônico da vibe.
+                                                </p>
+                                                <ul className="text-[9px] text-zinc-500 space-y-0.5 list-disc list-inside">
+                                                    <li>Ajuda humanos a entenderem o cluster</li>
+                                                    <li>Estabiliza sinais motores</li>
+                                                </ul>
+                                             </div>
+                                         </div>
+
                                          <button 
                                             onClick={(e) => { e.stopPropagation(); handleNodeCuration(node.nodeId, node.curationStatus === 'removed' ? 'active' : 'removed'); }}
-                                            className={cn("p-1.5 rounded backdrop-blur-md", node.curationStatus === 'removed' ? "bg-red-500 text-white" : "bg-black/50 text-white hover:bg-red-500")}
-                                             title="Remover do Cluster"
+                                            className={cn("p-1.5 rounded backdrop-blur-md transition-colors", node.curationStatus === 'removed' ? "bg-red-500 text-white" : "bg-black/50 text-white hover:bg-red-500")}
+                                             title="Remover do Cluster (Ruído)"
                                          >
                                             {node.curationStatus === 'removed' ? <RotateCcw className="w-3 h-3" /> : <Trash2 className="w-3 h-3" />}
                                          </button>
@@ -577,6 +663,21 @@ export function ClusterEditor({ clusterId, onClose }: ClusterEditorProps) {
 
                 </aside>
             </div>
+
+            {/* 6. Feedback Toast */}
+            {feedback && (
+                <div className={cn(
+                    "fixed bottom-8 left-1/2 -translate-x-1/2 px-4 py-2 rounded-full shadow-2xl backdrop-blur-md border flex items-center gap-3 z-[200] animate-in fade-in slide-in-from-bottom-4 zoom-in-95 duration-200",
+                    feedback.type === 'success' ? "bg-lime-950/90 border-lime-500/20 text-lime-400" :
+                    feedback.type === 'warning' ? "bg-red-950/90 border-red-500/20 text-red-400" :
+                    "bg-zinc-900/90 border-white/10 text-zinc-200"
+                )}>
+                    {feedback.type === 'success' && <Check className="w-4 h-4" />}
+                    {feedback.type === 'warning' && <AlertTriangle className="w-4 h-4" />}
+                    {feedback.type === 'neutral' && <Info className="w-4 h-4 text-blue-400" />}
+                    <span className="text-xs font-medium tracking-wide">{feedback.message}</span>
+                </div>
+            )}
         </div>
     );
 }
