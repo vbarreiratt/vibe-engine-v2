@@ -39,17 +39,18 @@ export async function updateSession(request: NextRequest) {
 
     const isAuthPage = request.nextUrl.pathname.startsWith('/login') || request.nextUrl.pathname.startsWith('/auth')
     const isApi = request.nextUrl.pathname.startsWith('/api')
+    const isPublicPage = request.nextUrl.pathname === '/' || request.nextUrl.pathname.startsWith('/sobre')
 
-    if (!user && !isAuthPage && !isApi) {
+    if (!user && !isAuthPage && !isApi && !isPublicPage) {
         const url = request.nextUrl.clone()
         url.pathname = '/login'
         return NextResponse.redirect(url)
     }
 
-    // If logged in and on login page, redirect to dashboard?
+    // If logged in and on login page, redirect to dashboard
     if (user && isAuthPage) {
         const url = request.nextUrl.clone()
-        url.pathname = '/' // or dashboard
+        url.pathname = '/dashboard'
         return NextResponse.redirect(url)
     }
 
