@@ -33,24 +33,71 @@ export async function updateSession(request: NextRequest) {
         data: { user },
     } = await supabase.auth.getUser()
 
-    // Protect all routes except auth/login/public
-    // Basic Logic: If not logged in and not on login page, redirect to login.
-    // We allow public assets, _next, etc. based on matcher.
+    const pathname = request.nextUrl.pathname
 
-    const isAuthPage = request.nextUrl.pathname.startsWith('/login') || request.nextUrl.pathname.startsWith('/auth')
-    const isApi = request.nextUrl.pathname.startsWith('/api')
-    const isPublicPage = request.nextUrl.pathname === '/' || request.nextUrl.pathname.startsWith('/sobre')
+    // Public pages (Laboratório Bicho platform)
+    const isPublicPlatform =
+        pathname === '/' ||
+        pathname.startsWith('/sobre') ||
+        pathname.startsWith('/galeria') ||
+        pathname.startsWith('/governanca')
 
-    if (!user && !isAuthPage && !isApi && !isPublicPage) {
+    // Auth pages
+    const isAuthPage =
+        pathname.startsWith('/login') ||
+        pathname.startsWith('/auth') ||
+        pathname.startsWith('/ferramentas/vibe-engine/login')
+
+    // API routes
+    const isApi = pathname.startsWith('/api') || pathname.startsWith('/ferramentas/vibe-engine/api')
+
+    // Tool hero pages (public landing pages for each tool)
+    const isToolHeroPage = pathname === '/ferramentas/vibe-engine' || pathname.match(/^\/ferramentas\/[^/]+$/)
+
+    // Tool-specific pages that require authentication
+    const isToolPage = pathname.startsWith('/ferramentas/') && !isAuthPage && !isToolHeroPage
+
+    // Legacy routes (old /dashboard, /onboarding, /login) - redirect to new structure
+    if (pathname === '/login') {
         const url = request.nextUrl.clone()
-        url.pathname = '/login'
+        url.pathname = '/ferramentas/vibe-engine/login'
         return NextResponse.redirect(url)
     }
 
-    // If logged in and on login page, redirect to dashboard
+    if (pathname.startsWith('/dashboard') && !pathname.startsWith('/ferramentas')) {
+        const url = request.nextUrl.clone()
+        url.pathname = pathname.replace('/dashboard', '/ferramentas/vibe-engine/dashboard')
+        return NextResponse.redirect(url)
+    }
+
+    if (pathname.startsWith('/onboarding') && !pathname.startsWith('/ferramentas')) {
+        const url = request.nextUrl.clone()
+        url.pathname = '/ferramentas/vibe-engine/onboarding'
+        return NextResponse.redirect(url)
+    }
+
+    // Protect tool pages - redirect to tool-specific login
+    if (!user && isToolPage && !isApi) {
+        const url = request.nextUrl.clone()
+        // Extract tool name from path (e.g., /ferramentas/vibe-engine/... -> vibe-engine)
+        const toolMatch = pathname.match(/^\/ferramentas\/([^/]+)/)
+        const toolName = toolMatch ? toolMatch[1] : 'vibe-engine'
+        url.pathname = `/ferramentas/${toolName}/login`
+        return NextResponse.redirect(url)
+    }
+
+    // If logged in and on login page, redirect to tool dashboard
     if (user && isAuthPage) {
         const url = request.nextUrl.clone()
-        url.pathname = '/dashboard'
+        if (pathname.includes('/ferramentas/')) {
+            // Extract tool name and redirect to its dashboard
+            const toolMatch = pathname.match(/^\/ferramentas\/([^/]+)/)
+            const toolName = toolMatch ? toolMatch[1] : 'vibe-engine'
+            url.pathname = `/ferramentas/${toolName}/dashboard`
+        } else {
+            // Legacy /login -> redirect to vibe-engine dashboard
+            url.pathname = '/ferramentas/vibe-engine/dashboard'
+        }
         return NextResponse.redirect(url)
     }
 
