@@ -1,7 +1,5 @@
 import { GoogleAuth } from 'google-auth-library';
-import * as fs from 'fs/promises';
-
-const SERVICE_ACCOUNT_PATH = '/Users/vbarreirat/utilidades/bicho_utilidades/vibe-engine/service-account.json';
+import { loadGoogleCredentials } from './google/credentials';
 
 let authClient: any = null;
 let projectId: string | null = null;
@@ -10,9 +8,7 @@ async function getAuthClient() {
     if (authClient && projectId) return { authClient, projectId };
 
     try {
-        const serviceAccountRaw = await fs.readFile(SERVICE_ACCOUNT_PATH, 'utf-8');
-        const serviceAccount = JSON.parse(serviceAccountRaw);
-
+        const serviceAccount = loadGoogleCredentials();
         projectId = serviceAccount.project_id;
 
         const auth = new GoogleAuth({

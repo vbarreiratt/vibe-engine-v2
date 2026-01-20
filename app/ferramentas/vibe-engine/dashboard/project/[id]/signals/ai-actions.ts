@@ -1,9 +1,7 @@
 'use server'
 
 import { VertexAI, HarmCategory, HarmBlockThreshold } from '@google-cloud/vertexai'
-import fs from 'fs/promises'
-
-const SERVICE_ACCOUNT_PATH = '/Users/vbarreirat/utilidades/bicho_utilidades/vibe-engine/service-account.json'
+import { loadGoogleCredentials } from '@/lib/ai/google/credentials'
 
 // Definition of the Vibe Engine Marker Agent Prompt
 const SYSTEM_PROMPT = `
@@ -58,9 +56,7 @@ Ex: "pulsar", "deslizar", "explodir", "derreter".
 export async function generateImageSignals(imageUrl: string) {
     try {
         // 1. Load Credentials
-        const serviceAccountRaw = await fs.readFile(SERVICE_ACCOUNT_PATH, 'utf-8')
-        const serviceAccount = JSON.parse(serviceAccountRaw)
-
+        const serviceAccount = loadGoogleCredentials()
         const project = serviceAccount.project_id
         const location = 'us-central1' // Default for Vertex AI
 

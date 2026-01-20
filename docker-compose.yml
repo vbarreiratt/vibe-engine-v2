@@ -12,3 +12,7 @@ services:
     # Load env vars from .env file (ensure this file exists on server)
     env_file:
       - .env
+    # Mount GCP service account credentials
+    # On VPS: ensure the file exists at the path specified below
+    volumes:
+      - ${GCP_SERVICE_ACCOUNT_FILE:-/home/vitor/apps/secrets/vibe-engine-v2/gcp-service-account.json}:/app/gcp-service-account.json:ro

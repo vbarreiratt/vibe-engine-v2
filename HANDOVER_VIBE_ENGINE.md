@@ -253,3 +253,100 @@ Toda feature nova deve respeitar:
 	•	Separação entre leitura e síntese
 	•	Versionamento consciente
 
+
+---
+
+## 🔐 Google Cloud Platform Credentials Setup
+
+### Overview
+The Vibe Engine uses Google Cloud Vertex AI for:
+- Image captioning and analysis
+- Text embeddings generation
+- AI-powered signal extraction
+
+**Critical**: All GCP authentication now uses environment variables - no hardcoded paths.
+
+### Configuration
+
+#### 1. Environment Variables
+
+Required in `.env` file:
+
+```bash
+# GCP Project Configuration
+GOOGLE_CLOUD_PROJECT_ID=your-project-id
+GOOGLE_CLOUD_LOCATION=us-central1
+
+# Path to service account JSON (inside container)
+GOOGLE_CLOUD_CREDENTIALS_PATH=/app/gcp-service-account.json
+
+# Docker Compose: Host path to service account file
+GCP_SERVICE_ACCOUNT_FILE=/home/vitor/apps/secrets/vibe-engine-v2/gcp-service-account.json
+```
+
+#### 2. Local Development
+
+1. Obtain your GCP service account JSON from Google Cloud Console
+2. Save it to a secure location (e.g., `~/secrets/gcp-service-account.json`)
+3. Update `.env`:
+   ```bash
+   GOOGLE_CLOUD_CREDENTIALS_PATH=/absolute/path/to/your/service-account.json
+   ```
+
+#### 3. VPS/Docker Production Setup
+
+**Directory Structure on VPS:**
+```
+/home/vitor/apps/secrets/vibe-engine-v2/
+└── gcp-service-account.json
+```
+
+**Docker Compose automatically mounts:**
+- Host: `/home/vitor/apps/secrets/vibe-engine-v2/gcp-service-account.json`
+- Container: `/app/gcp-service-account.json`
+
+**Verification Commands:**
+
+```bash
+# Check environment variable inside container
+docker exec -it vibe-engine sh -c 'printenv | grep GOOGLE'
+
+# Verify file exists inside container
+docker exec -it vibe-engine sh -c 'ls -la /app/gcp-service-account.json'
+
+# Should output: -r--r--r-- 1 root root <size> <date> /app/gcp-service-account.json
+```
+
+### Security Notes
+
+1. **Never commit** `service-account.json` to version control
+2. **File is mounted read-only** (`:ro`) in Docker for security
+3. **Permissions**: Ensure the file is readable by the container user
+4. **Secrets location on VPS**: `/home/vitor/apps/secrets/` is outside the app directory for isolation
+
+### Troubleshooting
+
+**Error: `ENOENT: no such file or directory`**
+- Check `GOOGLE_CLOUD_CREDENTIALS_PATH` is set correctly
+- Verify file exists at the specified path
+- In Docker: ensure volume mount is configured
+
+**Error: `Missing GOOGLE_CLOUD_CREDENTIALS_PATH`**
+- Add the environment variable to `.env`
+- Restart the container after updating `.env`
+
+**Error: `Failed to read or parse credentials`**
+- Verify JSON file is valid (use `cat <file> | jq` to validate)
+- Check file permissions (must be readable)
+
+### Implementation Details
+
+**Helper Module**: `lib/ai/google/credentials.ts`
+- `getGoogleCredentialsPath()`: Resolves and validates credentials path
+- `loadGoogleCredentials()`: Loads and parses the JSON file
+
+**Used by:**
+- `lib/ai/embedding.ts`: Text embeddings via Vertex AI
+- `app/ferramentas/vibe-engine/dashboard/project/[id]/signals/ai-actions.ts`: Image analysis
+
+---
