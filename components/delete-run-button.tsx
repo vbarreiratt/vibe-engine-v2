@@ -1,7 +1,7 @@
 'use client'
 
 import { DeleteWithConfirmation } from '@/components/delete-with-confirmation'
-import { deleteSignalRun } from '@/app/dashboard/project/[id]/scan/actions'
+import { deleteSignalRun } from '@/app/ferramentas/vibe-engine/dashboard/project/[id]/scan/actions'
 import { useRouter } from 'next/navigation'
 
 export function DeleteRunButton({ runId }: { runId: string }) {
